@@ -65,4 +65,15 @@ class GameController(MethodView):
                 response_mimetype="application/json"
             )
 
-        return "Ok"
+        p = RedisPersist()
+        game_data = p.load(key)
+        g = Game()
+        g.load_game(game_data)
+        g.guess(1, 2, 3, 4)
+        save = g.save_game()
+        p.save(key, save)
+
+        return build_response(
+            html_status=200,
+            response_data=g.save_game()
+        )
