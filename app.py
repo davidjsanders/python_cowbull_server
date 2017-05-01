@@ -1,7 +1,9 @@
+import logging
 from flask import Flask
 from flask_controllers import GameController, HealthCheck, Readiness
 
-
+log_format = "%(asctime)s %(name)s %(levelname)s: %(message)s"
+logging.basicConfig(level=logging.DEBUG, format=log_format)
 game_version = "v0_1"
 app = Flask(__name__)
 
