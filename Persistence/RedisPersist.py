@@ -15,7 +15,6 @@ class RedisPersist:
             port=self._server["port"],
             db=self._server["db"]
         )
-        self._redis_connection.set('tmp_validate', 'tmp_validate')
 
     def save(self, key=None, jsonstr=None):
         if key is None:

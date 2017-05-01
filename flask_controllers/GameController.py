@@ -40,6 +40,11 @@ class GameController(MethodView):
             return self._return_error(400, e.description, "Bad request. There was no JSON present.")
 
         #
+        # Get a persister
+        #
+        p = RedisPersist()
+
+        #
         # Load the game based on the JSON. If the JSON data is invalid, return a
         # response to the user indicating an HTML status, the exception, and an
         # explanatory message.
@@ -47,8 +52,8 @@ class GameController(MethodView):
         _key = json_dict["key"]
         _game = None
         try:
-            _game = self._get_game(json_dict)
-        except ValueError as ve:
+            _game = self._get_game(p, _key)
+        except RuntimeError as ve:
             return self._return_error(500, str(ve), "Bad request. For some reason the json_dict was None!")
         except KeyError as ke:
             return self._return_error(400, str(ke), "The request must contain a valid game key.")
@@ -58,33 +63,59 @@ class GameController(MethodView):
         #
         # Get the digits being guessed and add them to a list
         #
-        _guesses = [1, 2, 3, 4]
+        try:
+            _guesses = self._get_digits(game=_game, json_dict=json_dict)
+        except RuntimeError as ve:
+            return self._return_error(500, str(ve), "Bad request. For some reason the json_dict was None!")
+        except ValueError as ve:
+            return self._return_error(400, str(ve), "There was a problem with the value of the digits provided!")
+        except KeyError as ke:
+            return self._return_error(400, str(ke), "The request must contain an array of digits called 'digits'")
+        except TypeError as te:
+            return self._return_error(400, str(te), "The game key provided was invalid.")
 
         #
         # Make a guess
         #
-        _analysis = _game.guess(*_guesses)
-
-        #
-        # Analyse the guess - won, lost, still playing
-        #
+        try:
+            _analysis = _game.guess(*_guesses)
+        except ValueError as ve:
+            return self._return_error(400, str(ve), "There is a problem with the digits provided!")
 
         #
         # Save the game
         #
-        p = RedisPersist()
-        p.save(key=_key, jsonstr=_game.save_game())
+        save_game = _game.save_game()
+        p.save(key=_key, jsonstr=save_game)
 
         #
         # Return the analysis of the guess to the user.
         #
         logging.debug('_game object loaded: {}'.format(_game.save_game()))
 
-        _display_info = json.loads(_game.save_game())
+        _display_info = json.loads(save_game)
         del(_display_info["answer"])
         _return_response = {"Game": _display_info, "Analysis": _analysis}
 
         return build_response(response_data=_return_response)
+
+    @staticmethod
+    def _get_digits(game=None, json_dict=None):
+        if game is None:
+            raise RuntimeError("Game object must be instantiated before loading digits!")
+        if json_dict is None:
+            raise RuntimeError("Game must be loaded before loading digits!")
+        if 'digits' not in json_dict:
+            raise KeyError("The JSON provided no digits object!")
+
+        digits_required = game.digits_required
+
+        digits = json_dict["digits"]
+
+        if len(digits) != digits_required:
+            raise ValueError("The digits provided did not match the required number ({})".format(digits_required))
+
+        return digits
 
     @staticmethod
     def _return_error(status, exception, message):
@@ -100,16 +131,15 @@ class GameController(MethodView):
         )
 
     @staticmethod
-    def _get_game(game_dict=None):
-        if game_dict is None:
-            raise ValueError("The game dictionary (game_dict) was None!")
-        if 'key' not in game_dict:
-            raise KeyError("No game key was provided.")
+    def _get_game(persister=None, game_key=None):
+        if game_key is None:
+            raise RuntimeError("The game key must be specified and cannot be None!")
+        if persister is None:
+            raise RuntimeError("The persistence engine is None!")
 
-        p = RedisPersist()
         g = Game()
 
-        _json = p.load(game_dict["key"])
+        _json = persister.load(game_key)
         logging.debug("_json is {}".format(_json))
 
         if _json is None:
