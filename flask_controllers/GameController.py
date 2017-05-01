@@ -2,12 +2,13 @@ import json
 import logging
 import os
 from redis.exceptions import ConnectionError
-from flask import request, g
+from flask import request
 from flask.views import MethodView
 from flask_helpers.build_response import build_response
 from werkzeug.exceptions import BadRequest
 from python_cowbull_game.Game import Game
 from Persistence.RedisPersist import RedisPersist as PersistenceEngine
+from flask_helpers.ErrorHandler import ErrorHandler
 
 
 class GameController(MethodView):
@@ -60,7 +61,16 @@ class GameController(MethodView):
         self._dolog(method='__init__', message='DONE')
 
     def get(self):
-        self._dolog(method='get', message='Processing GET request')
+        errorHandler = ErrorHandler(module="GameController", method="get")
+        errorHandler.error(
+            module="GameController",
+            method="GET",
+            message="This is a test error v2!",
+            status=400,
+            exception="This is the exception text"
+        )
+        errorHandler.log(message='Processing GET request')
+
         try:
             persister = PersistenceEngine(
                 host=self.redis_host,
@@ -299,53 +309,3 @@ class GameController(MethodView):
 
         g.load_game(_json)
         return g
-
-    def oldpost(self):
-        control_object = None
-
-        try:
-            control_object = request.json
-            if control_object is None:
-                raise ValueError()
-        except Exception as e:
-            _response = {
-                "status": "error",
-                "exception": repr(e),
-                "message": "There was no JSON data provided!"
-            }
-            return build_response(
-                html_status=400,
-                response_data=_response,
-                response_mimetype="application/json"
-            )
-
-        key = None
-        try:
-            print('Control object --> {}'.format(control_object))
-            key = control_object.get("key", None)
-            if key is None:
-                raise KeyError()
-        except KeyError as ke:
-            _response = {
-                "status": "error",
-                "exception": repr(ke),
-                "message": "There was no key provided in the JSON data!"
-            }
-            return build_response(
-                html_status=400,
-                response_data=_response,
-                response_mimetype="application/json"
-            )
-
-        p = RedisPersist()
-        game_data = p.load(key)
-        g = Game()
-        g.load_game(game_data)
-        g.guess(1, 2, 3, 4)
-        save = g.save_game()
-        p.save(key, save)
-
-        return build_response(
-            html_status=200,
-            response_data=g.save_game()
-        )
