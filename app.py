@@ -14,7 +14,7 @@ health_view = HealthCheck.as_view('Health')
 app.add_url_rule('/{0}/health'.format(game_version), view_func=health_view, methods=["GET"])
 
 # Add readiness view
-readiness_view = HealthCheck.as_view('Readiness')
+readiness_view = Readiness.as_view('ready')
 app.add_url_rule('/{0}/ready'.format(game_version), view_func=readiness_view, methods=["GET"])
 
 #
