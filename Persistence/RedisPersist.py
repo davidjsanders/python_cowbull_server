@@ -2,19 +2,15 @@ import redis
 
 
 class RedisPersist:
-    _server = {
-        "db": 0,
-        "port": 6379,
-        "host": "localhost"
-    }
     _redis_connection = None
 
-    def __init__(self):
+    def __init__(self, host="localhost", port=6379, db=0):
         self._redis_connection = redis.StrictRedis(
-            host=self._server["host"],
-            port=self._server["port"],
-            db=self._server["db"]
+            host=host,
+            port=port,
+            db=db
         )
+        self._redis_connection.set('tmp_validate', 'tmp_validate')
 
     def save(self, key=None, jsonstr=None):
         if key is None:
