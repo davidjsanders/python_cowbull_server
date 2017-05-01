@@ -1,3 +1,8 @@
+#
+# D Sanders, 30 Apr 2017
+#
+.idea/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
