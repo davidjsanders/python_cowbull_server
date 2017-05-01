@@ -1,5 +1,4 @@
 import json
-import logging
 import os
 from redis.exceptions import ConnectionError
 from flask import request
@@ -15,61 +14,33 @@ class GameController(MethodView):
     redis_host = None
     redis_port = 6379
     redis_db = 0
-
-    @staticmethod
-    def _dolog(module=None, method=None, message=None, level=None):
-        log_string = (module or "GameController")
-        log_string += ":" + (method or "not-specified")
-        log_string += ">> " + (message or "Not provided?!?")
-        if level is None or not isinstance(level, str):
-            logging.debug(log_string)
-        elif level.lower() == "error":
-            logging.error("** "+log_string+" **")
-        elif level.lower() == "warning":
-            logging.warning(log_string)
-        elif level.lower() == "info":
-            logging.info(log_string)
-        else:
-            logging.debug(log_string)
-
-    @staticmethod
-    def _return_error(module, method, status, exception, message):
-        GameController._dolog(
-            module=module,
-            method=method,
-            message=message,
-            level="error"
-        )
-        _response = {
-            "status": status,
-            "exception": exception,
-            "module": module,
-            "method": method,
-            "message": message
-        }
-        return build_response(
-            html_status=400,
-            response_data=_response,
-            response_mimetype="application/json"
-        )
+    handler = None
 
     def __init__(self):
-        self._dolog(method='__init__', message='Loading environment variables')
+        self.handler = ErrorHandler(module="GameController", method="__init__")
+        self.handler.log(
+            message="Loading configuration from environment.",
+            status=0,
+            verbose=True
+        )
+
         self.redis_host = os.getenv("redis_host", "localhost")
         self.redis_port = os.getenv("redis_port", 6379)
         self.redis_db = os.getenv("redis_db", 0)
-        self._dolog(method='__init__', message='DONE')
+
+        self.handler.log(
+            message="Redis configured: {}:{}/{}".format(
+                self.redis_host,
+                self.redis_port,
+                self.redis_db
+            ),
+            status=0,
+            verbose=True
+        )
 
     def get(self):
-        errorHandler = ErrorHandler(module="GameController", method="get")
-        errorHandler.error(
-            module="GameController",
-            method="GET",
-            message="This is a test error v2!",
-            status=400,
-            exception="This is the exception text"
-        )
-        errorHandler.log(message='Processing GET request')
+        self.handler = ErrorHandler(module="GameController", method="get")
+        self.handler.log(message='Processing GET request', status=0)
 
         try:
             persister = PersistenceEngine(
@@ -77,40 +48,36 @@ class GameController(MethodView):
                 port=self.redis_port,
                 db=self.redis_db
             )
-            self._dolog(method='get', message='Persister initiated')
+            self.handler.log(message='Persister instantiated', status=0)
         except ConnectionError as ce:
-            return self._return_error(
-                module="GameController",
-                method='get',
+            return self.handler.error(
                 status=503,
                 exception=str(ce),
                 message="There is no redis service available!"
             )
         except AttributeError as ae:
-            return self._return_error(
-                module="GameController",
-                method='get',
+            return self.handler.error(
                 status=503,
                 exception=str(ae),
                 message="An internal error occurred - attribute missing for redis - check GameController:__init__")
 
         _game = Game()
-        self._dolog(method='get', message='Instantiated Game object')
+        self.handler.log(message='Game object created', status=0)
 
         jsonstr = _game.new_game(mode="normal")
-        self._dolog(method='get', message='Created new game: {}'.format(_game.save_game()))
+        self.handler.log(message='New game created with key {}'.format(_game.key), status=0)
 
         persister.save(_game.key, _game.save_game())
-        self._dolog(method='get', message='Persisted game')
+        self.handler.log(message='Game {} persisted.'.format(_game.key), status=0)
 
         _response = {
             "key": _game.key,
             "digits": _game.digits_required,
             "guesses": _game.guesses_allowed
         }
-        self._dolog(method='get', message='Responding to user with: {}'.format(_response))
 
-        self._dolog(method='get', message='GET request fulfilled.')
+        self.handler.log(message='GET request fulfilled. Returned: {}'.format(_response), status=0)
+
         return build_response(
             html_status=200,
             response_data=_response,
@@ -118,15 +85,18 @@ class GameController(MethodView):
         )
 
     def post(self):
-        self._dolog(method='post', message='Processing POST request')
+        self.handler = ErrorHandler(module="GameController", method="post")
+        self.handler.log(message='Processing POST request.', status=0)
+
         #
         # Get the JSON from the request
         #
         try:
-            self._dolog(method='post', message='Attempting to load JSON')
+            self.handler.log(message='Attempting to load JSON', status=0)
             json_dict = request.get_json()
+            self.handler.log(message='Loaded JSON. Returned: {}'.format(json_dict), status=0)
         except BadRequest as e:
-            return self._return_error(
+            return self.handler.error(
                 module="GameController",
                 method='post',
                 status=400,
@@ -138,16 +108,14 @@ class GameController(MethodView):
         # Get a persister
         #
         try:
-            self._dolog(method='post', message='Getting a Persister')
+            self.handler.log(message='Getting persister', status=0)
             persister = PersistenceEngine(
                 host=self.redis_host,
                 port=self.redis_port,
                 db=self.redis_db
             )
         except ConnectionError as ce:
-            return self._return_error(
-                module="GameController",
-                method='post',
+            return self.handler.error(
                 status=503,
                 exception=str(ce),
                 message="There is no redis service available!"
@@ -159,32 +127,26 @@ class GameController(MethodView):
         # explanatory message.
         #
         _key = json_dict["key"]
-        self._dolog(method='post', message='Game key is {}'.format(_key))
+        self.handler.log(message='Attempting to load game {}'.format(_key), status=0)
 
         _game = None
         try:
-            self._dolog(method='post', message='Getting the game in progress')
             _game = self._get_game(persister, _key)
+            self.handler.log(message='Loaded game {}'.format(_key), status=0)
         except RuntimeError as ve:
-            return self._return_error(
-                module="GameController",
-                method='post',
+            return self.handler.error(
                 status=500,
                 exception=str(ve),
                 message="Bad request. For some reason the json_dict was None!"
             )
         except KeyError as ke:
-            return self._return_error(
-                module="GameController",
-                method='post',
+            return self.handler.error(
                 status=400,
                 exception=str(ke),
                 message="The request must contain a valid game key."
             )
         except TypeError as te:
-            return self._return_error(
-                module="GameController",
-                method='post',
+            return self.handler.error(
                 status=400,
                 exception=str(te),
                 message="The game key provided was invalid."
@@ -194,36 +156,28 @@ class GameController(MethodView):
         # Get the digits being guessed and add them to a list
         #
         try:
-            self._dolog(method='post', message='Making a guess against the game object.')
             _guesses = self._get_digits(game=_game, json_dict=json_dict)
+            self.handler.log(message='Guesses extracted from JSON: {}'.format(_guesses), status=0)
         except RuntimeError as ve:
-            return self._return_error(
-                module="GameController",
-                method='post',
+            return self.handler.error(
                 status=500,
                 exception=str(ve),
                 message="Bad request. For some reason the json_dict was None!"
             )
         except ValueError as ve:
-            return self._return_error(
-                module="GameController",
-                method='post',
+            return self.handler.error(
                 status=400,
                 exception=str(ve),
                 message="There was a problem with the value of the digits provided!"
             )
         except KeyError as ke:
-            return self._return_error(
-                module="GameController",
-                method='post',
+            return self.handler.error(
                 status=400,
                 exception=str(ke),
                 message="The request must contain an array of digits called 'digits'"
             )
         except TypeError as te:
-            return self._return_error(
-                module="GameController",
-                method='post',
+            return self.handler.error(
                 status=400,
                 exception=str(te),
                 message="The game key provided was invalid."
@@ -233,12 +187,11 @@ class GameController(MethodView):
         # Make a guess
         #
         try:
-            self._dolog(method='post', message='Getting the guess analysis to return to the caller')
+            self.handler.log(message='Making a guess with digits: {}'.format(_guesses), status=0)
             _analysis = _game.guess(*_guesses)
+            self.handler.log(message='Retrieved guess analysis', status=0)
         except ValueError as ve:
-            return self._return_error(
-                module="GameController",
-                method='post',
+            return self.handler.error(
                 status=400,
                 exception=str(ve),
                 message="There is a problem with the digits provided!"
@@ -247,15 +200,13 @@ class GameController(MethodView):
         #
         # Save the game
         #
-        self._dolog(method='post', message='Saving the game progress')
+        self.handler.log(message='Update game (save) after guess', status=0)
         save_game = _game.save_game()
         persister.save(key=_key, jsonstr=save_game)
 
         #
         # Return the analysis of the guess to the user.
         #
-        self._dolog(method='post', message='Returning info to caller.')
-
         _display_info = json.loads(save_game)
         del(_display_info["answer"])
         _return_response = \
@@ -264,15 +215,11 @@ class GameController(MethodView):
                 "outcome": _analysis
             }
 
-        self._dolog(method='post', message='Returning to caller. POST request complete.')
+        self.handler.log(message='Returning analysis and game info to caller', status=0)
         return build_response(response_data=_return_response)
 
     @staticmethod
     def _get_digits(game=None, json_dict=None):
-        GameController._dolog(
-            method='_get_digits',
-            message='Getting the digits from JSON data'
-        )
         if game is None:
             raise RuntimeError("Game object must be instantiated before loading digits!")
         if json_dict is None:
@@ -284,16 +231,13 @@ class GameController(MethodView):
 
         digits = json_dict["digits"]
 
-        GameController._dolog(method='post', message='Comparing digit lengths')
         if len(digits) != digits_required:
             raise ValueError("The digits provided did not match the required number ({})".format(digits_required))
 
-        GameController._dolog(method='post', message='Return digits from JSON data')
         return digits
 
     @staticmethod
     def _get_game(persister=None, game_key=None):
-        GameController._dolog(method='_get_game', message='Getting the game in progress')
         if game_key is None:
             raise RuntimeError("The game key must be specified and cannot be None!")
         if persister is None:
@@ -302,7 +246,6 @@ class GameController(MethodView):
         g = Game()
 
         _json = persister.load(game_key)
-        logging.debug("_json is {}".format(_json))
 
         if _json is None:
             raise KeyError("The key provided is invalid.")
