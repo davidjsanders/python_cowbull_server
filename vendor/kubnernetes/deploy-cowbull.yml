@@ -1,0 +1,50 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: cowbull-service
+  labels:
+    run: cowbull
+    app: cowbull
+    tier: frontend
+spec:
+  selector:
+    app: cowbull
+    tier: frontend
+  ports:
+    - protocol: TCP
+      targetPort: 5000
+      port: 5000
+  type: LoadBalancer
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: cowbull-deployment
+spec:
+  replicas: 3
+  template: # create pods using pod definition in this template
+    metadata:
+      labels:
+        app: cowbull
+        run: cowbull
+        tier: frontend
+    spec:
+      containers:
+      - name: cowbull
+        image: dsanderscan/cowbull_v5:latest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+        env:
+        - name: CONFIG
+          valueFrom:
+            secretKeyRef:
+              name: cowbull-config
+              key: config-kube.json
+        - name: redis_host
+          value: "redis-master"
+        - name: redis_port
+          value: "6379"
+        ports:
+        - containerPort: 5000
