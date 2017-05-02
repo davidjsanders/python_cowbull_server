@@ -37,11 +37,6 @@ spec:
             cpu: 100m
             memory: 200Mi
         env:
-        - name: CONFIG
-          valueFrom:
-            secretKeyRef:
-              name: cowbull-config
-              key: config-kube.json
         - name: redis_host
           value: "redis-master"
         - name: redis_port
