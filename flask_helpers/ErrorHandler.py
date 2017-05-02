@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 from flask import Response
 
 
@@ -48,11 +49,11 @@ class ErrorHandler:
         if logger is None:
             logger = logging.debug
         if verbose is None:
-            _verbose = False
+            _verbose = os.getenv("debug_verbose", False) == "true"
         else:
             _verbose = verbose
 
-        if verbose:
+        if _verbose:
             _message = "MODULE:{}({}) STATUS:{} MESSAGE:{} {}".format(
                 module or self.defaults["module"],
                 method or self.defaults["method"],

@@ -4,10 +4,10 @@ from redis.exceptions import ConnectionError
 from flask import request
 from flask.views import MethodView
 from flask_helpers.build_response import build_response
+from flask_helpers.ErrorHandler import ErrorHandler
 from werkzeug.exceptions import BadRequest
 from python_cowbull_game.Game import Game
 from Persistence.RedisPersist import RedisPersist as PersistenceEngine
-from flask_helpers.ErrorHandler import ErrorHandler
 
 
 class GameController(MethodView):
@@ -17,59 +17,65 @@ class GameController(MethodView):
     handler = None
 
     def __init__(self):
+        #
+        # Get an error handler
+        #
         self.handler = ErrorHandler(module="GameController", method="__init__")
-        self.handler.log(
-            message="Loading configuration from environment.",
-            status=0,
-            verbose=True
-        )
+        self.handler.log(message="Loading configuration from environment.", status=0)
 
+        #
+        # Configure persistence - Redis
+        #
         self.redis_host = os.getenv("redis_host", "localhost")
         self.redis_port = os.getenv("redis_port", 6379)
         self.redis_db = os.getenv("redis_db", 0)
 
-        self.handler.log(
-            message="Redis configured: {}:{}/{}".format(
+        _message = "Redis configured: {}:{}/{}".format(
                 self.redis_host,
                 self.redis_port,
                 self.redis_db
-            ),
-            status=0,
-            verbose=True
-        )
+            )
+        self.handler.log(message=_message, status=0)
 
     def get(self):
+        #
+        # Get an error handler
+        #
         self.handler = ErrorHandler(module="GameController", method="get")
         self.handler.log(message='Processing GET request', status=0)
 
+        #
+        # Get a persister
+        #
         try:
-            persister = PersistenceEngine(
-                host=self.redis_host,
-                port=self.redis_port,
-                db=self.redis_db
-            )
+            persister = PersistenceEngine(host=self.redis_host, port=self.redis_port, db=self.redis_db)
             self.handler.log(message='Persister instantiated', status=0)
         except ConnectionError as ce:
-            return self.handler.error(
-                status=503,
-                exception=str(ce),
-                message="There is no redis service available!"
-            )
+            return self.handler.error(status=503, exception=str(ce), message="There is no redis service available!")
         except AttributeError as ae:
-            return self.handler.error(
-                status=503,
-                exception=str(ae),
-                message="An internal error occurred - attribute missing for redis - check GameController:__init__")
+            return self.handler.error(status=503, exception=str(ae), message="An internal error occurred - attribute missing for redis - check GameController:__init__")
 
+        #
+        # Instantiate a game
+        #
         _game = Game()
         self.handler.log(message='Game object created', status=0)
 
+        #
+        # Create a new game
+        #
         jsonstr = _game.new_game(mode="normal")
         self.handler.log(message='New game created with key {}'.format(_game.key), status=0)
 
+        #
+        # Save the newly created game
+        #
         persister.save(_game.key, _game.save_game())
         self.handler.log(message='Game {} persisted.'.format(_game.key), status=0)
 
+        #
+        # Build the user response - key, no. of digits, and no. of guesses
+        #
         _response = {
             "key": _game.key,
             "digits": _game.digits_required,
@@ -78,11 +84,7 @@ class GameController(MethodView):
 
         self.handler.log(message='GET request fulfilled. Returned: {}'.format(_response), status=0)
 
-        return build_response(
-            html_status=200,
-            response_data=_response,
-            response_mimetype="application/json"
-        )
+        return build_response(html_status=200, response_data=_response, response_mimetype="application/json")
 
     def post(self):
         self.handler = ErrorHandler(module="GameController", method="post")
@@ -97,8 +99,6 @@ class GameController(MethodView):
             self.handler.log(message='Loaded JSON. Returned: {}'.format(json_dict), status=0)
         except BadRequest as e:
             return self.handler.error(
-                module="GameController",
-                method='post',
                 status=400,
                 exception=e.description,
                 message="Bad request. There was no JSON present. ### LIKELY CALLER ERROR ###"
@@ -109,11 +109,7 @@ class GameController(MethodView):
         #
         try:
             self.handler.log(message='Getting persister', status=0)
-            persister = PersistenceEngine(
-                host=self.redis_host,
-                port=self.redis_port,
-                db=self.redis_db
-            )
+            persister = PersistenceEngine(host=self.redis_host, port=self.redis_port, db=self.redis_db)
         except ConnectionError as ce:
             return self.handler.error(
                 status=503,
