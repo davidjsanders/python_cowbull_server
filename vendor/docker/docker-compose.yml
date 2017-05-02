@@ -1,0 +1,24 @@
+version: '2'
+services:
+  redis:
+    image: 'redis'
+    networks:
+      - cowbull_network
+    restart: always
+  cowbull_v5:
+    image: 'dsanderscan/cowbull_v5'
+    depends_on:
+      - redis
+    ports:
+      - 0:5000
+    environment:
+      - LOG_LEVEL=debug
+      - REDIS_HOST=redis
+      # This needs to change to configuration secrets - i.e. from Docker Swarm or something else
+      # like CONFIG="{json string}"
+      - SECRETS_FILE=/cowbull/config.json
+    networks:
+      - cowbull_network
+    restart: always
+networks:
+  cowbull_network:
