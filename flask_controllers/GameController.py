@@ -1,5 +1,6 @@
 import json
 import os
+import socket
 from redis.exceptions import ConnectionError
 from flask import request
 from flask.views import MethodView
@@ -79,7 +80,8 @@ class GameController(MethodView):
         _response = {
             "key": _game.key,
             "digits": _game.digits_required,
-            "guesses": _game.guesses_allowed
+            "guesses": _game.guesses_allowed,
+            "served-by": socket.gethostname()
         }
 
         self.handler.log(message='GET request fulfilled. Returned: {}'.format(_response), status=0)
@@ -208,7 +210,8 @@ class GameController(MethodView):
         _return_response = \
             {
                 "game": _display_info,
-                "outcome": _analysis
+                "outcome": _analysis,
+                "served-by": socket.gethostname()
             }
 
         self.handler.log(message='Returning analysis and game info to caller', status=0)

@@ -1,7 +1,7 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: cowbull-service
+  name: cowbull-svc
   labels:
     run: cowbull
     app: cowbull
@@ -19,7 +19,7 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: cowbull-deployment
+  name: cowbull-dep
 spec:
   replicas: 3
   template: # create pods using pod definition in this template
