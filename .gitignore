@@ -2,6 +2,7 @@
 # D Sanders, 30 Apr 2017
 #
 .idea/
+*.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
