@@ -10,6 +10,7 @@ class ErrorHandler:
     def __init__(self, **kwargs):
         self.defaults["module"] = kwargs.get("module", None)
         self.defaults["method"] = kwargs.get("method", None)
+        self.basicConfig = logging.basicConfig
 
     def error(self, module=None, method=None, status=None, exception=None, message=None):
         response_dict = {
