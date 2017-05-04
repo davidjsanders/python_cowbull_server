@@ -9,10 +9,10 @@ logging.basicConfig(level=logging.DEBUG, format=log_format)
 try:
     app.config.from_pyfile(os.environ.get("COWBULL_CONFIG", "config/cowbull-prod.cfg"))
 except FileNotFoundError:
-    app.config["GAME_VERSION"] = "v0_1"
-    app.config["REDIS_HOST"] = "redis"
-    app.config["REDIS_PORT"] = 6379
-    app.config["REDIS_DB"] = 0
+    app.config["GAME_VERSION"] = os.getenv("GAME_VERSION", "v0_1")
+    app.config["REDIS_HOST"] = os.getenv("REDIS_HOST", "redis")
+    app.config["REDIS_PORT"] = os.getenv("REDIS_PORT", 6379)
+    app.config["REDIS_DB"] = os.getenv("REDIS_DB", 0)
     app.config["REDIS_USEAUTH"] = False
 
 game_version = app.config["GAME_VERSION"]
