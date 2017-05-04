@@ -1,5 +1,4 @@
 import json
-import os
 import socket
 from redis.exceptions import ConnectionError
 from flask import request
@@ -9,14 +8,11 @@ from flask_helpers.ErrorHandler import ErrorHandler
 from werkzeug.exceptions import BadRequest
 from python_cowbull_game.Game import Game
 from Persistence.RedisPersist import RedisPersist as PersistenceEngine
-
-#from app import app
+from python_cowbull_server import app
 
 
 class GameController(MethodView):
-    redis_host = None
-    redis_port = 6379
-    redis_db = 0
+    # Initialize class level variables
     handler = None
 
     def __init__(self):
@@ -27,22 +23,24 @@ class GameController(MethodView):
         self.handler.log(message="Loading configuration from environment.", status=0)
 
         #
-        # Configure persistence - Redis
+        # Configure environment
         #
-        self.redis_host = os.getenv("redis_host", "localhost")
-        self.redis_port = os.getenv("redis_port", 6379)
-        self.redis_db = os.getenv("redis_db", 0)
+        self.game_version = app.config.get("GAME_VERSION", "v0_1")
+        self.redis_host = app.config.get("REDIS_HOST", "localhost")
+        self.redis_port = app.config.get("REDIS_PORT", 6379)
+        self.redis_db = app.config.get("REDIS_DB", 0)
+        self.redis_auth = app.config.get("REDIS_USEAUTH", False)
 
-        #self.redis_host = app.config["REDIS_HOST"]
-        #self.redis_port = app.config["REDIS_PORT"]
-        #self.redis_db = app.config["REDIS_DB"]
-
-        _message = "Redis configured: {}:{}/{}".format(
-                self.redis_host,
-                self.redis_port,
-                self.redis_db
-            )
-        self.handler.log(message=_message, status=0)
+        self.handler.log(
+            message="Redis configured for: {}:{}/{} -- auth? {}"\
+                .format(
+                    self.redis_host,
+                    self.redis_port,
+                    self.redis_db,
+                    self.redis_auth
+                ),
+            status=0
+        )
 
     def get(self):
         #
