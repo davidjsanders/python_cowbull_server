@@ -1,0 +1,2 @@
+The kubeconfig folder contains the yaml definitions for the Kubernetes
+deployments (services and pods) with settings to use configmaps.
