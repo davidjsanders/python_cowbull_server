@@ -10,6 +10,8 @@ from werkzeug.exceptions import BadRequest
 from python_cowbull_game.Game import Game
 from Persistence.RedisPersist import RedisPersist as PersistenceEngine
 
+#from app import app
+
 
 class GameController(MethodView):
     redis_host = None
@@ -30,6 +32,10 @@ class GameController(MethodView):
         self.redis_host = os.getenv("redis_host", "localhost")
         self.redis_port = os.getenv("redis_port", 6379)
         self.redis_db = os.getenv("redis_db", 0)
+
+        #self.redis_host = app.config["REDIS_HOST"]
+        #self.redis_port = app.config["REDIS_PORT"]
+        #self.redis_db = app.config["REDIS_DB"]
 
         _message = "Redis configured: {}:{}/{}".format(
                 self.redis_host,
