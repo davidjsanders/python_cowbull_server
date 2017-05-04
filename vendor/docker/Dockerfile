@@ -9,9 +9,14 @@ WORKDIR		/cowbull
 COPY		requirements.txt /cowbull
 RUN		    pip install -q -r /cowbull/requirements.txt
 USER		cowbull
-VOLUME		/cowbull/src
+#VOLUME		/cowbull/src
 ENV			PYTHONPATH="/cowbull"
-ENV         redis_host="redis"
+#ENV         redis_host="redis"
+COPY		python_cowbull_server /cowbull/python_cowbull_server/
+COPY        flask_controllers /cowbull/flask_controllers/
+COPY        flask_helpers /cowbull/flask_helpers
+COPY        Persistence /cowbull/Persistence/
+COPY        app.py  /cowbull/
+COPY        LICENSE /cowbull/
 CMD			["gunicorn", "-b", "0.0.0.0:5000", "-w", "4", "app:app"]
 EXPOSE		5000
-COPY		. /cowbull

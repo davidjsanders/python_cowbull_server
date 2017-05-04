@@ -6,15 +6,11 @@ from python_cowbull_server import app
 log_format = "%(asctime)s %(levelname)s: %(message)s"
 logging.basicConfig(level=logging.DEBUG, format=log_format)
 
-#fetch_config()
-#
-#app = Flask(__name__)
-
 try:
     app.config.from_pyfile(os.environ.get("COWBULL_CONFIG", "config/cowbull-prod.cfg"))
 except FileNotFoundError:
     app.config["GAME_VERSION"] = "v0_1"
-    app.config["REDIS_HOST"] = "localhost"
+    app.config["REDIS_HOST"] = "redis"
     app.config["REDIS_PORT"] = 6379
     app.config["REDIS_DB"] = 0
     app.config["REDIS_USEAUTH"] = False
