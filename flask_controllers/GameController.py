@@ -1,13 +1,27 @@
+# GameController is class based on Flask.MethodView which provides the logic
+# required to handle get and post requests. It could also handle put, patch, etc.,
+# but currently only supports GET (get a new game) and POST (make a guess against
+# an existing game
+
+# Import standard packages
 import json
 import socket
 from redis.exceptions import ConnectionError
+
+# Import flask packages
 from flask import request
 from flask.views import MethodView
 from flask_helpers.build_response import build_response
 from flask_helpers.ErrorHandler import ErrorHandler
 from werkzeug.exceptions import BadRequest
+
+# Import the game object
 from python_cowbull_game.Game import Game
+
+# Import a persistence package
 from Persistence.RedisPersist import RedisPersist as PersistenceEngine
+
+# Import the Flask app object
 from python_cowbull_server import app
 
 
@@ -16,21 +30,22 @@ class GameController(MethodView):
     handler = None
 
     def __init__(self):
-        #
-        # Get an error handler
-        #
+        # Get an error handler that can be used to handle errors and log to
+        # std i/o. The error handler logs the error and forms an HTML response
+        # using Flask's Response class.
         self.handler = ErrorHandler(module="GameController", method="__init__")
         self.handler.log(message="Loading configuration from environment.", status=0)
 
-        #
-        # Configure environment
-        #
-        self.game_version = app.config.get("GAME_VERSION", "v0_1")
-        self.redis_host = app.config.get("REDIS_HOST", "localhost")
-        self.redis_port = app.config.get("REDIS_PORT", 6379)
-        self.redis_db = app.config.get("REDIS_DB", 0)
-        self.redis_auth = app.config.get("REDIS_USEAUTH", False)
+        # Get key configuration information from Flask's configuration engine.
+        # These should have all been set before (in python_cowbull_server/__init__.py)
+        # and if they haven't (for whatever reason) an exception WILL be raised.
+        self.game_version = app.config.get("GAME_VERSION")
+        self.redis_host = app.config.get("REDIS_HOST")
+        self.redis_port = app.config.get("REDIS_PORT")
+        self.redis_db = app.config.get("REDIS_DB")
+        self.redis_auth = app.config.get("REDIS_USEAUTH")
 
+        # Log the configuration to the handler.
         self.handler.log(
             message="Redis configured for: {}:{}/{} -- auth? {}"\
                 .format(
@@ -43,26 +58,28 @@ class GameController(MethodView):
         )
 
     def get(self):
-        #
-        # Get an error handler
-        #
+        # Set the error handler to default the module and method so that logging
+        # calls can be more precise and easier to read.
         self.handler = ErrorHandler(module="GameController", method="get")
         self.handler.log(message='Processing GET request', status=0)
 
-        #
-        # Get a persister
-        #
+        # Get a persistence engine. Currently, this is set to be redis but can
+        # easily be changed simply by changing the import statement above. Ideally
+        # an abstract class would be created which concrete classes could inherit
+        # from to ensure uniform consistency in persistence handling regardless
+        # of the engine (Redis, Mongo, etc.) used.
         try:
-            persister = PersistenceEngine(host=self.redis_host, port=self.redis_port, db=self.redis_db)
+            persister = PersistenceEngine\
+                (host=self.redis_host, port=self.redis_port, db=self.redis_db)
+
             self.handler.log(message='Persister instantiated', status=0)
         except ConnectionError as ce:
             return self.handler.error(status=503, exception=str(ce), message="There is no redis service available!")
         except AttributeError as ae:
             return self.handler.error(status=503, exception=str(ae), message="An internal error occurred - attribute missing for redis - check GameController:__init__")
 
-        #
-        # Instantiate a game
-        #
+        # Instantiate a game object. This calls the cowbull game object and creates
+        # an empty object.
         _game = Game()
         self.handler.log(message='Game object created', status=0)
 
