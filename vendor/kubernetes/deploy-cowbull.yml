@@ -19,7 +19,7 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: cowbull-dep
+  name: cowbull-v5
 spec:
   replicas: 3
   template: # create pods using pod definition in this template
@@ -37,6 +37,8 @@ spec:
             cpu: 100m
             memory: 40Mi
         env:
+        - name: LOGGING_LEVEL
+          value: "10"
         - name: REDIS_HOST
           value: "redis-master"
         - name: REDIS_PORT
