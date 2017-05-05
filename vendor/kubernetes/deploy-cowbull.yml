@@ -34,7 +34,7 @@ spec:
         image: dsanderscan/cowbull_v5:latest
         resources:
           requests:
-            cpu: 100m
+            cpu: '0.1'
             memory: 40Mi
         env:
         - name: LOGGING_LEVEL

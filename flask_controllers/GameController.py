@@ -58,6 +58,14 @@ class GameController(MethodView):
         )
 
     def get(self):
+        # Check if a game mode has been passed as a query parameter. If it has,
+        # validate the mode and use it to create the game. If it hasn't, then
+        # default to normal.
+        game_mode = request.args.get('mode', 'normal')
+        if game_mode != "normal":
+            if game_mode not in ["hard", "easy"]:
+                game_mode = "normal"
+
         # Set the error handler to default the module and method so that logging
         # calls can be more precise and easier to read.
         self.handler = ErrorHandler(module="GameController", method="get")
@@ -86,7 +94,7 @@ class GameController(MethodView):
         #
         # Create a new game
         #
-        jsonstr = _game.new_game(mode="normal")
+        jsonstr = _game.new_game(mode=game_mode)
         self.handler.log(message='New game created with key {}'.format(_game.key), status=0)
 
         #

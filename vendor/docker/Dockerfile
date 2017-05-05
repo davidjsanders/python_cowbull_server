@@ -9,9 +9,7 @@ WORKDIR		/cowbull
 COPY		requirements.txt /cowbull
 RUN		    pip install -q -r /cowbull/requirements.txt
 USER		cowbull
-#VOLUME		/cowbull/src
 ENV			PYTHONPATH="/cowbull"
-#ENV         redis_host="redis"
 COPY		python_cowbull_server /cowbull/python_cowbull_server/
 COPY        flask_controllers /cowbull/flask_controllers/
 COPY        flask_helpers /cowbull/flask_helpers
