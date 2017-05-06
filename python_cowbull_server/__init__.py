@@ -6,6 +6,7 @@ import logging          # Import standard logging - for levels only
 import os               # Import OS package
 from flask import Flask # Import Flask
 
+
 def set_defaults(flask_app=None):
     if flask_app is None:
         return
