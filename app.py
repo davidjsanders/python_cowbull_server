@@ -7,14 +7,16 @@ from flask_helpers.ErrorHandler import ErrorHandler
 # Importing the app also enables the configuration to be executed in the
 # __init__.py code.
 from python_cowbull_server import app
+print("INITIALIZATION: App imported")
 
 # Setup an error handler and configure logging based on the config
 # variables LOGGING_LEVEL and LOGGING_FORMAT (see __init__.py for
 # default values.)
 errorHandler = ErrorHandler(module="app.py", method="Initialization")
 errorHandler.basicConfig(
-    level=app.config["LOGGING_LEVEL"],
-    format=app.config["LOGGING_FORMAT"]
+    level=app.config.get("LOGGING_LEVEL", 20),
+    format=app.config.get("LOGGING_FORMAT",
+                          "/home/devdsanders/Documents/dev/python_cowbull_server/vendor/kubeconfig/cowbull.cfg")
 )
 
 # Add a game view. The game view is actually contained within a class
