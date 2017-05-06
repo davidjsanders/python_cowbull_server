@@ -13,7 +13,7 @@ services:
     ports:
       - 0:5000
     environment:
-      - LOG_LEVEL=debug
+      - LOGGING_LEVEL=debug
       - REDIS_HOST=redis
       # This needs to change to configuration secrets - i.e. from Docker Swarm or something else
       # like CONFIG="{json string}"
