@@ -10,11 +10,17 @@ from flask import Flask # Import Flask
 def set_defaults(flask_app=None):
     if flask_app is None:
         return
-    # Setup default configuration
+
+    # Setup default log format - time level: mesage
     flask_app.config["LOGGING_FORMAT"] = os.getenv(
         "LOGGING_FORMAT",
         "%(asctime)s %(levelname)s: %(message)s"
     )
+
+    # Set the default logging level. Because only Python knows about
+    # logging.DEBUG, logging.INFO, etc., rather than convert string
+    # representations of these to actual values from the logging
+    # package, the code looks for the integer equivalent.
     flask_app.config["LOGGING_LEVEL"] = os.getenv("LOGGING_LEVEL", logging.INFO)
     try:
         # Env vars will be strings; so, the variable must be cast to an
