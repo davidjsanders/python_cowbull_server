@@ -4,6 +4,7 @@
 
 import logging          # Import standard logging - for levels only
 import os               # Import OS package
+import sys		# Import System package.
 from flask import Flask # Import Flask
 
 
@@ -77,8 +78,13 @@ set_defaults(flask_app=app)
 # exception will be raised and the configurator will look for individual
 # env vars or set default values.
 try:
+    pyver = sys.version_info[0]
+    if pyver < 3:
+        exception_to_handle = IOError
+    else:
+        exception_to_handle = FileNotFoundError
     config_file = os.getenv("COWBULL_CONFIG", "/cowbull/config/cowbull.cfg")
     status = app.config.from_pyfile(config_file)
     print("CONFIGURATION: Using values from {}".format(config_file))
-except FileNotFoundError:
+except exception_to_handle:
     print("CONFIGURATION: Using default values")
