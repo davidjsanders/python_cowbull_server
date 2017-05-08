@@ -250,19 +250,16 @@ class GameController(MethodView):
 
     @staticmethod
     def _get_digits(game=None, json_dict=None):
-        print('In get_digits - Step 1')
         if game is None:
             raise RuntimeError("Game object must be instantiated before loading digits!")
-        print('In get_digits - Step 2')
+
         if json_dict is None:
             raise RuntimeError("Game must be loaded before loading digits!")
         if 'digits' not in json_dict:
             raise KeyError("The JSON provided no digits object!")
 
-        print('In get_digits - Step 3 - Game: {}'.format(game))
         digits_required = game.digits_required
 
-        print('In get_digits - Step 4')
         digits = json_dict["digits"]
 
         if len(digits) != digits_required:
