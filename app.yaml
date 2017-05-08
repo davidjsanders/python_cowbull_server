@@ -1,0 +1,13 @@
+runtime: python27
+api_version: 1
+threadsafe: false
+
+handlers:
+- url: /.*
+  script: app.app
+
+env_variables:
+  COWBULL_CONFIG: "config/cowbull.cfg"
+  REDIS_HOST: "redis-11039.c8.us-east-1-2.ec2.cloud.redislabs.com"
+  REDIS_PORT: "11039"
+  LOGGING_LEVEL: "10"
