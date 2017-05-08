@@ -17,12 +17,12 @@ class RedisPersist:
             raise ValueError("Key must be present to persist game.")
         if jsonstr is None:
             raise ValueError("JSON is badly formed or not present")
-        self._redis_connection.set(key, jsonstr)
+        self._redis_connection.set(key, str(jsonstr))
 
     def load(self, key=None):
         if key is None:
             raise ValueError("Key must be present to load game")
         return_result = self._redis_connection.get(key)
         if return_result is not None:
-            return_result = return_result.decode('utf-8')
+            return_result = str(return_result)
         return return_result
