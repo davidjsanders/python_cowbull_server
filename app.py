@@ -1,5 +1,5 @@
 # Import the controllers and helpers for this app
-from flask_controllers import GameController, HealthCheck, Readiness
+from flask_controllers import GameController, HealthCheck, Readiness, GameModes
 from flask_helpers.ErrorHandler import ErrorHandler
 
 # Import the app from the python_cowbull_server Python package. This allows
@@ -27,6 +27,16 @@ app.add_url_rule(
     '/{0}/game'.format(app.config["GAME_VERSION"]),
     view_func=game_view,
     methods=["GET", "POST"]
+)
+
+# Add a game modes view. The game modes view is actually contained within a class
+# based on a MethodView. See flask_controllers/GameModes.py
+errorHandler.log(message="Adding game URL: {}/modes".format(app.config["GAME_VERSION"]))
+modes_view = GameModes.as_view('Modes')
+app.add_url_rule(
+    '/{0}/modes'.format(app.config["GAME_VERSION"]),
+    view_func=modes_view,
+    methods=["GET"]
 )
 
 # Add a health check view so that infrastructure, such as Kubernetes or AWS ECS, can
