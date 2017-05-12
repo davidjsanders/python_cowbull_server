@@ -6,6 +6,6 @@ class Readiness(MethodView):
     def get(self):
         return build_response(
             html_status=200,
-            response_data={"status":"ready"},
+            response_data={"status": "ready"},
             response_mimetype="application/json"
         )

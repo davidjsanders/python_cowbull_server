@@ -7,6 +7,7 @@
 import json
 import socket
 from redis.exceptions import ConnectionError
+from json.decoder import JSONDecodeError
 
 # Import flask packages
 from flask import request
@@ -129,6 +130,12 @@ class GameController(MethodView):
             json_dict = request.get_json()
             self.handler.log(message='Loaded JSON. Returned: {}'.format(json_dict), status=0)
         except BadRequest as e:
+            return self.handler.error(
+                status=400,
+                exception=e.description,
+                message="Bad request. There was no JSON present. ### LIKELY CALLER ERROR ###"
+            )
+        except JSONDecodeError as e:
             return self.handler.error(
                 status=400,
                 exception=e.description,
@@ -276,10 +283,17 @@ class GameController(MethodView):
 
         g = Game()
 
-        _json = persister.load(game_key)
+        try:
+            _json = persister.load(game_key)
+        except JSONDecodeError as e:
+            return None
 
         if _json is None:
             raise KeyError("The key provided is invalid.")
 
-        g.load_game(_json)
+        try:
+            g.load_game(str(_json))
+        except JSONDecodeError as e:
+            return None
+
         return g

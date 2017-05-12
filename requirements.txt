@@ -8,7 +8,7 @@ jsonschema==2.6.0
 MarkupSafe==1.0
 packaging==16.8
 pyparsing==2.2.0
-python-cowbull-game==0.4
+python-cowbull-game==0.4.1
 python-digits==0.4.2
 redis==2.10.5
 six==1.10.0

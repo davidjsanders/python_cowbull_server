@@ -2,12 +2,26 @@
 from flask_controllers import GameController, HealthCheck, Readiness, GameModes
 from flask_helpers.ErrorHandler import ErrorHandler
 
+from flask import Response, request
+
 # Import the app from the python_cowbull_server Python package. This allows
 # us to define the app there and have it importable throughout the app.
 # Importing the app also enables the configuration to be executed in the
 # __init__.py code.
 from python_cowbull_server import app
 print("INITIALIZATION: App imported")
+
+# Add cross origin scripting support
+@app.after_request
+def allow_cors(resp):
+    resp.headers.add('Access-Control-Allow-Origin', '*')
+    resp.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+#    headers = resp.headers
+#    if request.method in ['GET', 'POST'] and 'Origin' in request.headers:
+#        print("Grant cross origin")
+#        headers['Access-Control-Allow-Origin'] = request.headers['Origin']
+
+    return resp
 
 # Setup an error handler and configure logging based on the config
 # variables LOGGING_LEVEL and LOGGING_FORMAT (see __init__.py for
