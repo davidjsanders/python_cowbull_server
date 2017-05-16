@@ -160,3 +160,35 @@ an array of Digits (integers between 0 and 9) as raw JSON data.
     }
   }
   ```
+* Errors will be reported back to the caller via JSON.
+  * Incorrect number of digits:
+  ```
+  {
+  "module": "GameController",
+  "exception": "The digits provided did not match the required number (6)",
+  "method": "post",
+  "message": "There was a problem with the value of the digits provided!",
+  "status": 400
+  }
+  ```
+  * Bad key:
+  ```bash
+  {
+    "module": "GameController",
+    "exception": "'The key provided is invalid.'",
+    "method": "post",
+    "message": "The request must contain a valid game key.",
+    "status": 400
+  }
+  ```
+  * Bad JSON data:
+  ```
+  {
+    "module": "GameController",
+    "exception": "Failed to decode JSON object: Expecting value: line 1 column 1 (char 0)",
+    "method": "post",
+    "message": "Bad request. There was no JSON present. ### LIKELY CALLER ERROR ###",
+    "status": 400
+  }
+  ```
+  
