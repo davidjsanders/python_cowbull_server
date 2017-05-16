@@ -37,7 +37,7 @@ Any redis server will do and options include:
 2. Docker - use `docker run --name redis -p 6379:6379 -d redis`
 
 ### Running the game
-To run the game server, follow these steps (assuming using Docker for Redis):
+To run the game server using source, follow these steps (assuming using Docker for Redis):
 ```
 virtualenv /path/to/virtual/env --python=python3
 source /path/to/virtual/env/bin/activate
@@ -49,6 +49,42 @@ export FLASK_DEBUG="true"
 docker run --name redis -p 6379:6379 -d redis
 cd /to/location/repo/installed
 python app.py
+```
+
+To run the game server using Docker, follow these steps:
+```
+cd /to/location/repo/installed
+docker build -t imagename -f vendor/docker/Dockerfile .
+docker network create yournetwork --driver bridge
+docker run --name redis --network yournetwork -d redis
+docker run --name cowbull --network yournetwork --env REDIS_HOST="redis" -p 5000:5000 -d {imagename}
+#
+# Tear down
+#
+docker stop redis && docker rm redis
+docker stop cowbull && docker rm cowbull
+```
+
+To run the game using local Kubernetes (minikube) *NOTE* This uses 
+the standard Docker image for the game server (dsanderscan/cowbull_v5):
+```
+minikube start
+cd /to/location/repo/installed
+kubectl create configmap cowbull-config --from-file vendor/kubeconfig/cowbull.cfg # **ONE TIME ONLY**
+kubectl create -f vendor/kubernetes/deploy-redis.yml
+kubectl create -f vendor/kubeconfig/configured-cowbull.yml
+kubectl get po # See the pods and wait till they are running
+kubectl get svc
+# NAME           CLUSTER-IP   EXTERNAL-IP   PORT(S)          AGE
+# cowbull-svc    {ip addr.}   <pending>     5000:{port}/TCP   9s
+#
+# Use the minikube address (usually 192.168.99.100) and the port mapped
+# to 5000 in the get svc output for requests.
+#
+# Tear down
+#
+kubectl delete -f vendor/kubernetes/deploy-redis.yml
+kubectl delete -f vendor/kubeconfig/configured-cowbull.yml
 ```
 
 ### Requests
