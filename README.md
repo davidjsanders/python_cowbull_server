@@ -95,6 +95,16 @@ For added benefit, install [jq](https://stedolan.github.io/jq/) to be able
 to parse the JSON returned by the request:
 * `curl -s <-X {method}> http://FLASK_HOST:FLASK_PORT/v0_1/game | jq`
 
+**_Notes_**: 
+1. If using Kubernetes:
+  * Use your minikube node address (typically 192.168.99.100 and found
+by executing `kubectl describe nodes minikube | grep Addresses | grep -v grep`) 
+for FLASK_HOST
+  * Use the port number found above (`kubectl get svc cowbull-svc`)
+2. If using Docker:
+  * Use `localhost` for FLASK_HOST
+  * Use the port number `5000` for FLASK_PORT
+
 
 ### Methods
 #### GET
