@@ -37,7 +37,7 @@ Any redis server will do and options include:
 2. Docker - use `docker run --name redis -p 6379:6379 -d redis`
 
 ### Running the game
-To run the game server, follow these steps (assuming using Docker):
+To run the game server, follow these steps (assuming using Docker for Redis):
 ```
 virtualenv /path/to/virtual/env --python=python3
 source /path/to/virtual/env/bin/activate
