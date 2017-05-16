@@ -21,6 +21,9 @@ by responding to http requests to ``http://server/version/game`` and
 decides the action based on the method used for the request: ``GET`` starts
 a new game and ``POST`` makes a guess against the game.
 
+### Swagger Definition
+coming soon.
+
 ### Depdendencies
 The game requires a Redis server to act as a cache for game object information
 and must be configured before running the game. The game picks up the Redis
@@ -61,8 +64,10 @@ docker run --name cowbull --network yournetwork --env REDIS_HOST="redis" -p 5000
 #
 # Tear down
 #
-docker stop redis && docker rm redis
-docker stop cowbull && docker rm cowbull
+docker stop redis
+docker rm redis
+docker stop cowbull
+docker rm cowbull
 ```
 
 To run the game using local Kubernetes (minikube) *NOTE* This uses 
@@ -70,7 +75,7 @@ the standard Docker image for the game server (dsanderscan/cowbull_v5):
 ```
 minikube start
 cd /to/location/repo/installed
-kubectl create configmap cowbull-config --from-file vendor/kubeconfig/cowbull.cfg # **ONE TIME ONLY**
+kubectl create configmap cowbull-config --from-file vendor/kubeconfig/cowbull.cfg
 kubectl create -f vendor/kubernetes/deploy-redis.yml
 kubectl create -f vendor/kubeconfig/configured-cowbull.yml
 kubectl get po # See the pods and wait till they are running
@@ -85,6 +90,10 @@ kubectl get svc
 #
 kubectl delete -f vendor/kubernetes/deploy-redis.yml
 kubectl delete -f vendor/kubeconfig/configured-cowbull.yml
+#
+# To remove configuration
+#
+kubectl delete configmap cowbull-config
 ```
 
 ### Requests
