@@ -38,6 +38,7 @@ server to use redis authentication.
 Any redis server will do and options include:
 1. [Redis Labs](https://redislabs.com/) free service with 30MB
 2. Docker - use `docker run --name redis -p 6379:6379 -d redis`
+3. Kubernetes - use the K8s instructions below
 
 ### Running the game
 To run the game server using source, follow these steps (assuming using Docker for Redis):
