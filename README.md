@@ -55,7 +55,7 @@ python app.py
 Make a request by issuing GET or POST methods to:
 * `curl http://FLASK_HOST:FLASK_PORT/v0_1/game`
 
-For added benefit, install [jq](https://stedolan.github.io/jq/download/) to be able 
+For added benefit, install [jq](https://stedolan.github.io/jq/) to be able 
 to parse the JSON returned by the request:
 * `curl -s <-X {method}> http://FLASK_HOST:FLASK_PORT/v0_1/game | jq`
 
