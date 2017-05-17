@@ -1,0 +1,35 @@
+version: '2'
+
+services:
+  redis:
+    image: 'redis'
+    networks:
+      - cowbull_network
+    restart: always
+  cowbull_v5:
+    image: 'dsanderscan/cowbull_v5'
+    depends_on:
+      - redis
+#    ports:
+#      - 5000:5000
+    environment:
+      - LOGGING_LEVEL=10
+      - REDIS_HOST=redis
+    volumes:
+      - /home/devdsanders/Documents/dev/python_cowbull_server/vendor/docker/:/cowbull/config
+    networks:
+      - cowbull_network
+    restart: always
+  cowbull_webapp:
+    image: 'dsanderscan/cowbull_webapp'
+    depends_on:
+      - cowbull_v5
+    ports:
+      - 0:5000
+    environment:
+      - COWBULL_HOST=http://cowbull_v5
+      - COWBULL_PORT=5000
+    networks:
+      - cowbull_network
+networks:
+  cowbull_network:
