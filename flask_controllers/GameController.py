@@ -18,8 +18,9 @@ from werkzeug.exceptions import BadRequest
 
 # Import the game object
 from python_cowbull_game.Game import Game
-from python_cowbull_game.GameObject import GameObject as BaseGameObject
-from Game.GameObject import GameObject
+#from python_cowbull_game.GameObject import GameObject as BaseGameObject
+#from Game.GameObject import GameObject
+from python_cowbull_game.GameObject import GameObject as GameObject
 
 # Import a persistence package
 from Persistence.RedisPersist import RedisPersist as PersistenceEngine
