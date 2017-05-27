@@ -5,6 +5,7 @@
 
 # Import standard packages
 import json
+import logging
 import socket
 from redis.exceptions import ConnectionError
 
@@ -65,6 +66,7 @@ class GameController(MethodView):
         # default to normal.
         game_mode = request.args.get('mode', 'normal')
         if game_mode != "normal":
+            logging.debug("Game modes available: {}".format(GameObject.game_modes))
             if game_mode not in GameObject.game_modes:
                 game_mode = "normal"
 
