@@ -17,6 +17,7 @@ from werkzeug.exceptions import BadRequest
 
 # Import the game object
 from python_cowbull_game.Game import Game
+from python_cowbull_game.GameObject import GameObject
 
 # Import a persistence package
 from Persistence.RedisPersist import RedisPersist as PersistenceEngine
@@ -63,7 +64,7 @@ class GameController(MethodView):
         # default to normal.
         game_mode = request.args.get('mode', 'normal')
         if game_mode != "normal":
-            if game_mode not in ["hard", "easy"]:
+            if game_mode not in GameObject.game_modes:
                 game_mode = "normal"
 
         # Set the error handler to default the module and method so that logging
