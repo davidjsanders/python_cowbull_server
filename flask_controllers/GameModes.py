@@ -2,7 +2,7 @@ from flask import request
 from flask.views import MethodView
 from flask_helpers.build_response import build_response
 from flask_helpers.ErrorHandler import ErrorHandler
-from python_cowbull_game.GameObject import GameObject
+from Game.GameObject import GameObject
 
 
 class GameModes(MethodView):
