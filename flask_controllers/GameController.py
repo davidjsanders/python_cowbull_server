@@ -18,9 +18,9 @@ from werkzeug.exceptions import BadRequest
 
 # Import the game object
 from python_cowbull_game.Game import Game
-#from python_cowbull_game.GameObject import GameObject as BaseGameObject
-#from Game.GameObject import GameObject
-from python_cowbull_game.GameObject import GameObject as GameObject
+from python_cowbull_game.GameObject import GameObject as BaseGameObject
+from Game.GameObject import GameObject
+#from python_cowbull_game.GameObject import GameObject as GameObject
 
 # Import a persistence package
 from Persistence.RedisPersist import RedisPersist as PersistenceEngine
@@ -93,7 +93,7 @@ class GameController(MethodView):
 
         # Instantiate a game object. This calls the cowbull game object and creates
         # an empty object.
-        _game = Game()
+        _game = Game(game_object=GameObject)
         self.handler.log(message='Game object created', status=0)
 
         #
@@ -279,7 +279,7 @@ class GameController(MethodView):
         if persister is None:
             raise RuntimeError("The persistence engine is None!")
 
-        g = Game()
+        g = Game(game_object=GameObject)
 
         _json = persister.load(game_key)
 
