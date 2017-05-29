@@ -7,17 +7,13 @@ class GameObject(BaseGameObject):
     digits_used = {
         'easy': 3,
         'normal': 4,
-        'hard': 6,
-        'crazy': 10,
-        'mega': 5
+        'hard': 6
     }
 
     guesses_allowed = {
         'easy': 15,
         'normal': 10,
-        'hard': 6,
-        'crazy': 10,
-        'mega': 3
+        'hard': 6
     }
 
     def __init__(self):
