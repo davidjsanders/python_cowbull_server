@@ -7,6 +7,7 @@
 import json
 import logging
 import socket
+import sys
 from redis.exceptions import ConnectionError
 
 # Import flask packages
@@ -304,9 +305,14 @@ class GameController(MethodView):
         if _json is None:
             raise KeyError("The key provided is invalid.")
 
+        if sys.version_info[0] > 2:
+            exception_to_check = json.decoder.JSONDecodeError
+        else:
+            exception_to_check = ValueError
+
         try:
             g.load_game(str(_json))
-        except JSONDecodeError as e:
+        except exception_to_check as e:
             return None
 
         return g
