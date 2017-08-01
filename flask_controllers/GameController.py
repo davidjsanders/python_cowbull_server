@@ -175,7 +175,8 @@ class GameController(MethodView):
             return self.handler.error(
                 status=500,
                 exception=str(te),
-                message="Bad request. For some reason the json_dict is None!"
+                message="Bad request. For some reason the json_dict is None! Are you "
+                        "sure the header is set to application/json?"
             )
 
         _game = None
