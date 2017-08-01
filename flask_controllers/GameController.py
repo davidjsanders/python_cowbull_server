@@ -16,11 +16,21 @@ from flask_helpers.build_response import build_response
 from flask_helpers.ErrorHandler import ErrorHandler
 from werkzeug.exceptions import BadRequest
 
-# Import the game object
+# Import the Game and GameObject. The Game always comes from
+# the python_cowbull_game package as this provides the core
+# functionality of the game; however, the GameObject can come
+# from the package, or can be inherited and modified.
+#
+# So, step 1, import the game
 from python_cowbull_game.Game import Game
-from python_cowbull_game.GameObject import GameObject as BaseGameObject
-from Game.GameObject import GameObject
-#from python_cowbull_game.GameObject import GameObject as GameObject
+#
+# Step 2, import the game object.
+#
+# 2a - a subclassed version of the game object
+#from Game.GameObject import GameObject # Note: subclassed
+#
+# 2b - the original
+from python_cowbull_game.GameObject import GameObject as GameObject
 
 # Import a persistence package
 from Persistence.RedisPersist import RedisPersist as PersistenceEngine
