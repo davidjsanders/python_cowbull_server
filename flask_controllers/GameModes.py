@@ -2,7 +2,16 @@ from flask import request
 from flask.views import MethodView
 from flask_helpers.build_response import build_response
 from flask_helpers.ErrorHandler import ErrorHandler
-from Game.GameObject import GameObject
+# Import the GameObject. The GameObject can come
+# from the package, or can be inherited and modified.
+#
+# Step 1, import the game object.
+#
+# 1a - a subclassed version of the game object
+#from Game.GameObject import GameObject # Note: subclassed
+#
+# 1b - the original
+from python_cowbull_game.GameObject import GameObject as GameObject
 
 
 class GameModes(MethodView):
