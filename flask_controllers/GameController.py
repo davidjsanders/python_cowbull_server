@@ -168,8 +168,15 @@ class GameController(MethodView):
         # response to the user indicating an HTML status, the exception, and an
         # explanatory message.
         #
-        _key = json_dict["key"]
-        self.handler.log(message='Attempting to load game {}'.format(_key), status=0)
+        try:
+            _key = json_dict["key"]
+            self.handler.log(message='Attempting to load game {}'.format(_key), status=0)
+        except TypeError as te:
+            return self.handler.error(
+                status=500,
+                exception=str(te),
+                message="Bad request. For some reason the json_dict is None!"
+            )
 
         _game = None
         try:
