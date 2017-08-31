@@ -61,20 +61,26 @@ class GameController(MethodView):
         )
 
     def get(self):
+        # Set the error handler to default the module and method so that logging
+        # calls can be more precise and easier to read.
+        self.handler = ErrorHandler(module="GameController", method="get")
+        self.handler.log(message='Processing GET request', status=0)
+
         # Check if a game mode has been passed as a query parameter. If it has,
         # validate the mode and use it to create the game. If it hasn't, then
         # default to normal.
         game_mode = request.args.get('mode', 'normal')
         _ = GameObject()
+        valid_modes = _.game_modes
+
+        if game_mode not in valid_modes:
+            return self.handler.error(
+                status=400, exception="Invalid game mode", message="There is no game mode {}!".format(game_mode)
+            )
         if game_mode != "normal":
             logging.debug("Game modes available: {}".format(_.game_modes))
             if game_mode not in _.game_modes:
                 game_mode = "normal"
-
-        # Set the error handler to default the module and method so that logging
-        # calls can be more precise and easier to read.
-        self.handler = ErrorHandler(module="GameController", method="get")
-        self.handler.log(message='Processing GET request', status=0)
 
         # Get a persistence engine. Currently, this is set to be redis but can
         # easily be changed simply by changing the import statement above. Ideally
