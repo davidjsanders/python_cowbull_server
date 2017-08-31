@@ -70,17 +70,12 @@ class GameController(MethodView):
         # validate the mode and use it to create the game. If it hasn't, then
         # default to normal.
         game_mode = request.args.get('mode', 'normal')
-        _ = GameObject()
-        valid_modes = _.game_modes
+        game_object = GameObject()
 
-        if game_mode not in valid_modes:
+        if game_mode not in game_object.game_modes:
             return self.handler.error(
                 status=400, exception="Invalid game mode", message="There is no game mode {}!".format(game_mode)
             )
-        if game_mode != "normal":
-            logging.debug("Game modes available: {}".format(_.game_modes))
-            if game_mode not in _.game_modes:
-                game_mode = "normal"
 
         # Get a persistence engine. Currently, this is set to be redis but can
         # easily be changed simply by changing the import statement above. Ideally
@@ -99,8 +94,10 @@ class GameController(MethodView):
 
         # Instantiate a game object. This calls the cowbull game object and creates
         # an empty object.
-        _game = Game(game_object=_)
+        _game = Game(game_object=game_object)
         self.handler.log(message='Game object created', status=0)
+
+        #TODO ADD VALIDATION!
 
         #
         # Create a new game
@@ -293,7 +290,7 @@ class GameController(MethodView):
         if persister is None:
             raise RuntimeError("The persistence engine is None!")
 
-        g = Game(game_object=GameObject)
+        g = Game()
 
         _json = persister.load(game_key)
 
