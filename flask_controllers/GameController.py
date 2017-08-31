@@ -65,9 +65,10 @@ class GameController(MethodView):
         # validate the mode and use it to create the game. If it hasn't, then
         # default to normal.
         game_mode = request.args.get('mode', 'normal')
+        _ = GameObject()
         if game_mode != "normal":
-            logging.debug("Game modes available: {}".format(GameObject.game_modes))
-            if game_mode not in GameObject.game_modes:
+            logging.debug("Game modes available: {}".format(_.game_modes))
+            if game_mode not in _.game_modes:
                 game_mode = "normal"
 
         # Set the error handler to default the module and method so that logging
@@ -92,7 +93,7 @@ class GameController(MethodView):
 
         # Instantiate a game object. This calls the cowbull game object and creates
         # an empty object.
-        _game = Game(game_object=GameObject)
+        _game = Game(game_object=_)
         self.handler.log(message='Game object created', status=0)
 
         #

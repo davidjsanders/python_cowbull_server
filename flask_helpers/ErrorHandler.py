@@ -4,7 +4,7 @@ import os
 from flask import Response
 
 
-class ErrorHandler:
+class ErrorHandler(object):
     defaults = {}
 
     def __init__(self, **kwargs):
