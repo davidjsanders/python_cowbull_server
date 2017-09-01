@@ -7,18 +7,27 @@ from python_cowbull_game.GameObject import GameObject as GameObject
 
 class GameModes(MethodView):
     def get(self):
-        _ = GameObject()
+        game_object = GameObject()
+
         textonly = request.args.get('textmode', None)
         if textonly:
             return build_response(
                 html_status=200,
-                response_data=_.game_modes,
+                response_data=game_object.game_modes,
                 response_mimetype="application/json"
             )
 
-        digits = _.digits_used
-        guesses = _.guesses_allowed
-        game_modes = _.game_modes
+        return game_object.game_types
+
+        game_types = game_object.game_types
+        game_modes = [{"mode": game_object.game_types[gt].mode,
+                       "digits": game_object.game_types[gt].digits,
+                       "guesses": game_object.game_types[gt].guesses_allowed
+                       } for gt in game_object.game_types]
+
+        digits = game_object.digits_used
+        guesses = game_object.guesses_allowed
+        game_modes = game_object.game_modes
 #        game_modes = [mode for mode in GameObject.digits_used]
 
         return_list = []
