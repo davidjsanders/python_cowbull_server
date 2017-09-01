@@ -19,7 +19,7 @@ class GameModes(MethodView):
 
         game_modes = [{"mode": game_object.game_types[gt].mode,
                        "digits": game_object.game_types[gt].digits,
-                       "guesses": game_object.game_types[gt].guesses_allowed
+                       "guesses": game_object.game_types[gt].guesses
                        } for gt in game_object.game_types]
 
         return build_response(
