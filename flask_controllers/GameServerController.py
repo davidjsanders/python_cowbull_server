@@ -18,8 +18,9 @@ from flask_helpers.ErrorHandler import ErrorHandler
 from werkzeug.exceptions import BadRequest
 
 # Import the Game and GameObject.
-from python_cowbull_game.Game import Game
-from python_cowbull_game.GameObject import GameObject as GameObject
+#from python_cowbull_game.GameController import GameController
+from extensions.ExtGameController import ExtGameController as GameController
+from python_cowbull_game.GameMode import GameMode
 
 # Import a persistence package
 from Persistence.RedisPersist import RedisPersist as PersistenceEngine
@@ -28,7 +29,7 @@ from Persistence.RedisPersist import RedisPersist as PersistenceEngine
 from python_cowbull_server import app
 
 
-class GameController(MethodView):
+class GameServerController(MethodView):
     # Initialize class level variables
     handler = None
 
@@ -36,7 +37,7 @@ class GameController(MethodView):
         # Get an error handler that can be used to handle errors and log to
         # std i/o. The error handler logs the error and forms an HTML response
         # using Flask's Response class.
-        self.handler = ErrorHandler(module="GameController", method="__init__")
+        self.handler = ErrorHandler(module="GameServerController", method="__init__")
         self.handler.log(message="Loading configuration from environment.", status=0)
 
         # Get key configuration information from Flask's configuration engine.
@@ -63,16 +64,17 @@ class GameController(MethodView):
     def get(self):
         # Set the error handler to default the module and method so that logging
         # calls can be more precise and easier to read.
-        self.handler = ErrorHandler(module="GameController", method="get")
+        self.handler = ErrorHandler(module="GameServerController", method="get")
         self.handler.log(message='Processing GET request', status=0)
 
         # Check if a game mode has been passed as a query parameter. If it has,
         # validate the mode and use it to create the game. If it hasn't, then
         # default to normal.
         game_mode = request.args.get('mode', 'normal')
-        game_object = GameObject()
+        game_controller = GameController()
 
-        if game_mode not in game_object.game_modes:
+        print(game_controller.game_mode_names)
+        if game_mode not in game_controller.game_mode_names:
             return self.handler.error(
                 status=400, exception="Invalid game mode", message="There is no game mode {}!".format(game_mode)
             )
@@ -90,34 +92,28 @@ class GameController(MethodView):
         except ConnectionError as ce:
             return self.handler.error(status=503, exception=str(ce), message="There is no redis service available!")
         except AttributeError as ae:
-            return self.handler.error(status=503, exception=str(ae), message="An internal error occurred - attribute missing for redis - check GameController:__init__")
+            return self.handler.error(status=503, exception=str(ae), message="An internal error occurred - attribute missing for redis - check GameServerController:__init__")
 
         # Instantiate a game object. This calls the cowbull game object and creates
         # an empty object.
-        _game = Game(game_object=game_object)
-        self.handler.log(message='Game object created', status=0)
-
-        #TODO ADD VALIDATION!
-
-        #
-        # Create a new game
-        #
-        jsonstr = _game.new_game(mode=game_mode)
-        self.handler.log(message='New game created with key {}'.format(_game.key), status=0)
+        print("Game mode is {}".format(game_mode))
+        game_controller.new(mode=game_mode)
+        self.handler.log(message='New game created with key {}'.format(game_controller.key), status=0)
 
         #
         # Save the newly created game
         #
-        persister.save(_game.key, _game.save_game())
-        self.handler.log(message='Game {} persisted.'.format(_game.key), status=0)
+        persister.save(game_controller.key, game_controller.save())
+        self.handler.log(message='Game {} persisted.'.format(game_controller.key), status=0)
 
         #
         # Build the user response - key, no. of digits, and no. of guesses
         #
         _response = {
-            "key": _game.key,
-            "digits": _game.digits_required,
-            "guesses": _game.guesses_allowed,
+            "key": game_controller.key,
+            "digits": game_controller.digits_required,
+            "digit-type": game_controller.digits_type,
+            "guesses": game_controller.guesses_allowed,
             "served-by": socket.gethostname()
         }
 
@@ -126,7 +122,7 @@ class GameController(MethodView):
         return build_response(html_status=200, response_data=_response, response_mimetype="application/json")
 
     def post(self):
-        self.handler = ErrorHandler(module="GameController", method="post")
+        self.handler = ErrorHandler(module="GameServerController", method="post")
         self.handler.log(message='Processing POST request.', status=0)
 
         #
@@ -172,9 +168,8 @@ class GameController(MethodView):
                         "sure the header is set to application/json?"
             )
 
-        _game = None
         try:
-            _game = self._get_game(persister, _key)
+            _game = GameController(game=str(persister.load(_key)))
             self.handler.log(message='Loaded game {}'.format(_key), status=0)
         except RuntimeError as ve:
             return self.handler.error(
@@ -200,7 +195,7 @@ class GameController(MethodView):
         #
         try:
             self.handler.log(message='Getting digits from {}'.format(json_dict))
-            _guesses = self._get_digits(game=_game, json_dict=json_dict)
+            _guesses = json_dict["digits"]
             self.handler.log(message='Guesses extracted from JSON: {}'.format(_guesses), status=0)
         except RuntimeError as ve:
             return self.handler.error(
@@ -246,7 +241,7 @@ class GameController(MethodView):
         # Save the game
         #
         self.handler.log(message='Update game (save) after guess', status=0)
-        save_game = _game.save_game()
+        save_game = _game.save()
         persister.save(key=_key, jsonstr=save_game)
 
         #
@@ -274,13 +269,7 @@ class GameController(MethodView):
         if 'digits' not in json_dict:
             raise KeyError("The JSON provided no digits object!")
 
-        digits_required = game.digits_required
-
         digits = json_dict["digits"]
-
-        if len(digits) != digits_required:
-            raise ValueError("The digits provided did not match the required number ({})".format(digits_required))
-
         return digits
 
     @staticmethod

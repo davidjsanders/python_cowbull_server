@@ -1,5 +1,5 @@
 # Import the controllers and helpers for this app
-from flask_controllers import GameController, HealthCheck, Readiness, GameModes
+from flask_controllers import GameServerController, HealthCheck, Readiness, GameModes
 from flask_helpers.ErrorHandler import ErrorHandler
 
 from flask import Response, request
@@ -34,9 +34,9 @@ errorHandler.basicConfig(
 )
 
 # Add a game view. The game view is actually contained within a class
-# based on a MethodView. See flask_controllers/GameController.py
+# based on a MethodView. See flask_controllers/GameServerControllerroller.py
 errorHandler.log(message="Adding game URL: {}/game".format(app.config["GAME_VERSION"]))
-game_view = GameController.as_view('Game')
+game_view = GameServerController.as_view('Game')
 app.add_url_rule(
     '/{0}/game'.format(app.config["GAME_VERSION"]),
     view_func=game_view,
