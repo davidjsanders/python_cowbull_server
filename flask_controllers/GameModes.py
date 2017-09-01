@@ -17,9 +17,12 @@ class GameModes(MethodView):
                 response_mimetype="application/json"
             )
 
-        return game_object.game_types
+        return build_response(
+            html_status=200,
+            response_data=game_object.game_types,
+            response_mimetype="application/json"
+        )
 
-        game_types = game_object.game_types
         game_modes = [{"mode": game_object.game_types[gt].mode,
                        "digits": game_object.game_types[gt].digits,
                        "guesses": game_object.game_types[gt].guesses_allowed
