@@ -8,8 +8,7 @@ class GameModes(MethodView):
     def get(self):
         game_object = GameObject()
 
-        textonly = request.args.get('textmode', None)
-        if textonly:
+        if request.args.get('textmode', None):
             response_data = game_object.game_modes
         else:
             response_data = [{"mode": game_object.game_types[gt].mode,
