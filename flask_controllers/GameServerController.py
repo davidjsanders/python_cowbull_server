@@ -30,6 +30,9 @@ from python_cowbull_server import app
 
 
 class GameServerController(MethodView):
+    """
+    tbc
+    """
     # Initialize class level variables
     handler = None
 
