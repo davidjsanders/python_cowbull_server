@@ -9,5 +9,5 @@ class ExtGameController(GameController):
     ]
 
     def __init__(self):
-        super(ExtGameController, self).__init__()
+        super(ExtGameController, self).__init__(game=None)
         self.add_mode(self.additional_modes)
