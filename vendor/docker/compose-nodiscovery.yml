@@ -27,7 +27,7 @@ services:
     ports:
       - 8080:8080
     environment:
-      - COWBULL_SERVER=http://cowbull_v5
+      - COWBULL_SERVER=cowbull_v5
       - COWBULL_PORT=5000
     networks:
       - cowbull_network
