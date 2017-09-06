@@ -209,7 +209,20 @@ class GameServerController(MethodView):
         try:
             _loaded_game = json.loads(persister.load(key=_key))
             self.handler.log(message="Loaded game: {}".format(_loaded_game))
+        except KeyError as ke:
+            return self.handler.error(
+                status=400,
+                exception=str(ke),
+                message="The request must contain a valid game key."
+            )
 
+        #
+        # Load the game based on the key contained in the JSON provided to
+        # the POST request. If the JSON data is invalid, return a
+        # response to the user indicating an HTML status, the exception, and an
+        # explanatory message. If the data
+        #
+        try:
             self.handler.log(message="Loading game mode from: {}.".format(_loaded_game["mode"]))
             _mode = _loaded_game["mode"]
             self.handler.log(message="Loaded game mode.")
@@ -236,6 +249,12 @@ class GameServerController(MethodView):
                 status=400,
                 exception=str(te),
                 message="The game key provided was invalid."
+            )
+        except Exception as e:
+            return self.handler.error(
+                status=500,
+                exception=repr(e),
+                message="Exception occurred while loading game!"
             )
 
         #
