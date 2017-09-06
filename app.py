@@ -1,14 +1,15 @@
+# Import the app from the python_cowbull_server Python package. This allows
+# us to define the app there and have it importable throughout the app.
+# Importing the app also enables the configuration to be executed in the
+# __init__.py code.
+from python_cowbull_server import app
+
 # Import the controllers and helpers for this app
 from flask_controllers import GameServerController, HealthCheck, Readiness, GameModes
 from flask_helpers.ErrorHandler import ErrorHandler
 
 from flask import Response, request
 
-# Import the app from the python_cowbull_server Python package. This allows
-# us to define the app there and have it importable throughout the app.
-# Importing the app also enables the configuration to be executed in the
-# __init__.py code.
-from python_cowbull_server import app
 print("INITIALIZATION: App imported")
 
 # Add cross origin scripting support
