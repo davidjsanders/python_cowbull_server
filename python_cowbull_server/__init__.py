@@ -69,6 +69,11 @@ def set_defaults(flask_app=None):
 
 # Instantiate the Flask application as app
 app = Flask(__name__)
+set_defaults(flask_app=app)
+logging.basicConfig(
+    level=app.config["LOGGING_LEVEL"],
+    format=app.config["LOGGING_FORMAT"]
+)
 
 # Configure the app. Initially, the app will try to read a configuration
 # file specified in an OS env var called "COWBULL_CONFIG". If the env
@@ -88,10 +93,3 @@ try:
     print("CONFIGURATION: Using values from {}".format(config_file))
 except exception_to_handle:
     print("CONFIGURATION: Using default values")
-    set_defaults(flask_app=app)
-    print("Level  --> {}".format(app.config["LOGGING_LEVEL"]))
-    print("Format --> {}".format(app.config["LOGGING_FORMAT"]))
-    logging.basicConfig(
-        level=app.config["LOGGING_LEVEL"],
-        format=app.config["LOGGING_FORMAT"]
-    )
