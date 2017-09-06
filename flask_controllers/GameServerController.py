@@ -106,9 +106,11 @@ class GameServerController(MethodView):
         # from to ensure uniform consistency in persistence handling regardless
         # of the engine (Redis, Mongo, etc.) used.
         try:
-            persister = PersistenceEngine\
-                (host=self.redis_host, port=self.redis_port, db=self.redis_db)
-
+            persister = PersistenceEngine(
+                host=self.redis_host,
+                port=self.redis_port,
+                db=self.redis_db
+            )
             self.handler.log(message='Persister instantiated', status=0)
         except ConnectionError as ce:
             return self.handler.error(status=503, exception=str(ce), message="There is no redis service available!")
@@ -116,7 +118,7 @@ class GameServerController(MethodView):
             return self.handler.error(status=503, exception=str(ae), message="An internal error occurred - attribute missing for redis - check GameServerController:__init__")
 
         #
-        # Save the newly created game
+        # Save the newly created game to the persistence engine
         #
         persister.save(game_controller.game.key, game_controller.save())
         self.handler.log(message='Game {} persisted.'.format(game_controller.game.key), status=0)
@@ -135,7 +137,11 @@ class GameServerController(MethodView):
 
         self.handler.log(message='GET request fulfilled. Returned: {}'.format(_response), status=0)
 
-        return build_response(html_status=200, response_data=_response, response_mimetype="application/json")
+        return build_response(
+            html_status=200,
+            response_data=_response,
+            response_mimetype="application/json"
+        )
 
     def post(self):
         """
@@ -147,7 +153,11 @@ class GameServerController(MethodView):
         self.handler.log(message='Processing POST request.', status=0)
 
         #
-        # Get the JSON from the request
+        # Get the JSON from the POST request. If there is no JSON then an exception
+        # is raised. IMPORTANT NOTE: When debugging ensuring the Content-type is
+        # set to application/json - for example (using cURL):
+        #
+        # curl -H "Content-type: application/json" ...
         #
         try:
             self.handler.log(message='Attempting to load JSON', status=0)
@@ -157,11 +167,13 @@ class GameServerController(MethodView):
             return self.handler.error(
                 status=400,
                 exception=e.description,
-                message="Bad request. There was no JSON present. ### LIKELY CALLER ERROR ###"
+                message="Bad request. There was no JSON present. Are you sure the "
+                        "header Content-type is set to application/json?"
             )
 
         #
-        # Get a persister
+        # Get a persister to enable the game to be loaded and then saved (updated).
+        # See the GET method above for more information on the persister.
         #
         try:
             self.handler.log(message='Getting persister', status=0)
@@ -174,21 +186,26 @@ class GameServerController(MethodView):
             )
 
         #
-        # Load the game based on the JSON. If the JSON data is invalid, return a
-        # response to the user indicating an HTML status, the exception, and an
-        # explanatory message.
+        # Get the game key from the JSON provided above. If it does not exist,
+        # return a 400 status (client) error
         #
         try:
             _key = json_dict["key"]
             self.handler.log(message='Attempting to load game {}'.format(_key), status=0)
         except TypeError as te:
             return self.handler.error(
-                status=500,
+                status=400,
                 exception=str(te),
                 message="Bad request. For some reason the json_dict is None! Are you "
                         "sure the header is set to application/json?"
             )
 
+        #
+        # Load the game based on the key contained in the JSON provided to
+        # the POST request. If the JSON data is invalid, return a
+        # response to the user indicating an HTML status, the exception, and an
+        # explanatory message. If the data
+        #
         try:
             _loaded_game = json.loads(persister.load(key=_key))
             self.handler.log(message="Loaded game: {}".format(_loaded_game))
