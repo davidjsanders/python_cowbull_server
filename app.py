@@ -30,7 +30,7 @@ errorHandler = ErrorHandler(module="app.py", method="Initialization")
 errorHandler.basicConfig(
     level=app.config.get("LOGGING_LEVEL", 20),
     format=app.config.get("LOGGING_FORMAT",
-                          "/home/devdsanders/Documents/dev/python_cowbull_server/vendor/kubeconfig/cowbull.cfg")
+                          "%(asctime)s %(levelname)s: %(message)s")
 )
 
 # Add a game view. The game view is actually contained within a class
