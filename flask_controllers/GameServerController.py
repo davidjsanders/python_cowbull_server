@@ -207,7 +207,10 @@ class GameServerController(MethodView):
         # explanatory message. If the data
         #
         try:
-            _loaded_game = json.loads(persister.load(key=_key))
+            _persisted_response = persister.load(key=_key)
+            self.handler.log(message="Persister response: {}".format(_persisted_response))
+
+            _loaded_game = json.loads(_persisted_response)
             self.handler.log(message="Loaded game: {}".format(_loaded_game))
         except KeyError as ke:
             return self.handler.error(
