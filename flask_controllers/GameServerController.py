@@ -183,9 +183,13 @@ class GameServerController(MethodView):
         try:
             _loaded_game = persister.load(key=_key)
             self.handler.log(message="Loaded game: {}".format(_loaded_game))
+
+            _mode = _loaded_game["mode"]["mode"]
+            self.handler.log(message="Loaded game mode: {}".format(_mode))
+
             _game = GameController(
                 game_json=str(_loaded_game),
-                mode=str(_loaded_game["mode"]["mode"])
+                mode=_mode
             )
             self.handler.log(message='Loaded game {}'.format(_key), status=0)
         except RuntimeError as ve:
