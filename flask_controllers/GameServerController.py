@@ -5,9 +5,7 @@
 
 # Import standard packages
 import json
-import logging
 import socket
-import sys
 from redis.exceptions import ConnectionError
 
 # Import flask packages
@@ -34,26 +32,34 @@ class GameServerController(MethodView):
     """
     tbc
     """
-    # Initialize class level variables
-    handler = None
 
     def __init__(self):
+        """
+        TBC
+        """
+
+        #
         # Get an error handler that can be used to handle errors and log to
         # std i/o. The error handler logs the error and forms an HTML response
         # using Flask's Response class.
+        #
         self.handler = ErrorHandler(module="GameServerController", method="__init__")
         self.handler.log(message="Loading configuration from environment.", status=0)
 
+        #
         # Get key configuration information from Flask's configuration engine.
         # These should have all been set before (in python_cowbull_server/__init__.py)
         # and if they haven't (for whatever reason) an exception WILL be raised.
+        #
         self.game_version = app.config.get("GAME_VERSION")
         self.redis_host = app.config.get("REDIS_HOST")
         self.redis_port = app.config.get("REDIS_PORT")
         self.redis_db = app.config.get("REDIS_DB")
         self.redis_auth = app.config.get("REDIS_USEAUTH")
 
+        #
         # Log the configuration to the handler.
+        #
         self.handler.log(
             message="Redis configured for: {}:{}/{} -- auth? {}"\
                 .format(
@@ -71,15 +77,18 @@ class GameServerController(MethodView):
         :return:
         """
 
+        #
         # Set the error handler to default the module and method so that logging
         # calls can be more precise and easier to read.
+        #
         self.handler = ErrorHandler(module="GameServerController", method="get")
         self.handler.log(message='Processing GET request', status=0)
 
+        #
         # Check if a game mode has been passed as a query parameter. If it has,
-        # validate the mode and use it to create the game. If it hasn't, then
-        # default to normal.
-        game_mode = request.args.get('mode', 'normal')
+        # use it to create the game. If it hasn't, then let the game decide.
+        #
+        game_mode = request.args.get('mode', None)
 
         try:
             game_controller = GameController(mode=game_mode)
@@ -186,7 +195,7 @@ class GameServerController(MethodView):
 
             self.handler.log(message="Loading game mode from: {}.".format(_loaded_game["mode"]))
             _mode = _loaded_game["mode"]
-            self.handler.log(message="Loaded game mode: {}".format(_mode))
+            self.handler.log(message="Loaded game mode.")
 
             _game = GameController(
                 game_json=json.dumps(_loaded_game),
