@@ -66,6 +66,11 @@ class GameServerController(MethodView):
         )
 
     def get(self):
+        """
+        TBC
+        :return:
+        """
+
         # Set the error handler to default the module and method so that logging
         # calls can be more precise and easier to read.
         self.handler = ErrorHandler(module="GameServerController", method="get")
@@ -124,6 +129,11 @@ class GameServerController(MethodView):
         return build_response(html_status=200, response_data=_response, response_mimetype="application/json")
 
     def post(self):
+        """
+        TBC
+        :return:
+        """
+
         self.handler = ErrorHandler(module="GameServerController", method="post")
         self.handler.log(message='Processing POST request.', status=0)
 
@@ -161,6 +171,7 @@ class GameServerController(MethodView):
         #
         try:
             _key = json_dict["key"]
+            _mode = json_dict["mode"]["mode"]
             self.handler.log(message='Attempting to load game {}'.format(_key), status=0)
         except TypeError as te:
             return self.handler.error(
@@ -172,8 +183,11 @@ class GameServerController(MethodView):
 
         try:
             #_game = GameController(game=str(persister.load(_key)))
-            _game = GameController()
-            _game.load(game=str(persister.load(_key)))
+            _game = GameController(
+                game_json=str(persister.load(_key)),
+                mode=_mode
+            )
+#            _game.load(game=str(persister.load(_key)))
             self.handler.log(message='Loaded game {}'.format(_key), status=0)
         except RuntimeError as ve:
             return self.handler.error(
