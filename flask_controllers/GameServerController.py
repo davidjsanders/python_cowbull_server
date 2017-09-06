@@ -171,7 +171,6 @@ class GameServerController(MethodView):
         #
         try:
             _key = json_dict["key"]
-            _mode = json_dict["mode"]["mode"]
             self.handler.log(message='Attempting to load game {}'.format(_key), status=0)
         except TypeError as te:
             return self.handler.error(
@@ -183,9 +182,10 @@ class GameServerController(MethodView):
 
         try:
             #_game = GameController(game=str(persister.load(_key)))
+            _loaded_game = persister.load(key=_key)
             _game = GameController(
-                game_json=str(persister.load(_key)),
-                mode=_mode
+                game_json=str(_loaded_game),
+                mode=str(_loaded_game["mode"]["mode"])
             )
 #            _game.load(game=str(persister.load(_key)))
             self.handler.log(message='Loaded game {}'.format(_key), status=0)
