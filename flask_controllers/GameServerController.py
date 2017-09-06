@@ -17,8 +17,10 @@ from flask_helpers.build_response import build_response
 from flask_helpers.ErrorHandler import ErrorHandler
 from werkzeug.exceptions import BadRequest
 
-# Import the Game and GameObject.
-#from python_cowbull_game import GameController
+# Import the Game Controller; NB: a subclassed GameController is imported
+# from extensions.ExtGameController which allows specific actions (such as
+# additional modes) to be added to the game by default.
+#
 from extensions.ExtGameController import ExtGameController as GameController
 
 # Import a persistence package
