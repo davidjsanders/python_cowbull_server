@@ -18,9 +18,7 @@ from flask_helpers.ErrorHandler import ErrorHandler
 from werkzeug.exceptions import BadRequest
 
 # Import the Game and GameObject.
-#from python_cowbull_game.GameController import GameController
-from extensions.ExtGameController import ExtGameController as GameController
-from python_cowbull_game.GameMode import GameMode
+from python_cowbull_game import GameController
 
 # Import a persistence package
 from Persistence.RedisPersist import RedisPersist as PersistenceEngine

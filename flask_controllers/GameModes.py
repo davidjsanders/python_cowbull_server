@@ -1,8 +1,7 @@
 from flask import request
 from flask.views import MethodView
 from flask_helpers.build_response import build_response
-from extensions.ExtGameController import ExtGameController as GameController
-#from python_cowbull_game.GameController import GameController
+from python_cowbull_game import GameController
 
 
 class GameModes(MethodView):
