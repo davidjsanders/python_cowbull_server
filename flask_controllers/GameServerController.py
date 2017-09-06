@@ -239,7 +239,7 @@ class GameServerController(MethodView):
 
             _game = GameController(
                 game_json=json.dumps(_loaded_game),
-                mode=_mode
+                mode=_mode["mode"]
             )
             self.handler.log(message='Loaded game {}'.format(_key), status=0)
         except RuntimeError as ve:
