@@ -185,7 +185,7 @@ class GameServerController(MethodView):
             self.handler.log(message="Loaded game: {} ({})".format(_loaded_game, type(_loaded_game)))
 
             self.handler.log(message="About to load mode.")
-            _mode = dict(_loaded_game)["mode"]
+            _mode = dict(**_loaded_game)
             self.handler.log(message="Loaded game mode: {}".format(_mode))
 
             _game = GameController(
