@@ -235,7 +235,7 @@ class GameServerController(MethodView):
         try:
             self.handler.log(message="Loading game mode from: {}.".format(_loaded_game["mode"]))
             _mode = _loaded_game["mode"]
-            self.handler.log(message="Loaded game mode.")
+            self.handler.log(message="Loaded game mode {}.".format(str(_mode["mode"])))
 
             _game = GameController(
                 game_json=json.dumps(_loaded_game),
