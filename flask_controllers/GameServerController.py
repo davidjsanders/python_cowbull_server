@@ -107,7 +107,7 @@ class GameServerController(MethodView):
         # an empty object.
         print("Game mode is {}".format(game_mode))
 #        game_controller.new(mode=game_mode)
-        self.handler.log(message='New game created with key {}'.format(game_controller.key), status=0)
+        self.handler.log(message='New game created with key {}'.format(game_controller.game.key), status=0)
 
         #
         # Save the newly created game
