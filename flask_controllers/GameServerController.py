@@ -182,9 +182,9 @@ class GameServerController(MethodView):
 
         try:
             _loaded_game = json.loads(persister.load(key=_key))
-            self.handler.log(message="Loaded game: {} ({})".format(_loaded_game, type(_loaded_game)))
+            self.handler.log(message="Loaded game: {}".format(_loaded_game))
 
-            self.handler.log(message="About to load mode.")
+            self.handler.log(message="Loading game mode from: {}.".format(_loaded_game["mode"]))
             _mode = _loaded_game["mode"]
             self.handler.log(message="Loaded game mode: {}".format(_mode))
 
