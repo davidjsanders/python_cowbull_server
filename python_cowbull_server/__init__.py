@@ -89,6 +89,8 @@ try:
 except exception_to_handle:
     print("CONFIGURATION: Using default values")
     set_defaults(flask_app=app)
+    print("Level  --> {}".format(app.config["LOGGING_LEVEL"]))
+    print("Format --> {}".format(app.config["LOGGING_FORMAT"]))
     logging.basicConfig(
         level=app.config["LOGGING_LEVEL"],
         format=app.config["LOGGING_FORMAT"]
