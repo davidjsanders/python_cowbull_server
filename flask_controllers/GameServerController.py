@@ -112,17 +112,17 @@ class GameServerController(MethodView):
         #
         # Save the newly created game
         #
-        persister.save(game_controller.key, game_controller.save())
-        self.handler.log(message='Game {} persisted.'.format(game_controller.key), status=0)
+        persister.save(game_controller.game.key, game_controller.save())
+        self.handler.log(message='Game {} persisted.'.format(game_controller.game.key), status=0)
 
         #
         # Build the user response - key, no. of digits, and no. of guesses
         #
         _response = {
-            "key": game_controller.key,
-            "digits": game_controller.digits_required,
-            "digit-type": game_controller.digits_type,
-            "guesses": game_controller.guesses_allowed,
+            "key": game_controller.game.key,
+            "digits": game_controller.game.digits_required,
+            "digit-type": game_controller.game.digit_type,
+            "guesses": game_controller.game.guesses_allowed,
             "served-by": socket.gethostname()
         }
 
