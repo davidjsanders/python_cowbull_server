@@ -120,7 +120,7 @@ class GameServerController(MethodView):
         #
         _response = {
             "key": game_controller.game.key,
-            "digits": game_controller.game.digits_required,
+            "digits": game_controller.game.digits,
             "digit-type": game_controller.game.digit_type,
             "guesses": game_controller.game.guesses_allowed,
             "served-by": socket.gethostname()
