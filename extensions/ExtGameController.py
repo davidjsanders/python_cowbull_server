@@ -34,8 +34,9 @@ class ExtGameController(GameController):
             instruction_text="hexTough is a hard hexidecimal based game. You need to "
                              "guess 3 digits, each of which needs to be a hex number "
                              "(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A, B, C, D, E, or F). "
-                             "The numbers can be passed as hex (0x0, 0xd, 0xE) or as "
-                             "strings (A, b, C, 0, 5, etc.)."
+                             "The numbers can be passed as hex (0x0, 0xd, 0xE), as "
+                             "strings (A, b, C, 0, 5, etc.), or even integers (0 "
+                             "to 15)."
         )
     ]
 
