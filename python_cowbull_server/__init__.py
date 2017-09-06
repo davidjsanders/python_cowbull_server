@@ -23,6 +23,7 @@ def set_defaults(flask_app=None):
     # representations of these to actual values from the logging
     # package, the code looks for the integer equivalent.
     flask_app.config["LOGGING_LEVEL"] = os.getenv("LOGGING_LEVEL", logging.INFO)
+    print("Logging level is {}".format(os.getenv("LOGGING_LEVEL")))
     try:
         # Env vars will be strings; so, the variable must be cast to an
         # int.
