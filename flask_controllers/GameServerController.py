@@ -209,7 +209,9 @@ class GameServerController(MethodView):
         try:
             _persisted_response = persister.load(key=_key)
             if not _persisted_response:
-                raise KeyError("The game key was not found in the persistence engine!")
+                raise KeyError(
+                    "The game key '{}' was not found in the persistence engine!".format(_key)
+                )
             self.handler.log(message="Persister response: {}".format(_persisted_response))
 
             _loaded_game = json.loads(_persisted_response)
