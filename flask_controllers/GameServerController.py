@@ -18,7 +18,8 @@ from flask_helpers.ErrorHandler import ErrorHandler
 from werkzeug.exceptions import BadRequest
 
 # Import the Game and GameObject.
-from python_cowbull_game import GameController
+#from python_cowbull_game import GameController
+from extensions.ExtGameController import ExtGameController as GameController
 
 # Import a persistence package
 from Persistence.RedisPersist import RedisPersist as PersistenceEngine
@@ -75,18 +76,13 @@ class GameServerController(MethodView):
 
         try:
             game_controller = GameController(mode=game_mode)
+            self.handler.log(message='New game created with key {}'.format(game_controller.game.key), status=0)
         except ValueError as ve:
             return self.handler.error(
                 status=400,
                 exception="Invalid game mode",
                 message="{}: game mode {}!".format(str(ve), game_mode)
             )
-
-#        print(game_controller.game_mode_names)
-#        if game_mode not in game_controller.game_mode_names:
-#            return self.handler.error(
-#                status=400, exception="Invalid game mode", message="There is no game mode {}!".format(game_mode)
-#            )
 
         # Get a persistence engine. Currently, this is set to be redis but can
         # easily be changed simply by changing the import statement above. Ideally
@@ -102,12 +98,6 @@ class GameServerController(MethodView):
             return self.handler.error(status=503, exception=str(ce), message="There is no redis service available!")
         except AttributeError as ae:
             return self.handler.error(status=503, exception=str(ae), message="An internal error occurred - attribute missing for redis - check GameServerController:__init__")
-
-        # Instantiate a game object. This calls the cowbull game object and creates
-        # an empty object.
-        print("Game mode is {}".format(game_mode))
-#        game_controller.new(mode=game_mode)
-        self.handler.log(message='New game created with key {}'.format(game_controller.game.key), status=0)
 
         #
         # Save the newly created game
