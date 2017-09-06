@@ -132,7 +132,9 @@ class GameServerController(MethodView):
             "digits": game_controller.game.mode.digits,
             "digit-type": game_controller.game.mode.digit_type,
             "guesses": game_controller.game.mode.guesses_allowed,
-            "served-by": socket.gethostname()
+            "served-by": socket.gethostname(),
+            "help-text": game_controller.game.mode.help_text,
+            "instruction-text": game_controller.game.mode.instruction_text
         }
 
         self.handler.log(message='GET request fulfilled. Returned: {}'.format(_response), status=0)
