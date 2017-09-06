@@ -9,6 +9,9 @@ class ExtGameController(GameController):
     ]
 
     def __init__(self, game_modes=None, mode=None, game_json=None):
+        if game_modes is not None and not isinstance(game_modes, list):
+            raise TypeError("ExtGameController expected a list of GameMode objects")
+
         super(ExtGameController, self).__init__(
             game_json=game_json,
             mode=mode,
