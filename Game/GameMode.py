@@ -246,5 +246,5 @@ class GameMode(object):
         if _value and not isinstance(_value, datatype):
             raise TypeError("{} is of type {} where {} was expected.".format(keyword, type(_value), datatype))
 
-        self.handler.log(message="Set property {}:{}".format(keyword, _value))
+        self.handler.log(method="_property_setter", message="Set property {}:{}".format(keyword, _value))
         return _value
