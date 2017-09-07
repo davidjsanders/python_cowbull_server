@@ -30,7 +30,7 @@ class GameModes(MethodView):
                          "serves the game.",
                 "modes": [
                     {
-                        "mode": gt.mode.capitalize(),
+                        "mode": gt.mode,
                         "digits": gt.digits,
                         "digit-type": gt.digit_type,
                         "guesses": gt.guesses_allowed

@@ -56,7 +56,7 @@ class GameController(object):
 
     @property
     def game_mode_names(self):
-        return [game_mode.mode.capitalize() for game_mode in sorted(self._game_modes, key=lambda x: x.priority)]
+        return [game_mode.mode for game_mode in sorted(self._game_modes, key=lambda x: x.priority)]
 
     #
     # 'public' methods
@@ -255,7 +255,7 @@ class GameController(object):
         self.handler.log(method="load_modes", message="Loading default modes")
         _modes = [
             GameMode(
-                mode="normal",
+                mode="Normal",
                 priority=2,
                 digits=4,
                 digit_type=DigitWord.DIGIT,
@@ -268,7 +268,7 @@ class GameController(object):
                                  "(0, 1, 2, 3, 4, 5, 6, 7, 8, and 9)."
             ),
             GameMode(
-                mode="easy",
+                mode="Easy",
                 priority=1,
                 digits=3,
                 digit_type=DigitWord.DIGIT,
@@ -280,7 +280,7 @@ class GameController(object):
                                  "(0, 1, 2, 3, 4, 5, 6, 7, 8, and 9)."
             ),
             GameMode(
-                mode="hard",
+                mode="Hard",
                 priority=3,
                 digits=6,
                 digit_type=DigitWord.DIGIT,
@@ -292,7 +292,7 @@ class GameController(object):
                                  "(0, 1, 2, 3, 4, 5, 6, 7, 8, and 9)."
             ),
             GameMode(
-                mode="hex",
+                mode="Hex",
                 priority=4,
                 digits=4,
                 digit_type=DigitWord.HEXDIGIT,
