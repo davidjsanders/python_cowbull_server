@@ -1,5 +1,5 @@
-from python_cowbull_game.GameController import GameController
-from python_cowbull_game.GameMode import GameMode
+from Game.GameController import GameController
+from Game.GameMode import GameMode
 
 
 class ExtGameController(GameController):
