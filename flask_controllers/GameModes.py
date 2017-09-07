@@ -11,7 +11,7 @@ from extensions.ExtGameController import ExtGameController as GameController
 
 class GameModes(MethodView):
     def get(self):
-        game_object = GameController()
+        game_object = GameController(mode=None)
 
         if request.args.get('textmode', None):
             response_data = game_object.game_mode_names

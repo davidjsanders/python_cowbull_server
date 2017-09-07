@@ -148,6 +148,8 @@ class GameController(object):
         :return: A game object
         """
 
+        _mode = mode or 'normal' # Default mode to normal if not provided
+
         logging.debug("GameController: load: Validating (any) JSON provided")
         if game_json is None:    # New game_json
             logging.debug("GameController: load: No JSON, so start new game.")
