@@ -224,8 +224,8 @@ class GameMode(object):
     #
     # 'private' methods
     #
-    @staticmethod
     def _property_setter(
+            self,
             keyword=None,
             required=None,
             default=None,
@@ -246,5 +246,5 @@ class GameMode(object):
         if _value and not isinstance(_value, datatype):
             raise TypeError("{} is of type {} where {} was expected.".format(keyword, type(_value), datatype))
 
-        logging.debug("Set property {}:{}".format(keyword, _value))
+        self.handler.log(message="Set property {}:{}".format(keyword, _value))
         return _value
