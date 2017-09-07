@@ -223,7 +223,7 @@ class GameMode(object):
             value=None,
     ):
         if datatype == str:
-            _value = str(value) # To handle unicode to str conversion in Python 2
+            _value = str(value) # To handle unicode to str conversion in Python 2.7
         else:
             _value = value
         logging.debug("_property_setter: Keyword=={} Value=={}".format(keyword, _value))
