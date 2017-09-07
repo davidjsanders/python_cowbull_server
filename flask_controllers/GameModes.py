@@ -19,7 +19,7 @@ class GameModes(MethodView):
             logging.debug("GameModes: GET: Responding with list of names")
             response_data = game_object.game_mode_names
         else:
-            logging.debug("GameModes: GET: Responding with JSON object")
+            logging.debug("GameModes: GET: Responding with JSON object: {}".format(game_object.game_modes))
             response_data = [{"mode": gt.mode,
                               "digits": gt.digits,
                               "digit-type": gt.digit_type,
