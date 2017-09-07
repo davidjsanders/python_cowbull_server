@@ -155,7 +155,7 @@ class GameController(object):
             if mode is not None:
                 logging.debug("GameController: load: mode provided, checking if string or GameMode")
                 if isinstance(mode, str):
-                    logging.debug("GameController: load: Mode is a string; matching name,")
+                    logging.debug("GameController: load: Mode is a string; matching name {}".format(mode))
                     _game_object = GameObject(mode=self._match_mode(mode=mode))
                 elif isinstance(mode, GameMode):
                     logging.debug("GameController: load: Mode is a GameMode object")
