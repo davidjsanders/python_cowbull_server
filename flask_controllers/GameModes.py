@@ -14,7 +14,7 @@ from extensions.ExtGameController import ExtGameController as GameController
 class GameModes(MethodView):
     def get(self):
         logging.debug("GameModes: GET: Initializing GameObject")
-        game_object = GameController(mode=None)
+        game_object = GameController()
         logging.debug("GameModes: GET: GameObject initialized to {}".format(game_object.save()))
 
         logging.debug("GameModes: GET: Checking if textmode flag set")

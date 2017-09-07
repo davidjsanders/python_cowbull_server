@@ -32,11 +32,14 @@ class GameController(object):
         """
         # load game_modes
         logging.debug("GameController: __init__: Setup game modes")
+        logging.debug("GameController: __init__: game_modes: Value {} Type {}".format(game_modes, type(game_modes)))
         self._game_modes = None
         self.load_modes(input_modes=game_modes)
 
         # load any game passed
         logging.debug("GameController: __init__: Loading any saved game")
+        logging.debug("GameController: __init__: mode: Value {} Type {}".format(mode, type(mode)))
+        logging.debug("GameController: __init__: game_json: Value {} Type {}".format(game_json, type(game_json)))
         self.game = None
         self.load(game_json=game_json, mode=mode)
 
