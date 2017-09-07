@@ -56,7 +56,7 @@ class GameController(object):
 
     @property
     def game_mode_names(self):
-        return [game_mode.mode for game_mode in sorted(self._game_modes, key=lambda x: x.priority)]
+        return [game_mode.mode.capitalize() for game_mode in sorted(self._game_modes, key=lambda x: x.priority)]
 
     #
     # 'public' methods
