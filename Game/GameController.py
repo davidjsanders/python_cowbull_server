@@ -118,6 +118,12 @@ class GameController(object):
                 response_object["status"] = self._start_again_message(
                     "Sorry, you lost!"
                 )
+            else:
+                self.game_status = self.GAME_PLAYING
+                response_object["status"] = "You have {} bulls and {} cows".format(
+                    response_object["bulls"],
+                    response_object["cows"]
+                )
 
         return response_object
 
