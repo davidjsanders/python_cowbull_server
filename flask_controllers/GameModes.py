@@ -4,11 +4,8 @@ from flask import request
 from flask.views import MethodView
 from flask_helpers.build_response import build_response
 
-# Import the Game Controller; NB: a subclassed GameController is imported
-# from extensions.ExtGameController which allows specific actions (such as
-# additional modes) to be added to the game by default.
-#
-from extensions.ExtGameController import ExtGameController as GameController
+# Import the Game Controller
+from Game.GameController import GameController
 
 
 class GameModes(MethodView):
