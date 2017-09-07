@@ -157,6 +157,7 @@ class GameController(object):
                 else:
                     raise TypeError("Game mode must be a GameMode or string")
             else:
+                logging.debug("Game mode is None, so default mode used.")
                 _game_object = GameObject(mode=self._game_modes[0])
             _game_object.status = self.GAME_PLAYING
         else:
