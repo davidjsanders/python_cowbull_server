@@ -148,6 +148,8 @@ class GameController(object):
         :return: A game object
         """
 
+        logging.debug("GameController: load: Validating mode value")
+        logging.debug("GameController: load: Mode: Value {} Type {}".format(mode, type(mode)))
         _mode = mode or 'normal' # Default mode to normal if not provided
 
         logging.debug("GameController: load: Validating (any) JSON provided")
