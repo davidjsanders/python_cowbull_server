@@ -252,6 +252,7 @@ class GameController(object):
         """
 
         # Set default game modes
+        self.handler.log(method="load_modes", message="Loading default modes")
         _modes = [
             GameMode(
                 mode="normal", priority=2, digits=4, digit_type=DigitWord.DIGIT, guesses_allowed=10
@@ -266,6 +267,7 @@ class GameController(object):
                 mode="hex", priority=4, digits=4, digit_type=DigitWord.HEXDIGIT, guesses_allowed=10
             )
         ]
+        self.handler.log(method="load_modes", message="Loaded modes: {}".format(_modes))
 
         if input_modes is not None:
             if not isinstance(input_modes, list):
@@ -274,22 +276,38 @@ class GameController(object):
             for mode in input_modes:
                 if not isinstance(mode, GameMode):
                     raise TypeError("Expected list to contain only GameMode objects")
+                self.handler.log(
+                    method="load_modes",
+                    message="Appending mode: {}".format(mode)
+                )
                 _modes.append(mode)
 
+        self.handler.log(method="load_modes", message="Deep copying modes")
         self._game_modes = copy.deepcopy(_modes)
 
     #
     # 'private' methods
     #
     def _match_mode(self, mode):
+        self.handler.log(method="_match_mode", message="Attempting to match mode: {}".format(mode))
         _mode = [game_mode for game_mode in self._game_modes if game_mode.mode == mode]
-        if len(_mode) < 1:
-            raise ValueError("Mode {} not found - has it been initiated?".format(mode))
-        _mode = _mode[0]
 
+        if len(_mode) < 1:
+            self.handler.log(method="_match_mode", message="No match found for: {}".format(mode))
+            raise ValueError("Mode {} not found - has it been initiated?".format(mode))
+
+        _mode = _mode[0]
         if not _mode:
+            self.handler.log(
+                method="_match_mode",
+                message="Something unexpected happened while matching mode: {}".format(mode)
+            )
             raise ValueError("For some reason, the mode is defined but unavailable!")
 
+        self.handler.log(
+            method="_match_mode",
+            message="Returning mode: {}, value: {}".format(mode, _mode.dump())
+        )
         return _mode
 
     def _start_again_message(self, message=None):
