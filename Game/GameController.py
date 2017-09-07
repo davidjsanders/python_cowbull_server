@@ -277,4 +277,4 @@ class GameController(object):
 
     @staticmethod
     def _non_hex(value):
-        return str(value).replace('0x', '')
+        return str(value).replace('0x', '').upper()
