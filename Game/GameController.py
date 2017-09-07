@@ -72,9 +72,11 @@ class GameController(object):
         :return: A dictionary object detailing the analysis and results of the guess
         """
 
+        logging.debug("GameController: guess: Validating game is defined")
         if self.game is None:
             raise ValueError("The Game is unexpectedly undefined!")
 
+        logging.debug("GameController: guess: Building empty response object")
         response_object = {
             "bulls": None,
             "cows": None,
@@ -82,25 +84,42 @@ class GameController(object):
             "status": None
         }
 
+        logging.debug("GameController: guess: Checking game status")
         if self.game.status == self.GAME_WON:
+            logging.debug("GameController: guess: Game already won")
             response_object["status"] = \
                 self._start_again_message("You already won!")
         elif self.game.status == self.GAME_LOST:
+            logging.debug("GameController: guess: Game already lost")
             response_object["status"] = \
                 self._start_again_message("You already lost!")
         elif self.game.guesses_remaining < 1:
+            logging.debug("GameController: guess: Game lost, too many guesses")
             response_object["status"] = \
                 self._start_again_message("You've made too many guesses")
         else:
+            logging.debug("GameController: guess: Game is valid and in play")
+
             guess_made = DigitWord(*args, wordtype=self.game.mode.digit_type)
+            logging.debug("GameController: guess: Created DigitWord using digits provided: Value {} Type {}"
+                          .format(guess_made.word, type(guess_made))
+                          )
+
+            logging.debug("GameController: guess: Comparing guess and answer")
             comparison = self.game.answer.compare(guess_made)
 
+            logging.debug("GameController: guess: Increment number of guesses made")
             self.game.guesses_made += 1
             response_object["bulls"] = 0
             response_object["cows"] = 0
             response_object["analysis"] = []
 
+            logging.debug("GameController: guess: Process comparison analysis")
             for comparison_object in comparison:
+                logging.debug("GameController: guess: Processing index {} value {}".format(
+                    comparison_object.index,
+                    comparison_object.digit
+                ))
                 if comparison_object.match:
                     response_object["bulls"] += 1
                 elif comparison_object.in_word:
@@ -113,17 +132,24 @@ class GameController(object):
                 response_object["status"] = self._start_again_message(
                     "Congratulations, you win!"
                 )
+                logging.debug("GameController: guess: The game has been won with the answers: {}"
+                              .format(guess_made.word)
+                              )
             elif self.game.guesses_remaining < 1:
                 self.game.status = self.GAME_LOST
                 response_object["status"] = self._start_again_message(
                     "Sorry, you lost!"
                 )
+                logging.debug("GameController: guess: Game lost.")
             else:
                 self.game_status = self.GAME_PLAYING
                 response_object["status"] = "You have {} bulls and {} cows".format(
                     response_object["bulls"],
                     response_object["cows"]
                 )
+                logging.debug("GameController: guess: Still in play. {} bulls, {} cows"
+                              .format(response_object["bulls"], response_object["cows"])
+                              )
 
         return response_object
 
