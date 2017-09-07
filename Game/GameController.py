@@ -148,30 +148,41 @@ class GameController(object):
         :return: A game object
         """
 
+        logging.debug("GameController: load: Validating (any) JSON provided")
         if game_json is None:    # New game_json
+            logging.debug("GameController: load: No JSON, so start new game.")
+            logging.debug("GameController: load: Validating (any) mode provided")
             if mode is not None:
+                logging.debug("GameController: load: mode provided, checking if string or GameMode")
                 if isinstance(mode, str):
+                    logging.debug("GameController: load: Mode is a string; matching name,")
                     _game_object = GameObject(mode=self._match_mode(mode=mode))
                 elif isinstance(mode, GameMode):
+                    logging.debug("GameController: load: Mode is a GameMode object")
                     _game_object = GameObject(mode=mode)
                 else:
+                    logging.debug("GameController: load: Mode is invalid")
                     raise TypeError("Game mode must be a GameMode or string")
             else:
                 logging.debug("Game mode is None, so default mode used.")
                 _game_object = GameObject(mode=self._game_modes[0])
             _game_object.status = self.GAME_PLAYING
         else:
+            logging.debug("GameController: load: JSON provided")
             if not isinstance(game_json, str):
                 raise TypeError("Game must be passed as a serialized JSON string.")
 
+            logging.debug("GameController: load: Attempting to load")
             game_dict = json.loads(game_json)
 
+            logging.debug("GameController: load: Validating mode exists in JSON")
             if not 'mode' in game_dict:
                 raise ValueError("Mode is not provided in JSON; game_json cannot be loaded!")
 
             _mode = GameMode(**game_dict["mode"])
             _game_object = GameObject(mode=_mode, source_game=game_dict)
 
+        logging.debug("GameController: load: Deep copy loaded (or new) object")
         self.game = copy.deepcopy(_game_object)
 
     def save(self):
