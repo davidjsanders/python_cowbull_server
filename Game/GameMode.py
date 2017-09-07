@@ -238,13 +238,14 @@ class GameMode(object):
             _value = value
 
         if required and not _value and not default:
+            self.handler.log(method="_property_setter", message="Required property {} not provided".format(keyword, _value))
             raise KeyError("GameMode: '{}' not provided to __init__ and no default provided (or allowed).".format(keyword))
 
         if not _value and default is not None:
             _value = default
 
         if _value and not isinstance(_value, datatype):
+            self.handler.log(method="_property_setter", message="**ERROR** Set property {}:{} TypeError".format(keyword, _value))
             raise TypeError("{} is of type {} where {} was expected.".format(keyword, type(_value), datatype))
 
-        self.handler.log(method="_property_setter", message="Set property {}:{}".format(keyword, _value))
         return _value
