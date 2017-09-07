@@ -46,6 +46,6 @@ class ExtGameController(GameController):
 
         super(ExtGameController, self).__init__(
             game_json=game_json,
-            mode=str(mode),
+            mode=mode,
             game_modes=self.additional_modes + (game_modes or [])
         )
