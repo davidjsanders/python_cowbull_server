@@ -211,7 +211,6 @@ class GameMode(object):
         Dump (convert to a dict) the GameMode object
         :return: <dict>
         """
-        self.handler.log(message="Dumping mode {} to Python <dict>".format(self._mode))
         return {
             "mode": self._mode,
             "priority": self._priority,
