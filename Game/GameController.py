@@ -255,16 +255,54 @@ class GameController(object):
         self.handler.log(method="load_modes", message="Loading default modes")
         _modes = [
             GameMode(
-                mode="normal", priority=2, digits=4, digit_type=DigitWord.DIGIT, guesses_allowed=10
+                mode="normal",
+                priority=2,
+                digits=4,
+                digit_type=DigitWord.DIGIT,
+                guesses_allowed=10,
+                help_text="This is the default game. You need to guess 4 digits "
+                          "in the right place and each digit must be a whole number "
+                          "between 0 and 9. There are 10 tries to guess the "
+                          "correct answer.",
+                instruction_text="Enter 4 digits, each digit between 0 and 9 "
+                                 "(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)."
             ),
             GameMode(
-                mode="easy", priority=1, digits=3, digit_type=DigitWord.DIGIT, guesses_allowed=6
+                mode="easy",
+                priority=1,
+                digits=3,
+                digit_type=DigitWord.DIGIT,
+                guesses_allowed=6,
+                help_text="You need to guess 3 digits in the right place and each "
+                          "digit must be a whole number between 0 and 9. There are "
+                          "6 tries to guess the correct answer.",
+                instruction_text="Enter 3 digits, each digit between 0 and 9 "
+                                 "(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)."
             ),
             GameMode(
-                mode="hard", priority=3, digits=6, digit_type=DigitWord.DIGIT, guesses_allowed=6
+                mode="hard",
+                priority=3,
+                digits=6,
+                digit_type=DigitWord.DIGIT,
+                guesses_allowed=6,
+                help_text="You need to guess 6 digits in the right place and each "
+                          "digit must be a whole number between 0 and 9. There are "
+                          "only 6 tries to guess the correct answer.",
+                instruction_text="Enter 6 digits, each digit between 0 and 9 "
+                                 "(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)."
             ),
             GameMode(
-                mode="hex", priority=4, digits=4, digit_type=DigitWord.HEXDIGIT, guesses_allowed=10
+                mode="hex",
+                priority=4,
+                digits=4,
+                digit_type=DigitWord.HEXDIGIT,
+                guesses_allowed=10,
+                help_text="You need to guess 4 digits in the right place and each "
+                          "digit must be a hexidecimal number between 0 and F. There are "
+                          "10 tries to guess the correct answer.",
+                instruction_text="Enter 4 digits, each digit between 0 and F "
+                                 "(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A, B, C, D"
+                                 "E, F)."
             )
         ]
         self.handler.log(method="load_modes", message="Loaded modes: {}".format(_modes))
