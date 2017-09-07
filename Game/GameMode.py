@@ -1,5 +1,7 @@
 import logging
 
+from flask_helpers.ErrorHandler import ErrorHandler
+
 
 class GameMode(object):
     """
@@ -37,7 +39,12 @@ class GameMode(object):
         :param help_text: <str> Help text (dependent upon caller to show)
 
         """
+
+        # load error handler
+        self.handler = ErrorHandler(module="GameMode", method="__init__")
+
         # Initialize variables
+        self.handler.log(message="Initializing variables")
         self._mode = None
         self._priority = None
         self._digits = None
@@ -51,6 +58,7 @@ class GameMode(object):
         # that the property is created (following the existing code) and set the
         # property not the 'internal' variable.
         #
+        self.handler.log(message="Creating mode {}".format(mode))
         self.mode = mode
         self.priority = priority
         self.digits = digits
@@ -58,6 +66,8 @@ class GameMode(object):
         self.guesses_allowed = guesses_allowed
         self.instruction_text = instruction_text
         self.help_text = help_text
+
+        self.handler.log(message="Mode {} created: {}".format(mode, self.dump()))
 
     #
     # Overrides
@@ -201,6 +211,7 @@ class GameMode(object):
         Dump (convert to a dict) the GameMode object
         :return: <dict>
         """
+        self.handler.log(message="Dumping mode {} to Python <dict>".format(self._mode))
         return {
             "mode": self._mode,
             "priority": self._priority,
@@ -226,7 +237,6 @@ class GameMode(object):
             _value = str(value) # To handle unicode to str conversion in Python 2.7
         else:
             _value = value
-        logging.debug("_property_setter: Keyword=={} Value=={}".format(keyword, _value))
 
         if required and not _value and not default:
             raise KeyError("GameMode: '{}' not provided to __init__ and no default provided (or allowed).".format(keyword))
@@ -237,5 +247,5 @@ class GameMode(object):
         if _value and not isinstance(_value, datatype):
             raise TypeError("{} is of type {} where {} was expected.".format(keyword, type(_value), datatype))
 
-        logging.debug("_property_setter: Keyword=={} Value=={}".format(keyword, _value))
+        logging.debug("Set property {}:{}".format(keyword, _value))
         return _value
