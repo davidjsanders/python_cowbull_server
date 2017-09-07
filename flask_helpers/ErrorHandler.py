@@ -63,6 +63,10 @@ class ErrorHandler(object):
                 "EXCEPTION:{}".format(exception) if exception is not None else ""
             )
         else:
-            _message = "{}".format(message)
+            _message = "{}: {}: {}".format(
+                module or self.defaults["module"],
+                method or self.defaults["method"],
+                message
+            )
 
         logger(_message)

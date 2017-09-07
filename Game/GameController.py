@@ -290,7 +290,7 @@ class GameController(object):
 
     def _start_again_message(self, message=None):
         """Simple method to form a start again message and give the answer in readable form."""
-        logging.debug("Start again message delivered: {}".format(message))
+        logging.debug("GameController: _start_again_message: {}".format(message))
         the_answer = ', '.join(
             [self._non_hex(d) for d in self.game.answer][:-1]
         ) + ', and ' + [self._non_hex(d) for d in self.game.answer][-1]
