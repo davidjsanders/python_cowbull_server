@@ -36,72 +36,27 @@ errorHandler.basicConfig(
 # Version 1 routes                                                          #
 #############################################################################
 
-# Add a game view. The game view is actually contained within a class
-# based on a MethodView. See flask_controllers/GameServerControllerroller.py
-# ---------------------------------------------------------------------------
-#errorHandler.log(message="Adding game URL: {}/game".format(app.config["GAME_VERSION"]))
-#game_view = GameServerController.as_view('Game')
-#app.add_url_rule(
-#    '/v1/game'.format(app.config["GAME_VERSION"]),
-#    view_func=game_view,
-#    methods=["GET", "POST"]
-#)
-#
-# Add a game modes view. The game modes view is actually contained within a class
-# based on a MethodView. See flask_controllers/GameModes.py
-# ---------------------------------------------------------------------------
-#errorHandler.log(message="Adding game URL: {}/modes".format(app.config["GAME_VERSION"]))
-#modes_view = GameModes.as_view('Modes')
-#app.add_url_rule(
-#    '/v1/modes'.format(app.config["GAME_VERSION"]),
-#    view_func=modes_view,
-#    methods=["GET"]
-#)
-#
-# Add a health check view so that infrastructure, such as Kubernetes or AWS ECS, can
-# check the health of the application. This check simply returns a 200 status and
-# can be probed at regular occassions to check the responsiveness (of the pod,
-# container, etc.)
-# ---------------------------------------------------------------------------
-#errorHandler.log(message="Adding health check URL: {}/health".format(app.config["GAME_VERSION"]))
-#health_view = HealthCheck.as_view('Health')
-#app.add_url_rule(
-#    '/v1/health'.format(app.config["GAME_VERSION"]),
-#    view_func=health_view,
-#    methods=["GET"]
-#)
-#
-# Add a readiness view. The code below currently does nothing other than return an
-# HTML 200 status. In a more complex app, it could return a 503 error (service
-# unavailable), so that a scheduling engine like Kubernetes or a load balancer
-# could avoid sending traffic to the node until it responds ready (200).
-# ---------------------------------------------------------------------------
-#errorHandler.log(message="Adding readiness check URL: {}/ready".format(app.config["GAME_VERSION"]))
-#readiness_view = Readiness.as_view('ready')
-#app.add_url_rule(
-#    '/v1/ready'.format(app.config["GAME_VERSION"]),
-#    view_func=readiness_view,
-#    methods=["GET"]
-#)
-
 v1 = V1(errorHandler=errorHandler, app=app)
-v1.game(GameServerController=GameServerController)
-v1.modes(GameModes=GameModes)
-v1.health(HealthCheck=HealthCheck)
-v1.readiness(Readiness=Readiness)
+v1.game(controller=GameServerController)
+v1.modes(controller=GameModes)
+v1.health(controller=HealthCheck)
+v1.readiness(controller=Readiness)
 
-# If app.py has been run using Python, initiate a Flask object; otherwise, any
-# caller (e.g. uWSGI or gunicorn) should initiate workers and routes. The code
-# below is useful because it allows changes to be checked using Flask's built-in
-# webserver (before building a Docker image) simply by running "python app.py".
-# If using this method, remember:
-#
-# 1. instruct the app on how to find redis by setting environment variables (see
-#    python_cowbull_server/__init__.py)
-# 2. do not use for production workloads! The Flask webserver is suitable for
-#    dev / test workloads only.
-#
-# ---------------------------------------------------------------------------
+#############################################################################
+# Built-in Web Server                                                       #
+#############################################################################
+# If app.py has been run using Python, initiate a Flask object; otherwise,  #
+# any caller (e.g. uWSGI or gunicorn) should initiate workers and routes.   #
+# The code below is useful because it allows changes to be checked using    #
+# Flask's built-in webserver (before building a Docker image) simply by     #
+# running "python app.py". If using this method, remember:                  #
+#                                                                           #
+# 1. instruct the app on how to find redis by setting environment variables #
+#    (see python_cowbull_server/__init__.py)                                #
+# 2. do not use for production workloads! The Flask webserver is suitable   #
+#    for dev / test workloads only.                                         #
+#                                                                           #
+#############################################################################
 if __name__ == "__main__":
     app.run\
         (

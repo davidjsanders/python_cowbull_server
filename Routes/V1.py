@@ -19,29 +19,29 @@ class V1(object):
         self.errorHandler.method = "__init__"
         self.errorHandler.log(message="Initialized V1 Routes")
 
-    def game(self, GameServerController=None):
+    def game(self, controller=None):
         # Add a game view. The game view is actually contained within a class
         # based on a MethodView. See flask_controllers/GameServerControllerroller.py
         # ---------------------------------------------------------------------------
         self.errorHandler.method = "game"
         self.errorHandler.log(message="Adding game URL: /v1/game")
-        game_view = GameServerController.as_view('Game')
+        game_view = controller.as_view('Game')
         self.app.add_url_rule('/v1/game', view_func=game_view, methods=["GET", "POST"])
 
-    def modes(self, GameModes=None):
+    def modes(self, controller=None):
         # Add a game modes view. The game modes view is actually contained within a class
         # based on a MethodView. See flask_controllers/GameModes.py
         # ---------------------------------------------------------------------------
         self.errorHandler.method = "modes"
         self.errorHandler.log(message="Adding game URL: /v1/modes")
-        modes_view = GameModes.as_view('Modes')
+        modes_view = controller.as_view('Modes')
         self.app.add_url_rule(
             '/v1/modes',
             view_func=modes_view,
             methods=["GET"]
         )
 
-    def health(self, HealthCheck=None):
+    def health(self, controller=None):
         # Add a health check view so that infrastructure, such as Kubernetes or AWS ECS, can
         # check the health of the application. This check simply returns a 200 status and
         # can be probed at regular occassions to check the responsiveness (of the pod,
@@ -49,14 +49,14 @@ class V1(object):
         # ---------------------------------------------------------------------------
         self.errorHandler.method = "health"
         self.errorHandler.log(message="Adding health check URL: /v1/health")
-        health_view = HealthCheck.as_view('Health')
+        health_view = controller.as_view('Health')
         self.app.add_url_rule(
             '/v1/health',
             view_func=health_view,
             methods=["GET"]
         )
 
-    def readiness(self, Readiness=None):
+    def readiness(self, controller=None):
         # Add a readiness view. The code below currently does nothing other than return an
         # HTML 200 status. In a more complex app, it could return a 503 error (service
         # unavailable), so that a scheduling engine like Kubernetes or a load balancer
@@ -64,7 +64,7 @@ class V1(object):
         # ---------------------------------------------------------------------------
         self.errorHandler.method = "readiness"
         self.errorHandler.log(message="Adding readiness check URL: /v1/ready")
-        readiness_view = Readiness.as_view('ready')
+        readiness_view = controller.as_view('ready')
         self.app.add_url_rule(
             '/v1/ready',
             view_func=readiness_view,
