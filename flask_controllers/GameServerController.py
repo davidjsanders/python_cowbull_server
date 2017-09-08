@@ -90,7 +90,7 @@ class GameServerController(MethodView):
 
         try:
             self.handler.log(message="Creating game with mode {} ({})".format(game_mode, type(game_mode)))
-            game_controller = GameController(mode=str(game_mode))
+            game_controller = GameController(mode=game_mode)
             self.handler.log(message='New game created with key {}'.format(game_controller.game.key), status=0)
         except ValueError as ve:
             return self.handler.error(
