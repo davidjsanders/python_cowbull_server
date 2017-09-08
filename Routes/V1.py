@@ -65,7 +65,7 @@ class V1(object):
         self.errorHandler.method = "readiness"
         self.errorHandler.log(message="Adding readiness check URL: /v1/ready")
         readiness_view = Readiness.as_view('ready')
-        app.add_url_rule(
+        self.app.add_url_rule(
             '/v1/ready',
             view_func=readiness_view,
             methods=["GET"]
