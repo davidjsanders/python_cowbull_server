@@ -85,7 +85,7 @@ class GameServerController(MethodView):
         # Check if a game mode has been passed as a query parameter. If it has,
         # use it to create the game. If it hasn't, then let the game decide.
         #
-        game_mode = request.args.get('mode', 'normal')
+        game_mode = request.args.get('mode', None)
 
         try:
             self.handler.log(message="Creating game with mode {} ({})".format(game_mode, type(game_mode)))
