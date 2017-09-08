@@ -11,15 +11,15 @@ from Game.GameController import GameController
 class GameModes(MethodView):
     def get(self):
         logging.debug("GameModes: GET: Initializing GameObject")
-        game_object = GameController()
-        logging.debug("GameModes: GET: GameObject initialized to {}".format(game_object.save()))
+        game_controller = GameController()
+        logging.debug("GameModes: GET: GameObject initialized to {}".format(game_controller.save()))
 
         logging.debug("GameModes: GET: Checking if textmode flag set")
         if request.args.get('textmode', None):
             logging.debug("GameModes: GET: Responding with list of names")
-            response_data = game_object.game_mode_names
+            response_data = game_controller.game_mode_names
         else:
-            logging.debug("GameModes: GET: Responding with JSON object: {}".format(game_object.game_modes))
+            logging.debug("GameModes: GET: Responding with JSON object: {}".format(game_controller.game_modes))
             response_data = {
                 "instructions": "Welcome to the CowBull game. The objective of this game "
                                 "is to guess a set of digits by entering a sequence of "
@@ -28,6 +28,7 @@ class GameModes(MethodView):
                                 "of your guesses.",
                 "notes": "The modes can be different depending upon the game server that "
                          "serves the game.",
+                "default-mode": str(game_controller.default_mode),
                 "modes": [
                     {
                         "mode": gt.mode,
@@ -35,7 +36,7 @@ class GameModes(MethodView):
                         "digit-type": gt.digit_type,
                         "guesses": gt.guesses_allowed
                     }
-                    for gt in game_object.game_modes
+                    for gt in game_controller.game_modes
                 ]
             }
 #            response_data = [{"mode": gt.mode,

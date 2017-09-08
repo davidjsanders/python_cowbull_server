@@ -44,6 +44,9 @@ class GameController(object):
         # load error handler
         self.handler = ErrorHandler(module="GameController", method="__init__")
 
+        # Set defaults
+        self.default_mode = None
+
         # Dump parameters to log
         self.handler.log(message="Parameter game_modes: Value {} Type {}".format(game_modes, type(game_modes)))
         self.handler.log(message="Parameter mode: Value {} Type {}".format(mode, type(mode)))
@@ -339,6 +342,7 @@ class GameController(object):
 
         self.handler.log(message="Deep copying modes")
         self._game_modes = copy.deepcopy(_modes)
+        self.default_mode = "Normal"
 
     #
     # 'private' methods
