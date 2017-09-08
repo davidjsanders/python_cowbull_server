@@ -40,6 +40,7 @@ class GameController(object):
         # load error handler
         self.handler = ErrorHandler(module="GameController", method="__init__")
         self.handler.log(message="mode: Value {} Type {}".format(mode, type(mode)))
+        print("***DEBUG*** ###{}### ---{}---".format(mode, type(mode)))
 
         # load game_modes
         self.handler.log(message="Setup game modes")
