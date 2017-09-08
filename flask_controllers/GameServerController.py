@@ -86,6 +86,7 @@ class GameServerController(MethodView):
         # use it to create the game. If it hasn't, then let the game decide.
         #
         game_mode = request.args.get('mode', default=None, type=None)
+        self.handler.log("game_mode value from request.args.get: {}, type: {}".format(game_mode, type(game_mode)))
 
         try:
             self.handler.log(message="Creating game with mode {} ({})".format(game_mode, type(game_mode)))
