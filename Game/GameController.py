@@ -39,19 +39,19 @@ class GameController(object):
         """
         # load error handler
         self.handler = ErrorHandler(module="GameController", method="__init__")
-        self.handler.log(message="mode: Value {} Type {}".format(mode, type(mode)))
-        print("***DEBUG*** ###{}### ---{}---".format(mode, type(mode)))
+
+        # Dump parameters to log
+        self.handler.log(message="Parameter game_modes: Value {} Type {}".format(game_modes, type(game_modes)))
+        self.handler.log(message="Parameter mode: Value {} Type {}".format(mode, type(mode)))
+        self.handler.log(message="Parameter game_json: Value {} Type {}".format(game_json, type(game_json)))
 
         # load game_modes
         self.handler.log(message="Setup game modes")
-        self.handler.log(message="game_modes: Value {} Type {}".format(game_modes, type(game_modes)))
         self._game_modes = None
         self.load_modes(input_modes=game_modes)
 
         # load any game passed
         self.handler.log(message="Loading any saved game")
-        self.handler.log(message="mode: Value {} Type {}".format(mode, type(mode)))
-        self.handler.log(message="game_json: Value {} Type {}".format(game_json, type(game_json)))
         self.game = None
         self.load(game_json=game_json, mode=mode)
 
