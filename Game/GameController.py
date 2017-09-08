@@ -6,6 +6,7 @@ from Game.GameMode import GameMode
 
 from python_digits import DigitWord
 from flask_helpers.ErrorHandler import ErrorHandler
+from flask_helpers.VersionHelpers import VersionHelpers
 
 
 class GameController(object):
@@ -23,6 +24,9 @@ class GameController(object):
     GAME_WAITING = "waiting"    # The game is waiting to start - not currently used.
     GAME_WON = "won"            # The game is over and has been won.
     GAME_LOST = "lost"          # The game is over and has been lost.
+
+    version_helper = VersionHelpers()
+    STRINGY = version_helper.STRINGTYPE
 
     def __init__(self, game_json=None, game_modes=None, mode=None):
         """
@@ -210,7 +214,7 @@ class GameController(object):
             self.handler.log(message="Validating (any) mode provided")
             if mode is not None:
                 self.handler.log(message="mode provided, checking if string or GameMode")
-                if isinstance(mode, str):
+                if isinstance(mode, self.STRINGY):
                     self.handler.log(message="Mode is a string; matching name {}".format(mode))
                     _game_object = GameObject(mode=self._match_mode(mode=mode))
                 elif isinstance(mode, GameMode):
@@ -225,7 +229,7 @@ class GameController(object):
             _game_object.status = self.GAME_PLAYING
         else:
             self.handler.log(message="JSON provided")
-            if not isinstance(game_json, str):
+            if not isinstance(game_json, self.STRINGY):
                 raise TypeError("Game must be passed as a serialized JSON string.")
 
             self.handler.log(message="Attempting to load")
