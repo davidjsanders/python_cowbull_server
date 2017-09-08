@@ -54,7 +54,7 @@ def set_defaults(flask_app=None):
     # Set the game version for the app. This is a key env var as it
     # defines the url for the game. EG, if it was set to v1_32, then
     # the URL for game would be http://.../v1_32/game
-    flask_app.config["GAME_VERSION"] = os.getenv("GAME_VERSION", "v0_1")
+    flask_app.config["GAME_VERSION"] = os.getenv("GAME_VERSION", "v1")
 
     # Configure the connection information for redis; note - no checking
     # takes place at configuration time, only when a Redis request is
