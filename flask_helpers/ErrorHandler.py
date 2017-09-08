@@ -12,6 +12,32 @@ class ErrorHandler(object):
         self.defaults["method"] = kwargs.get("method", None)
         self.basicConfig = logging.basicConfig
 
+    #
+    # Properties
+    #
+    @property
+    def module(self):
+        return self.defaults["module"]
+
+    @module.setter
+    def module(self, value):
+        if not isinstance(value, str):
+            raise TypeError("Module must be a string.")
+        self.defaults["module"] = value
+
+    @property
+    def method(self):
+        return self.defaults["method"]
+
+    @method.setter
+    def method(self, value):
+        if not isinstance(value, str):
+            raise TypeError("Method must be a string.")
+        self.defaults["method"] = value
+
+    #
+    # 'public' methods
+    #
     def error(self, module=None, method=None, status=None, exception=None, message=None):
         response_dict = {
             "status": status or "NA",

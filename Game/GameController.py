@@ -9,8 +9,15 @@ from flask_helpers.ErrorHandler import ErrorHandler
 
 
 class GameController(object):
-    """GameController - Provides the controller functions (load, save, and guess) to
+    """
+    GameController - Provides the controller functions (load, save, and guess) to
     interact with a CowBull game.
+
+    Originally, the GameController was a separate Python
+    package deployed to PyPi; however, there wasn't really much need for the game to
+    exist outside the game server, so a decision was made to relocate the package into
+    the game server (this can easily be undone at any time).
+
     """
     GAME_PLAYING = "playing"    # The game is in progress.
     GAME_WAITING = "waiting"    # The game is waiting to start - not currently used.
@@ -34,15 +41,15 @@ class GameController(object):
         self.handler = ErrorHandler(module="GameController", method="__init__")
 
         # load game_modes
-        self.handler.log(method="__init__", message="Setup game modes")
-        self.handler.log(method="__init__", message="game_modes: Value {} Type {}".format(game_modes, type(game_modes)))
+        self.handler.log(message="Setup game modes")
+        self.handler.log(message="game_modes: Value {} Type {}".format(game_modes, type(game_modes)))
         self._game_modes = None
         self.load_modes(input_modes=game_modes)
 
         # load any game passed
-        self.handler.log(method="__init__", message="Loading any saved game")
-        self.handler.log(method="__init__", message="mode: Value {} Type {}".format(mode, type(mode)))
-        self.handler.log(method="__init__", message="game_json: Value {} Type {}".format(game_json, type(game_json)))
+        self.handler.log(message="Loading any saved game")
+        self.handler.log(message="mode: Value {} Type {}".format(mode, type(mode)))
+        self.handler.log(message="game_json: Value {} Type {}".format(game_json, type(game_json)))
         self.game = None
         self.load(game_json=game_json, mode=mode)
 
@@ -75,11 +82,12 @@ class GameController(object):
         :return: A dictionary object detailing the analysis and results of the guess
         """
 
-        self.handler.log(method="guess", message="Validating game is defined")
+        self.handler.method="guess"
+        self.handler.log(message="Validating game is defined")
         if self.game is None:
             raise ValueError("The Game is unexpectedly undefined!")
 
-        self.handler.log(method="guess", message="Building empty response object")
+        self.handler.log(message="Building empty response object")
         response_object = {
             "bulls": None,
             "cows": None,
@@ -87,39 +95,40 @@ class GameController(object):
             "status": None
         }
 
-        self.handler.log(method="guess", message="Checking game status")
+        self.handler.log(message="Checking game status")
         if self.game.status == self.GAME_WON:
-            self.handler.log(method="guess", message="Game already won")
+            self.handler.log(message="Game already won")
             response_object["status"] = \
                 self._start_again_message("You already won!")
         elif self.game.status == self.GAME_LOST:
-            self.handler.log(method="guess", message="Game already lost")
+            self.handler.log(message="Game already lost")
             response_object["status"] = \
                 self._start_again_message("You already lost!")
         elif self.game.guesses_remaining < 1:
-            self.handler.log(method="guess", message="Game lost, too many guesses")
+            self.handler.log(message="Game lost, too many guesses")
             response_object["status"] = \
                 self._start_again_message("You've made too many guesses")
         else:
-            self.handler.log(method="guess", message="Game is valid and in play")
+            self.handler.log(message="Game is valid and in play")
 
             guess_made = DigitWord(*args, wordtype=self.game.mode.digit_type)
-            self.handler.log(method="guess", message="Created DigitWord using digits provided: Value {} Type {}"
-                          .format(guess_made.word, type(guess_made))
-                          )
+            self.handler.log(
+                message="Created DigitWord using digits provided: Value {} Type {}"
+                    .format(guess_made.word, type(guess_made))
+            )
 
-            self.handler.log(method="guess", message="Comparing guess and answer")
+            self.handler.log(message="Comparing guess and answer")
             comparison = self.game.answer.compare(guess_made)
 
-            self.handler.log(method="guess", message="Increment number of guesses made")
+            self.handler.log(message="Increment number of guesses made")
             self.game.guesses_made += 1
             response_object["bulls"] = 0
             response_object["cows"] = 0
             response_object["analysis"] = []
 
-            self.handler.log(method="guess", message="Process comparison analysis")
+            self.handler.log(message="Process comparison analysis")
             for comparison_object in comparison:
-                self.handler.log(method="guess", message="Processing index {} value {}".format(
+                self.handler.log(message="Processing index {} value {}".format(
                     comparison_object.index,
                     comparison_object.digit
                 ))
@@ -135,10 +144,10 @@ class GameController(object):
                 response_object["status"] = self._start_again_message(
                     "Congratulations, you win!"
                 )
-                self.handler.log(method="guess",
-                                 message="The game has been won with the answers: {}"
-                                 .format(guess_made.word)
-                                 )
+                self.handler.log(
+                    message="The game has been won with the answers: {}"
+                        .format(guess_made.word)
+                )
             elif self.game.guesses_remaining < 1:
                 self.game.status = self.GAME_LOST
                 response_object["status"] = self._start_again_message(
@@ -151,9 +160,10 @@ class GameController(object):
                     response_object["bulls"],
                     response_object["cows"]
                 )
-                self.handler.log(method="guess", message="Still in play. {} bulls, {} cows"
-                              .format(response_object["bulls"], response_object["cows"])
-                              )
+                self.handler.log(
+                    message="Still in play. {} bulls, {} cows"
+                        .format(response_object["bulls"], response_object["cows"])
+                )
 
         return response_object
 
@@ -187,45 +197,46 @@ class GameController(object):
         :return: A game object
         """
 
-        self.handler.log(method="load", message="Validating mode value")
-        self.handler.log(method="load", message="Mode: Value {} Type {}".format(mode, type(mode)))
+        self.handler.method = "load"
+        self.handler.log(message="Validating mode value")
+        self.handler.log(message="Mode: Value {} Type {}".format(mode, type(mode)))
         _mode = mode or 'normal' # Default mode to normal if not provided
 
-        self.handler.log(method="load", message="Validating (any) JSON provided")
+        self.handler.log(message="Validating (any) JSON provided")
         if game_json is None:    # New game_json
-            self.handler.log(method="load", message="No JSON, so start new game.")
-            self.handler.log(method="load", message="Validating (any) mode provided")
+            self.handler.log(message="No JSON, so start new game.")
+            self.handler.log(message="Validating (any) mode provided")
             if mode is not None:
-                self.handler.log(method="load", message="mode provided, checking if string or GameMode")
+                self.handler.log(message="mode provided, checking if string or GameMode")
                 if isinstance(mode, str):
-                    self.handler.log(method="load", message="Mode is a string; matching name {}".format(mode))
+                    self.handler.log(message="Mode is a string; matching name {}".format(mode))
                     _game_object = GameObject(mode=self._match_mode(mode=mode))
                 elif isinstance(mode, GameMode):
-                    self.handler.log(method="load", message="Mode is a GameMode object")
+                    self.handler.log(message="Mode is a GameMode object")
                     _game_object = GameObject(mode=mode)
                 else:
-                    self.handler.log(method="load", message="Mode is invalid")
+                    self.handler.log(message="Mode is invalid")
                     raise TypeError("Game mode must be a GameMode or string")
             else:
-                self.handler.log(method="load", message="Game mode is None, so default mode used.")
+                self.handler.log(message="Game mode is None, so default mode used.")
                 _game_object = GameObject(mode=self._game_modes[0])
             _game_object.status = self.GAME_PLAYING
         else:
-            self.handler.log(method="load", message="JSON provided")
+            self.handler.log(message="JSON provided")
             if not isinstance(game_json, str):
                 raise TypeError("Game must be passed as a serialized JSON string.")
 
-            self.handler.log(method="load", message="Attempting to load")
+            self.handler.log(message="Attempting to load")
             game_dict = json.loads(game_json)
 
-            self.handler.log(method="load", message="Validating mode exists in JSON")
+            self.handler.log(message="Validating mode exists in JSON")
             if not 'mode' in game_dict:
                 raise ValueError("Mode is not provided in JSON; game_json cannot be loaded!")
 
             _mode = GameMode(**game_dict["mode"])
             _game_object = GameObject(mode=_mode, source_game=game_dict)
 
-        self.handler.log(method="load", message="Deep copy loaded (or new) object")
+        self.handler.log(message="Deep copy loaded (or new) object")
         self.game = copy.deepcopy(_game_object)
 
     def save(self):
@@ -252,7 +263,8 @@ class GameController(object):
         """
 
         # Set default game modes
-        self.handler.log(method="load_modes", message="Loading default modes")
+        self.handler.method = "load_modes"
+        self.handler.log(message="Loading default modes")
         _modes = [
             GameMode(
                 mode="Normal",
@@ -305,7 +317,7 @@ class GameController(object):
                                  "E, and F)."
             )
         ]
-        self.handler.log(method="load_modes", message="Loaded modes: {}".format(_modes))
+        self.handler.log(message="Loaded modes: {}".format(_modes))
 
         if input_modes is not None:
             if not isinstance(input_modes, list):
@@ -315,19 +327,19 @@ class GameController(object):
                 if not isinstance(mode, GameMode):
                     raise TypeError("Expected list to contain only GameMode objects")
                 self.handler.log(
-                    method="load_modes",
                     message="Appending mode: {}".format(mode)
                 )
                 _modes.append(mode)
 
-        self.handler.log(method="load_modes", message="Deep copying modes")
+        self.handler.log(message="Deep copying modes")
         self._game_modes = copy.deepcopy(_modes)
 
     #
     # 'private' methods
     #
     def _match_mode(self, mode):
-        self.handler.log(method="_match_mode", message="Attempting to match mode: {}".format(mode))
+        self.handler.method = "_match_mode"
+        self.handler.log(message="Attempting to match mode: {}".format(mode))
         _mode = [game_mode for game_mode in self._game_modes if game_mode.mode == mode]
 
         if len(_mode) < 1:
@@ -337,13 +349,11 @@ class GameController(object):
         _mode = _mode[0]
         if not _mode:
             self.handler.log(
-                method="_match_mode",
                 message="Something unexpected happened while matching mode: {}".format(mode)
             )
             raise ValueError("For some reason, the mode is defined but unavailable!")
 
         self.handler.log(
-            method="_match_mode",
             message="Returning mode: {}, value: {}".format(mode, _mode.dump())
         )
         return _mode
