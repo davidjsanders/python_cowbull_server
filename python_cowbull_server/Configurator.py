@@ -81,6 +81,7 @@ class Configurator(object):
             self.load_from_iterable()
 
     def load_from_file(self, filename):
+        #TODO Implement file IO for config
         raise NotImplemented("Work in progress!")
 
     def load_from_iterable(self, env_var_iterable=None):
