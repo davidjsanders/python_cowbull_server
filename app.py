@@ -1,3 +1,5 @@
+import logging
+
 # Import python_cowbull_server initialization package
 # ---------------------------------------------------
 # Import the app from the python_cowbull_server package, which will also
@@ -36,9 +38,16 @@ def allow_cors(resp):
 # Setup the version 1 routes.
 v1 = V1(error_handler=error_handler, app=app)
 v1.game(controller=GameServerController)
+error_handler.log(message="Added route v1.game", logger=logging.info)
+
 v1.modes(controller=GameModes)
+error_handler.log(message="Added route v1.modes", logger=logging.info)
+
 v1.health(controller=HealthCheck)
+error_handler.log(message="Added route v1.health", logger=logging.info)
+
 v1.readiness(controller=Readiness)
+error_handler.log(message="Added route v1.readiness", logger=logging.info)
 
 # DEV USE ONLY! Built-in Web Server
 #----------------------------------
