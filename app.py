@@ -18,6 +18,10 @@ from flask_controllers import GameServerController, HealthCheck, Readiness, Game
 # Currently, there is only a V1, but you get the idea if there were a V2.
 from Routes.V1 import V1
 
+# Import ErrorHandler
+# -------------------
+from flask_helpers.ErrorHandler import ErrorHandler
+error_handler = ErrorHandler(module="app.py", method="startup")
 
 # Add cross origin scripting support
 # ----------------------------------
