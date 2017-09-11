@@ -12,6 +12,12 @@ class ErrorHandler(object):
         self.defaults["method"] = kwargs.get("method", None)
         self.basicConfig = logging.basicConfig
 
+        if "level" in kwargs and "format" in kwargs:
+            self.basicConfig(
+                level=kwargs.get("level", logging.DEBUG),
+                format=kwargs.get("format", "%(asctime)s %(levelname)s: %(message)s")
+            )
+
     #
     # Properties
     #

@@ -1,6 +1,9 @@
-import os
+import json
 import logging
+import os
 import sys
+
+from flask_helpers.ErrorHandler import ErrorHandler
 from flask import Flask
 
 
@@ -17,6 +20,33 @@ class Configurator(object):
             raise TypeError("Expected a Flask object")
 
         self.app = app
+
+        app.config["LOGGING_FORMAT"] = os.getenv(
+            "logging_format",
+            os.getenv("LOGGING_FORMAT", "%(asctime)s %(levelname)s: %(message)s")
+        )
+        app.config["LOGGING_LEVEL"] = int(os.getenv(
+            "logging_level",
+            os.getenv("LOGGING_LEVEL", logging.DEBUG)
+        ))
+
+        self.error_handler = ErrorHandler(
+            module="Configurator",
+            method="__init__",
+            level=app.config["LOGGING_LEVEL"],
+            format=app.config["LOGGING_FORMAT"]
+        )
+
+        self.error_handler.log(
+            message="Initialized logging (level: {}, format: {})"
+                .format(
+                    app.config["LOGGING_LEVEL"],
+                    app.config["LOGGING_FORMAT"]
+                ),
+            logger=logging.info
+        )
+
+        self.error_handler.log(message="Configuring environment variables.", logger=logging.info)
 
         self.configuration = {}
         self.env_vars = [
@@ -60,73 +90,82 @@ class Configurator(object):
                 "required": False,
                 "default": True,
                 "caster": bool
-            },
-            {
-                "name": "LOGGING_FORMAT",
-                "required": False,
-                "default": "%(asctime)s %(levelname)s: %(message)s"
-            },
-            {
-                "name": "LOGGING_LEVEL",
-                "required": False,
-                "default": logging.DEBUG,
-                "caster": int
             }
         ]
 
-        config_file = self._get_from_env_var("COWBULL_CONFIG")
+        config_file = self._set_config(
+            source=os.getenv,
+            name="COWBULL_CONFIG"
+        )
+
+        self.error_handler.log(
+            message="Loading configuration from: {}".format(
+                config_file if config_file else "environment variables"
+            )
+        )
+
+        source = {}
         if config_file:
-            self.load_from_file(config_file)
+            _file = open(config_file, 'r')
+            try:
+                source = json.load(_file)
+            except:
+                raise
+            finally:
+                _file.close()
+
+        self.load_variables(source=source)
+        self.dump_variables()
+
+    def dump_variables(self):
+        for item in self.env_vars:
+            self.error_handler.log(
+                method="Config Variable",
+                message="{}={}".format(item["name"], self.app.config[item["name"]])
+            )
+
+    def load_variables(self, source=None):
+        if source:
+            _fetch = source.get
         else:
-            self.load_from_iterable()
+            _fetch = os.getenv
 
-    def load_from_file(self, filename):
-        #TODO Implement file IO for config
-        raise NotImplemented("Work in progress!")
-
-    def load_from_iterable(self, env_var_iterable=None):
-        _list = env_var_iterable or self.env_vars
-
-        for item in _list:
+        for item in self.env_vars:
             if isinstance(item, dict):
                 self._set_config(
-                    value=self._get_from_env_var(item["name"]),
+                    source=_fetch,
                     **item
                 )
             elif isinstance(item, str):
                 self._set_config(
                     name=item,
-                    value=self._get_from_env_var(item)
+                    source=_fetch
                 )
             elif isinstance(item, list):
-                self.load_from_iterable(item)
+                self.load_variables(source=item)
             else:
                 raise TypeError("Unexpected item in configuration: {}, type: {}".format(item, type(item)))
 
-    def _get_from_env_var(
-            self,
-            name=None
-    ):
-        value = os.getenv(
-            name.lower(),
-            os.getenv(name.upper(), None)
-        )
-        return value
-
     def _set_config(
             self,
+            source=None,
             name=None,
-            value=None,
             required=None,
             default=None,
             errmsg=None,
             caster=None
     ):
+        value = source(
+            name.lower(),
+            source(name.upper(), None)
+        )
+
         if required and value is None:
             raise ValueError(
                 errmsg or
                 "Problem fetching config item: {}. It is required and was not found or the value was None.".format(name)
             )
+
         if value is None:
             value = default
 
@@ -134,3 +173,4 @@ class Configurator(object):
             value = caster(value)
 
         self.app.config[name] = value
+        return value
