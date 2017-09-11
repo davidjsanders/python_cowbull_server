@@ -34,7 +34,7 @@ def allow_cors(resp):
 # Version 1 routes
 # ----------------
 # Setup the version 1 routes.
-v1 = V1(errorHandler=errorHandler, app=app)
+v1 = V1(error_handler=error_handler, app=app)
 v1.game(controller=GameServerController)
 v1.modes(controller=GameModes)
 v1.health(controller=HealthCheck)

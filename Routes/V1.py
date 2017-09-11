@@ -6,25 +6,25 @@ from flask_helpers.ErrorHandler import ErrorHandler
 #############################################################################
 
 class V1(object):
-    def __init__(self, errorHandler=None, app=None):
-        if not isinstance(errorHandler, ErrorHandler):
+    def __init__(self, error_handler=None, app=None):
+        if not isinstance(error_handler, ErrorHandler):
             raise TypeError("Expected an ErrorHandler to be passed!")
         if app is None:
             raise ValueError("App must be passed to the route object!")
 
         self.app = app
 
-        self.errorHandler = errorHandler
-        self.errorHandler.module = "V1"
-        self.errorHandler.method = "__init__"
-        self.errorHandler.log(message="Initialized V1 Routes")
+        self.error_handler = error_handler
+        self.error_handler.module = "V1"
+        self.error_handler.method = "__init__"
+        self.error_handler.log(message="Initialized V1 Routes")
 
     def game(self, controller=None):
         # Add a game view. The game view is actually contained within a class
         # based on a MethodView. See flask_controllers/GameServerControllerroller.py
         # ---------------------------------------------------------------------------
-        self.errorHandler.method = "game"
-        self.errorHandler.log(message="Adding game URL: /v1/game")
+        self.error_handler.method = "game"
+        self.error_handler.log(message="Adding game URL: /v1/game")
         game_view = controller.as_view('Game')
         self.app.add_url_rule('/v1/game', view_func=game_view, methods=["GET", "POST"])
 
@@ -32,8 +32,8 @@ class V1(object):
         # Add a game modes view. The game modes view is actually contained within a class
         # based on a MethodView. See flask_controllers/GameModes.py
         # ---------------------------------------------------------------------------
-        self.errorHandler.method = "modes"
-        self.errorHandler.log(message="Adding game URL: /v1/modes")
+        self.error_handler.method = "modes"
+        self.error_handler.log(message="Adding game URL: /v1/modes")
         modes_view = controller.as_view('Modes')
         self.app.add_url_rule(
             '/v1/modes',
@@ -47,8 +47,8 @@ class V1(object):
         # can be probed at regular occassions to check the responsiveness (of the pod,
         # container, etc.)
         # ---------------------------------------------------------------------------
-        self.errorHandler.method = "health"
-        self.errorHandler.log(message="Adding health check URL: /v1/health")
+        self.error_handler.method = "health"
+        self.error_handler.log(message="Adding health check URL: /v1/health")
         health_view = controller.as_view('Health')
         self.app.add_url_rule(
             '/v1/health',
@@ -62,8 +62,8 @@ class V1(object):
         # unavailable), so that a scheduling engine like Kubernetes or a load balancer
         # could avoid sending traffic to the node until it responds ready (200).
         # ---------------------------------------------------------------------------
-        self.errorHandler.method = "readiness"
-        self.errorHandler.log(message="Adding readiness check URL: /v1/ready")
+        self.error_handler.method = "readiness"
+        self.error_handler.log(message="Adding readiness check URL: /v1/ready")
         readiness_view = controller.as_view('ready')
         self.app.add_url_rule(
             '/v1/ready',
