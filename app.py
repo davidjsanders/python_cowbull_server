@@ -63,6 +63,12 @@ error_handler.log(message="Added route v1.readiness", logger=logging.info)
 #    for dev / test workloads only.
 #
 if __name__ == "__main__":
+    error_handler.log(
+        module="app.py",
+        method="__main__",
+        message="Running application via Flask built-in server.",
+        logger=logging.info
+    )
     app.run\
         (
             host=app.config["FLASK_HOST"],
