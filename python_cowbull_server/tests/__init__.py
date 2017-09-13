@@ -1,3 +1,3 @@
+from python_cowbull_server.tests.TestV1Routes import TestV1Routes
 from python_cowbull_server.tests.TestGameController import TestGameController
 from python_cowbull_server.tests.TestGameObject import TestGameObject
-from python_cowbull_server.tests.TestV1Routes import TestV1Routes
