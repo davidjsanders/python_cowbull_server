@@ -20,7 +20,8 @@ class TestV1Routes(TestCase):
         v1.health(controller=HealthCheck)
         v1.readiness(controller=Readiness)
 
-    def _prepare_json_string(self, value=None):
+    @staticmethod
+    def _prepare_json_string(value=None):
         if not value:
             return
 
@@ -54,7 +55,7 @@ class TestV1Routes(TestCase):
     def test_v1_game_post(self):
         url = '/v1/game'
         results = self.app.get(url)
-        results_dict = json.loads(results.data)
+        results_dict = json.loads(self._prepare_json_string(results.data))
         key = results_dict["key"]
         json_data = {
             "key": key,
@@ -72,7 +73,7 @@ class TestV1Routes(TestCase):
     def test_v1_game_post_baddigits(self):
         url = '/v1/game'
         results = self.app.get(url)
-        results_dict = json.loads(results.data)
+        results_dict = json.loads(self._prepare_json_string(results.data))
         key = results_dict["key"]
         json_data = {
             "key": key,
