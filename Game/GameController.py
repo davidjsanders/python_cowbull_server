@@ -209,7 +209,7 @@ class GameController(object):
         self.handler.method = "load"
         self.handler.log(message="Validating mode value")
         self.handler.log(message="Mode: Value {} Type {}".format(mode, type(mode)))
-        _mode = mode or 'normal' # Default mode to normal if not provided
+        _mode = mode or 'Normal' # Default mode to normal if not provided
 
         self.handler.log(message="Validating (any) JSON provided")
         if game_json is None:    # New game_json
@@ -243,6 +243,10 @@ class GameController(object):
                 raise ValueError("Mode is not provided in JSON; game_json cannot be loaded!")
 
             _mode = GameMode(**game_dict["mode"])
+
+            if len(game_dict["answer"]) != game_dict["mode"]["digits"]:
+                raise ValueError("JSON provided answer does not match the JSON game mode")
+
             _game_object = GameObject(mode=_mode, source_game=game_dict)
 
         self.handler.log(message="Deep copy loaded (or new) object")

@@ -21,6 +21,8 @@ class Configurator(object):
 
         self.app = app
 
+        app.config["PYTHON_VERSION_MAJOR"] = sys.version_info[0]
+
         app.config["LOGGING_FORMAT"] = os.getenv(
             "logging_format",
             os.getenv("LOGGING_FORMAT", "%(asctime)s %(levelname)s: %(message)s")
