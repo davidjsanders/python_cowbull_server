@@ -16,7 +16,7 @@ services:
       - LOGGING_LEVEL=10
       - REDIS_HOST=redis
     volumes:
-      - /home/devdsanders/Documents/dev/python_cowbull_server/vendor/docker/:/cowbull/config
+      - /home/devdsanders/Documents/dev/cowbull/python_cowbull_server/vendor/docker/:/cowbull/config
     networks:
       - cowbull_network
     restart: always

@@ -10,12 +10,13 @@ COPY		requirements.txt /cowbull
 RUN		    pip install -q -r /cowbull/requirements.txt
 USER		cowbull
 ENV			PYTHONPATH="/cowbull"
-COPY		python_cowbull_server /cowbull/python_cowbull_server/
+COPY        extensions /cowbull/extensions/
 COPY        flask_controllers /cowbull/flask_controllers/
 COPY        flask_helpers /cowbull/flask_helpers
-COPY        Persistence /cowbull/Persistence/
-COPY        extensions /cowbull/extensions/
 COPY		Game	/cowbull/Game/
+COPY        Persistence /cowbull/Persistence/
+COPY		python_cowbull_server /cowbull/python_cowbull_server/
+COPY        Routes /cowbull/Routes
 COPY        app.py  /cowbull/
 COPY        LICENSE /cowbull/
 CMD			["gunicorn", "-b", "0.0.0.0:5000", "-w", "4", "app:app"]
