@@ -43,20 +43,6 @@ class GameObject(object):
         :param source_game: <optional> A JSON Serialized representation of the game.
         """
 
-        # If no mode has been defined, then raise an error. The GameController should have
-        # passed a mode to the game object, even if it is the default mode.
-        if mode is None:
-            raise ValueError(
-                "A GameMode must be provided to start or load a game object"
-            )
-
-        # If the mode has been passed but it's not a GameMode object, throw a TypeError
-        # and refuse the object.
-        if not isinstance(mode, GameMode):
-            raise TypeError(
-                "The mode passed to the game is not a GameMode!"
-            )
-
         self._key = None                    # A Unique ID
         self._status = None                 # A representation of status (e.g. won, playing, etc.)
         self._ttl = None                    # Time to live - a representation of time in seconds
@@ -179,6 +165,21 @@ class GameObject(object):
         :param mode: <required>
 
         """
+
+        # If no mode has been defined, then raise an error. The GameController should have
+        # passed a mode to the game object, even if it is the default mode.
+        if mode is None:
+            raise ValueError(
+                "A GameMode must be provided to start or load a game object"
+            )
+
+        # If the mode has been passed but it's not a GameMode object, throw a TypeError
+        # and refuse the object.
+        if not isinstance(mode, GameMode):
+            raise TypeError(
+                "The mode passed to the game is not a GameMode!"
+            )
+
         dw = DigitWord(wordtype=mode.digit_type)
         dw.random(mode.digits)
 
