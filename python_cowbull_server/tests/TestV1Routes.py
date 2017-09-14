@@ -1,8 +1,10 @@
 import json
 
-from unittest import TestCase
 from python_cowbull_server import app
+from Game.GameController import GameController
 from Routes.V1 import V1
+from unittest import TestCase
+
 from flask_helpers.ErrorHandler import ErrorHandler
 from flask_controllers import GameServerController
 from flask_controllers import HealthCheck
@@ -33,7 +35,7 @@ class TestV1Routes(TestCase):
     def _get_test(self, mode=None):
         url = '/v1/game' + ('?mode={}'.format(mode) if mode else '')
         results = self.app.get(url)
-        required_keys = set(("key", "served-by"))
+        required_keys = {"key", "served-by"}
         keys_returned_from_url = set(json.loads(self._prepare_json_string(results.data)))
         self.assertTrue(
             required_keys <= keys_returned_from_url
@@ -55,7 +57,7 @@ class TestV1Routes(TestCase):
     def test_v1_game_bad_mode(self):
         url = '/v1/game?mode=crazyDaisy123NoModeWithThisNameSurely'
         results = self.app.get(url)
-        required_keys = set(("key", "served-by"))
+        required_keys = {"key", "served-by"}
         keys_returned_from_url = set(json.loads(self._prepare_json_string(results.data)))
         self.assertFalse(
             required_keys <= keys_returned_from_url
@@ -156,7 +158,7 @@ class TestV1Routes(TestCase):
 
     def test_v1_get_modes(self):
         results = self.app.get('/v1/modes')
-        required_keys = set(("notes", "modes", "default-mode", "instructions"))
+        required_keys = {"notes", "modes", "default-mode", "instructions"}
         keys_returned_from_url = set(json.loads(self._prepare_json_string(results.data)))
         self.assertTrue(
             required_keys <= keys_returned_from_url
@@ -164,16 +166,18 @@ class TestV1Routes(TestCase):
         self.assertTrue(results.status_code == 200)
 
     def test_v1_get_modes_text(self):
+        g = GameController()
         results = self.app.get('/v1/modes?textmode=true')
-        text_list = json.loads(self._prepare_json_string(results.data))
-        self.assertIsInstance(text_list, list)
-        for text_item in text_list:
-            self.assertIsInstance(text_item, str)
+        required_modes = set(g.game_mode_names)
+        actual_modes = set(json.loads(self._prepare_json_string(results.data)))
+        self.assertTrue(
+            required_modes <= actual_modes
+        )
         self.assertTrue(results.status_code == 200)
 
     def test_v1_get_ready(self):
         results = self.app.get('/v1/ready')
-        required_keys = set(("status",))
+        required_keys = {"status"}
         keys_returned_from_url = set(json.loads(self._prepare_json_string(results.data)))
         self.assertTrue(
             required_keys <= keys_returned_from_url
@@ -182,7 +186,7 @@ class TestV1Routes(TestCase):
 
     def test_v1_get_health(self):
         results = self.app.get('/v1/health')
-        required_keys = set(("health",))
+        required_keys = {"health"}
         keys_returned_from_url = set(json.loads(self._prepare_json_string(results.data)))
         self.assertTrue(
             required_keys <= keys_returned_from_url
