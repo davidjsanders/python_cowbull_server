@@ -41,6 +41,10 @@ class ErrorHandler(object):
             raise TypeError("Method must be a string.")
         self.defaults["method"] = value
 
+    @property
+    def logger(self):
+        return logging.getLogger()
+
     #
     # 'public' methods
     #
@@ -87,7 +91,7 @@ class ErrorHandler(object):
             _verbose = verbose
 
         if _verbose:
-            _message = "MODULE:{}({}) STATUS:{} MESSAGE:{} {}".format(
+            _message = "{}: {}: STATUS:{} MESSAGE:{} {}".format(
                 module or self.defaults["module"],
                 method or self.defaults["method"],
                 status,
