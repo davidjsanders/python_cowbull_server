@@ -200,6 +200,14 @@ class GameServerController(MethodView):
                 message="Bad request. For some reason the json_dict is None! Are you "
                         "sure the header is set to application/json?"
             )
+        except KeyError as ke:
+            return self.handler.error(
+                status=400,
+                exception=str(ke),
+                message="Bad request. For some reason the json_dict does not contain "
+                        "a key! Are you sure the header is set to application/json and "
+                        "a key is present?"
+            )
 
         #
         # Load the game based on the key contained in the JSON provided to
