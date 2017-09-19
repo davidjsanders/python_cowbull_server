@@ -10,7 +10,7 @@ jobs:
       - restore_cache:
         keys:
         - v1-dependencies-{{ checksum "requirements.txt" }}
-        0 v1-dependencies-
+        - v1-dependencies-
 
       - run:
           name: install dependencies
