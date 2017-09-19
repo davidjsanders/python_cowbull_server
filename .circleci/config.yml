@@ -41,6 +41,11 @@ jobs:
             . venv/bin/activate
             python -m unittest -v tests
 
+      - run:
+          name: build docker image
+          command: |
+            docker build -f vendor/docker/Dockerfile -t dsanderscan/test_cowbull .
+
       - store_artifacts:
           path: test-reports
           destination: test-reports
