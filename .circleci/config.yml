@@ -44,6 +44,7 @@ jobs:
       - run:
           name: build docker image
           command: |
+            docker login --username=$doclog --password=$docpass
             docker build -f vendor/docker/Dockerfile -t dsanderscan/test_cowbull .
       - run:
           name: push docker image
