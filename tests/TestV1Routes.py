@@ -1,4 +1,6 @@
+import io
 import json
+import logging
 
 from python_cowbull_server import app
 from Game.GameController import GameController
@@ -43,7 +45,31 @@ class TestV1Routes(TestCase):
         self.assertTrue(results.status_code == 200)
 
     def setUp(self):
+        self.error_handler = ErrorHandler(
+            module="TestErrorHandler",
+            method="setUp"
+        )
         self.app = app.test_client()
+        if app.config["PYTHON_VERSION_MAJOR"] < 3:
+            self.logging_type = io.BytesIO
+        else:
+            self.logging_type = io.StringIO
+
+        self.logger = self.error_handler.logger
+        self.lhStdout = self.logger.handlers[0]
+
+        self.current_log_level = self.logger.getEffectiveLevel()
+        self.log_capture = self.logging_type()
+        self.sh = logging.StreamHandler(stream=self.log_capture)
+
+        self.logger.setLevel(logging.INFO)
+        self.logger.addHandler(hdlr=self.sh)
+        self.logger.removeHandler(self.lhStdout)
+
+    def tearDown(self):
+        self.logger.addHandler(self.lhStdout)
+        self.logger.removeHandler(self.sh)
+        self.logger.setLevel(self.current_log_level)
 
     def test_v1_game_default(self):
         self._get_test()
@@ -192,6 +218,3 @@ class TestV1Routes(TestCase):
             required_keys <= keys_returned_from_url
         )
         self.assertTrue(results.status_code == 200)
-
-    def tearDown(self):
-        pass

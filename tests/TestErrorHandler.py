@@ -18,6 +18,22 @@ class TestErrorHandler(TestCase):
         else:
             self.logging_type = io.StringIO
 
+        self.logger = self.error_handler.logger
+        self.lhStdout = self.logger.handlers[0]
+
+        self.current_log_level = self.logger.getEffectiveLevel()
+        self.log_capture = self.logging_type()
+        self.sh = logging.StreamHandler(stream=self.log_capture)
+
+        self.logger.setLevel(logging.INFO)
+        self.logger.addHandler(hdlr=self.sh)
+        self.logger.removeHandler(self.lhStdout)
+
+    def tearDown(self):
+        self.logger.addHandler(self.lhStdout)
+        self.logger.removeHandler(self.sh)
+        self.logger.setLevel(self.current_log_level)
+
     def test_eh_instantiation(self):
         eh = ErrorHandler(module="test_module", method="test_method")
         self.assertIsInstance(eh, ErrorHandler)
@@ -38,7 +54,7 @@ class TestErrorHandler(TestCase):
         self.assertIsInstance(result, Response)
         self.assertEqual(result.status_code, 400)
 
-    def test_eh_logging(self):
+    def test_eh_logging_info(self):
         self.error_handler.method="test_eh_logging"
         test_message = "This is a test message for logging"
         eval_message = "{}: {}: {}\n".format(
@@ -46,20 +62,6 @@ class TestErrorHandler(TestCase):
             self.error_handler.method,
             test_message
         )
-        log_capture = self.logging_type()
-        sh = logging.StreamHandler(stream=log_capture)
-
-        logger = self.error_handler.logger
-        logger.propagate = False
-
-        current_log_level = logger.getEffectiveLevel()
-        logger.setLevel(logging.INFO)
-        logger.addHandler(hdlr=sh)
-
         self.error_handler.log(logger=logging.info, message=test_message)
-
-        logger.removeHandler(hdlr=sh)
-        logger.setLevel(current_log_level)
-
-        logged_output = log_capture.getvalue()
+        logged_output = self.log_capture.getvalue()
         self.assertEqual(logged_output, eval_message)
