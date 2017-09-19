@@ -30,6 +30,14 @@ jobs:
             . venv/bin/activate
             pip install -r requirements.txt
 
+      - run:
+          name: install Google Cloud dependencies
+          command: |
+            export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
+            echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+            curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+            apt-get update && apt-get install google-cloud-sdk
+
       - save_cache:
           key: v2-dependencies-{{ "requirements.txt" }}
           paths:
@@ -46,6 +54,7 @@ jobs:
           command: |
             docker login --username=$doclog --password=$docpass
             docker build -f vendor/docker/Dockerfile -t dsanderscan/test_cowbull:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM .
+
       - run:
           name: push docker image
           command: |
