@@ -18,18 +18,18 @@ class TestErrorHandler(TestCase):
         else:
             self.logging_type = io.StringIO
 
-    def test_instantiation(self):
+    def test_eh_instantiation(self):
         eh = ErrorHandler(module="test_module", method="test_method")
         self.assertIsInstance(eh, ErrorHandler)
         self.assertEqual(eh.module, "test_module")
         self.assertEqual(eh.method, "test_method")
 
-    def test_get_logger(self):
+    def test_eh_get_logger(self):
         logger = self.error_handler.logger
         self.assertIsInstance(logger, logging.RootLogger)
 
-    def test_error(self):
-        self.error_handler.method = "test_error"
+    def test_eh_error(self):
+        self.error_handler.method = "test_eh_error"
         result = self.error_handler.error(
             status=400,
             exception="This is an exception for test purposes only",
@@ -38,8 +38,8 @@ class TestErrorHandler(TestCase):
         self.assertIsInstance(result, Response)
         self.assertEqual(result.status_code, 400)
 
-    def test_logging(self):
-        self.error_handler.method="test_logging"
+    def test_eh_logging(self):
+        self.error_handler.method="test_eh_logging"
         test_message = "This is a test message for logging"
         eval_message = "{}: {}: {}\n".format(
             self.error_handler.module,
@@ -50,6 +50,8 @@ class TestErrorHandler(TestCase):
         sh = logging.StreamHandler(stream=log_capture)
 
         logger = self.error_handler.logger
+        logger.propagate = False
+
         current_log_level = logger.getEffectiveLevel()
         logger.setLevel(logging.INFO)
         logger.addHandler(hdlr=sh)

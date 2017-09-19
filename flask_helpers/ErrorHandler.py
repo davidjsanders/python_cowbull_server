@@ -12,11 +12,9 @@ class ErrorHandler(object):
         self.defaults["method"] = kwargs.get("method", None)
         self.basicConfig = logging.basicConfig
 
-        if "level" in kwargs and "format" in kwargs:
-            self.basicConfig(
-                level=kwargs.get("level", logging.DEBUG),
-                format=kwargs.get("format", "%(asctime)s %(levelname)s: %(message)s")
-            )
+        l = logging.StreamHandler()
+        l.setLevel(kwargs.get("level", logging.INFO))
+        l.setFormatter(logging.Formatter(kwargs.get("format", "%(asctime)s %(levelname)s: %(message)s")))
 
     #
     # Properties
