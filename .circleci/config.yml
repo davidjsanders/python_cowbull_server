@@ -30,6 +30,8 @@ jobs:
 
       - save_cache:
           key: v2-dependencies-{{ "requirements.txt" }}
+          paths:
+            - ~/.m2
 
       - run:
           name: run tests
