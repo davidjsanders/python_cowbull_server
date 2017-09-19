@@ -40,6 +40,10 @@ jobs:
             sudo apt-get update && sudo apt-get install google-cloud-sdk --yes
             echo $circlecibuilder > auth.json
             gcloud auth activate-service-account --key-file auth.json
+            gcloud config set project $gproject
+            mkdir -p vendor/gae
+            pip install -t vendor/gae/lib -r requirements.txt
+            gcloud app deploy --quiet
 
       - save_cache:
           key: v2-dependencies-{{ "requirements.txt" }}
