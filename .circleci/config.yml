@@ -45,10 +45,12 @@ jobs:
           name: build docker image
           command: |
             docker login --username=$doclog --password=$docpass
-            docker build -f vendor/docker/Dockerfile -t dsanderscan/test_cowbull .
+            docker build -f vendor/docker/Dockerfile -t dsanderscan/test_cowbull:$CIRCLE_BUILD_NUM .
       - run:
           name: push docker image
-          command: docker push dsanderscan/test_cowbull
+          command: |
+            docker tag dsanderscan/test_cowbull:$CIRCLE_BUILD_NUM dsanderscan/test_cowbull:latest
+            docker push dsanderscan/test_cowbull:latest
 
       - store_artifacts:
           path: test-reports
