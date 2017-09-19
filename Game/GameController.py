@@ -5,8 +5,8 @@ from Game.GameObject import GameObject
 from Game.GameMode import GameMode
 
 from python_digits import DigitWord
-from flask_helpers.ErrorHandler import ErrorHandler
 from flask_helpers.VersionHelpers import VersionHelpers
+from python_cowbull_server import error_handler
 
 
 class GameController(object):
@@ -42,7 +42,9 @@ class GameController(object):
         passed via game_modes).
         """
         # load error handler
-        self.handler = ErrorHandler(module="GameController", method="__init__")
+        self.handler = error_handler
+        self.handler.module = "GameController"
+        self.handler.method = "__init__"
 
         # Set defaults
         self.default_mode = None

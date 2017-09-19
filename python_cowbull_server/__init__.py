@@ -10,7 +10,8 @@ from flask import Flask
 # Instantiate the Flask application as app
 app = Flask(__name__)
 c = Configurator(app)
-c.error_handler.log(
+error_handler = c.error_handler
+error_handler.log(
     method="__init__",
     module="python_cowbull_server",
     message="Initialization complete.",

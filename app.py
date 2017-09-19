@@ -7,7 +7,7 @@ import logging
 # key variables, configuration, and other general settings and also
 # defines the Flask app there, making it importable everywhere without
 # circular references.
-from python_cowbull_server import app
+from python_cowbull_server import app, error_handler
 
 # Import the Flask controllers for this app
 # -----------------------------------------
@@ -19,11 +19,6 @@ from flask_controllers import GameServerController, HealthCheck, Readiness, Game
 # -----------------------
 # Currently, there is only a V1, but you get the idea if there were a V2.
 from Routes.V1 import V1
-
-# Import ErrorHandler
-# -------------------
-from flask_helpers.ErrorHandler import ErrorHandler
-error_handler = ErrorHandler(module="app.py", method="startup")
 
 # Add cross origin scripting support
 # ----------------------------------

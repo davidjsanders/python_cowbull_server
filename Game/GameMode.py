@@ -1,6 +1,4 @@
-import logging
-
-from flask_helpers.ErrorHandler import ErrorHandler
+from python_cowbull_server import error_handler
 
 
 class GameMode(object):
@@ -41,7 +39,10 @@ class GameMode(object):
         """
 
         # load error handler
-        self.handler = ErrorHandler(module="GameMode", method="__init__")
+#        self.handler = ErrorHandler(module="GameMode", method="__init__")
+        self.handler = error_handler
+        self.handler.module = "GameMode"
+        self.handler.method = "__init__"
 
         # Initialize variables
         self.handler.log(message="Initializing variables")

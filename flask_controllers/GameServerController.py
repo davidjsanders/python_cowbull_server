@@ -12,7 +12,6 @@ from redis.exceptions import ConnectionError
 from flask import request
 from flask.views import MethodView
 from flask_helpers.build_response import build_response
-from flask_helpers.ErrorHandler import ErrorHandler
 from werkzeug.exceptions import BadRequest
 
 # Import the Game Controller
@@ -22,7 +21,7 @@ from Game.GameController import GameController
 from Persistence.RedisPersist import RedisPersist as PersistenceEngine
 
 # Import the Flask app object
-from python_cowbull_server import app
+from python_cowbull_server import app, error_handler
 
 
 class GameServerController(MethodView):
@@ -40,7 +39,10 @@ class GameServerController(MethodView):
         # std i/o. The error handler logs the error and forms an HTML response
         # using Flask's Response class.
         #
-        self.handler = ErrorHandler(module="GameServerController", method="__init__")
+#        self.handler = ErrorHandler(module="GameServerController", method="__init__")
+        self.handler = error_handler
+        self.handler.module = "GameServerController"
+        self.handler.method = "__init__"
         self.handler.log(message="Loading configuration from environment.", status=0)
 
         #
@@ -78,7 +80,7 @@ class GameServerController(MethodView):
         # Set the error handler to default the module and method so that logging
         # calls can be more precise and easier to read.
         #
-        self.handler = ErrorHandler(module="GameServerController", method="get")
+        self.handler.method = "get"
         self.handler.log(message='Processing GET request', status=0)
 
         #
@@ -150,7 +152,7 @@ class GameServerController(MethodView):
         :return:
         """
 
-        self.handler = ErrorHandler(module="GameServerController", method="post")
+        self.handler.method = "post"
         self.handler.log(message='Processing POST request.', status=0)
 
         #

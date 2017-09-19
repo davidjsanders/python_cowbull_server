@@ -1,4 +1,5 @@
 from flask_helpers.ErrorHandler import ErrorHandler
+from python_cowbull_server import error_handler
 
 
 #############################################################################
