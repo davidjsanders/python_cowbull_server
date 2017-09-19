@@ -1,4 +1,4 @@
-# Import required tests
+# Import required tests - Note new package placement.
 from tests.TestV1Routes import TestV1Routes
 from tests.TestGameController import TestGameController
 from tests.TestGameObject import TestGameObject
