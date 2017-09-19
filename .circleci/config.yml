@@ -29,7 +29,6 @@ jobs:
             python3 -m venv venv
             . venv/bin/activate
             pip install -r requirements.txt
-            export DOCKER_TAG=$CIRCLE_BUILD_NUM".0"
 
       - save_cache:
           key: v2-dependencies-{{ "requirements.txt" }}
@@ -46,12 +45,12 @@ jobs:
           name: build docker image
           command: |
             docker login --username=$doclog --password=$docpass
-            docker build -f vendor/docker/Dockerfile -t dsanderscan/test_cowbull:$DOCKER_TAG .
+            docker build -f vendor/docker/Dockerfile -t dsanderscan/test_cowbull:$CIRCLE_BUILD_NUM".0" .
       - run:
           name: push docker image
           command: |
-            docker tag dsanderscan/test_cowbull:$DOCKER_TAG dsanderscan/test_cowbull:latest
-            docker push dsanderscan/test_cowbull:$DOCKER_TAG
+            docker tag dsanderscan/test_cowbull:$CIRCLE_BUILD_NUM".0" dsanderscan/test_cowbull:latest
+            docker push dsanderscan/test_cowbull:$CIRCLE_BUILD_NUM".0"
             docker push dsanderscan/test_cowbull:latest
 
       - store_artifacts:
