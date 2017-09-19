@@ -3,14 +3,16 @@ jobs:
   build:
     docker:
       - image: circleci/python:3.6.1
+
     working_directory: ~/python_cowbull_server
 
     steps:
       - checkout
+
       - restore_cache:
-        keys:
-        - v1-dependencies-{{ checksum "requirements.txt" }}
-        - v1-dependencies-
+          keys:
+          - v1-dependencies-{{ checksum "requirements.txt" }}
+          - v1-dependencies-
 
       - run:
           name: install dependencies
@@ -29,6 +31,7 @@ jobs:
           command: |
             . venv/bin/activate
             python -m unittest tests
+
       - store_artifacts:
           path: test-reports
           destination: test-reports
