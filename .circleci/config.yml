@@ -43,7 +43,6 @@ jobs:
             gcloud config set project $gproject
             mkdir -p vendor/gae
             pip install -t vendor/gae/lib -r requirements.txt
-            gcloud app deploy --quiet
 
       - save_cache:
           key: v2-dependencies-{{ "requirements.txt" }}
