@@ -62,6 +62,7 @@ class TestErrorHandler(TestCase):
             self.error_handler.method,
             test_message
         )
+        self.error_handler.logger.setLevel(logging.INFO)
         self.error_handler.log(logger=logging.info, message=test_message)
         logged_output = self.log_capture.getvalue()
         self.assertEqual(logged_output, eval_message)
@@ -74,6 +75,7 @@ class TestErrorHandler(TestCase):
             self.error_handler.method,
             test_message
         )
+        self.error_handler.logger.setLevel(logging.DEBUG)
         self.error_handler.log(logger=logging.debug, message=test_message)
         logged_output = self.log_capture.getvalue()
         self.assertEqual(logged_output, eval_message)

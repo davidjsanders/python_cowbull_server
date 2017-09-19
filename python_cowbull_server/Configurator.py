@@ -27,10 +27,10 @@ class Configurator(object):
             "logging_format",
             os.getenv("LOGGING_FORMAT", "%(asctime)s %(levelname)s: %(message)s")
         )
-        app.config["LOGGING_LEVEL"] = int(os.getenv(
+        app.config["LOGGING_LEVEL"] = os.getenv(
             "logging_level",
-            os.getenv("LOGGING_LEVEL", logging.DEBUG)
-        ))
+            os.getenv("LOGGING_LEVEL", None)
+        )
 
         self.error_handler = ErrorHandler(
             module="Configurator",
