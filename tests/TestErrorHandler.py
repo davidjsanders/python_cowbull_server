@@ -55,7 +55,7 @@ class TestErrorHandler(TestCase):
         self.assertEqual(result.status_code, 400)
 
     def test_eh_logging_info(self):
-        self.error_handler.method="test_eh_logging"
+        self.error_handler.method="test_eh_logging_info"
         test_message = "This is a test message for logging"
         eval_message = "{}: {}: {}\n".format(
             self.error_handler.module,
@@ -63,5 +63,17 @@ class TestErrorHandler(TestCase):
             test_message
         )
         self.error_handler.log(logger=logging.info, message=test_message)
+        logged_output = self.log_capture.getvalue()
+        self.assertEqual(logged_output, eval_message)
+
+    def test_eh_logging_debug(self):
+        self.error_handler.method="test_eh_logging_debug"
+        test_message = "This is a debug message for logging"
+        eval_message = "{}: {}: {}\n".format(
+            self.error_handler.module,
+            self.error_handler.method,
+            test_message
+        )
+        self.error_handler.log(logger=logging.debug, message=test_message)
         logged_output = self.log_capture.getvalue()
         self.assertEqual(logged_output, eval_message)
