@@ -50,6 +50,7 @@ jobs:
           name: push docker image
           command: |
             docker tag dsanderscan/test_cowbull:$CIRCLE_BUILD_NUM dsanderscan/test_cowbull:latest
+            docker push dsanderscan/test_cowbull:$CIRCLE_BUILD_NUM
             docker push dsanderscan/test_cowbull:latest
 
       - store_artifacts:
