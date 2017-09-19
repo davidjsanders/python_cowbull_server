@@ -1,0 +1,34 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.6.1
+    working_directory: ~/python_cowbull_server
+
+    steps:
+      - checkout
+      - restore_cache:
+        keys:
+        - v1-dependencies-{{ checksum "requirements.txt" }}
+        0 v1-dependencies-
+
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+
+      - save_cache:
+          paths:
+            - ./venv
+          keys: v1-dependencies-{{ checksum "requirements.txt" }}
+
+      - run:
+          name: run tests
+          command: |
+            . venv/bin/activate
+            python -m unittests tests
+      - store_artifacts:
+          path: test-reports
+          destination: test-reports
