@@ -12,6 +12,7 @@ class ErrorHandler(object):
         self.defaults["method"] = kwargs.get("method", None)
         self.basicConfig = logging.basicConfig
 
+        str_level = None
         try:
             str_level = kwargs.get("level", None)
             level = int(str_level)
