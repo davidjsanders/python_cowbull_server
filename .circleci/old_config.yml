@@ -22,6 +22,13 @@ jobs:
             . venv/bin/activate
             pip install -r requirements.txt
 
+      - save_cache:
+          paths:
+            - ./venv
+          keys: 
+          - v2-dependencies-{{ checksum "requirements.txt" }}
+          - v2-dependencies-
+
       - run:
           name: run tests
           command: |
