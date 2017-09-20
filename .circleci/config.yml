@@ -31,25 +31,6 @@ jobs:
             pip install -r requirements.txt
 
       - run:
-          name: install Google Cloud dependencies
-          command: |
-            # Fix the repo to Jessie - needs to be updated later
-            export CLOUD_SDK_REPO="cloud-sdk-jessie"
-            echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
-            curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-            sudo apt-get update && sudo apt-get install google-cloud-sdk --yes
-            echo $circlecibuilder | base64 --decode --ignore-garbage > auth.json
-            gcloud auth activate-service-account --key-file auth.json
-            gcloud config set project $gproject
-            mkdir -p vendor/gae
-            pip install -t vendor/gae/lib -r requirements.txt
-
-      - save_cache:
-          key: v2-dependencies-{{ "requirements.txt" }}
-          paths:
-            - ~/.m2
-
-      - run:
           name: run tests
           command: |
             . venv/bin/activate
@@ -67,6 +48,25 @@ jobs:
             docker tag dsanderscan/test_cowbull:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM dsanderscan/test_cowbull:latest
             docker push dsanderscan/test_cowbull:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM
             docker push dsanderscan/test_cowbull:latest
+
+      - run:
+          name: install Google Cloud dependencies
+          command: |
+            # Fix the repo to Jessie - needs to be updated later
+            export CLOUD_SDK_REPO="cloud-sdk-jessie"
+            echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+            curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+            sudo apt-get update && sudo apt-get install google-cloud-sdk --yes
+            echo $circlecibuilder | base64 --decode --ignore-garbage > auth.json
+            gcloud auth activate-service-account --key-file auth.json
+            gcloud config set project $gproject
+            mkdir -p vendor/gae
+            pip install -t vendor/gae/lib -r requirements.txt
+
+      - save_cache:
+          key: v2-dependencies-{{ "requirements.txt" }}
+          paths:
+            - ~/.m2
 
       - store_artifacts:
           path: test-reports
