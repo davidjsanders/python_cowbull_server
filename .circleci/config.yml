@@ -63,6 +63,7 @@ jobs:
       - run:
           name: Build GAE project and deploy
           command: |
+            # Update to use logging temporarily.
             gcloud config set project $gproject
             mkdir -p vendor/gae
             pip install -t vendor/gae/lib -r requirements.txt
