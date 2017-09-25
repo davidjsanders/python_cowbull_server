@@ -319,8 +319,19 @@ class GameController(object):
                                  "(0, 1, 2, 3, 4, 5, 6, 7, 8, and 9)."
             ),
             GameMode(
-                mode="Hex",
+                mode="Silly",
                 priority=4,
+                digits=5,
+                digit_type=DigitWord.DIGIT,
+                guesses_allowed=3,
+                help_text="Silly mode is, well, just silly! It needs you to guess 5 (five) "
+                          "digits and only gives you 3 (three!!) goes to guess them!",
+                instruction_text="Enter 5 digits, each digit between 0 and 9 "
+                                 "(0, 1, 2, 3, 4, 5, 6, 7, 8, and 9)."
+            ),
+            GameMode(
+                mode="Hex",
+                priority=5,
                 digits=4,
                 digit_type=DigitWord.HEXDIGIT,
                 guesses_allowed=10,
