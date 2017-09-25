@@ -32,7 +32,8 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            python -m unittest -v tests
+            set -o pipefail
+            python -m unittest -v tests 2> >(tee -a test-reports/unittest.log >&2)
 
       - run:
           name: install Google Cloud dependencies
