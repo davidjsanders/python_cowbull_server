@@ -33,7 +33,7 @@ jobs:
           command: |
             . venv/bin/activate
             set -o pipefail
-            python -m unittest -v tests 2> >(tee -a test-reports/unittest.log >&2)
+            python -m unittest -v tests 2> >(tee -a /tmp/unittest-report.log >&2)
 
       - run:
           name: install Google Cloud dependencies
@@ -76,5 +76,5 @@ jobs:
             - ~/.m2
 
       - store_artifacts:
-          path: test-reports
-          destination: test-reports
+          path: /tmp/unittest-report.log
+          destination: unittest-report
