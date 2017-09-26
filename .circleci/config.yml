@@ -4,12 +4,11 @@ jobs:
     docker:
       - image: circleci/python:3.6.1
       - image: redis
-        name: redis
 
     working_directory: ~/python_cowbull_server
 
     environment:
-      - REDIS_HOST: localhostya
+      - REDIS_HOST: localhost
       - REDIS_PORT: 6379
 
     steps:
