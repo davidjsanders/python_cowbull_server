@@ -32,6 +32,9 @@ spec:
       containers:
       - name: cowbull
         image: dsanderscan/cowbull:latest
+        env:
+        - name: "cowbull_config"
+          value: "/cowbull/config/cowbull.cfg"
         resources:
           requests:
             cpu: '0.1'
