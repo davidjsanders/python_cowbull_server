@@ -6,8 +6,8 @@ services:
     networks:
       - cowbull_network
     restart: always
-  cowbull_v5:
-    image: 'dsanderscan/cowbull_v5'
+  cowbull_svc:
+    image: 'dsanderscan/cowbull'
     depends_on:
       - redis
     ports:
@@ -23,11 +23,11 @@ services:
   cowbull_webapp:
     image: 'dsanderscan/cowbull_webapp'
     depends_on:
-      - cowbull_v5
+      - cowbull_svc
     ports:
       - 8080:8080
     environment:
-      - COWBULL_SERVER=cowbull_v5
+      - COWBULL_SERVER=cowbull_svc
       - COWBULL_PORT=5000
       - COWBULL_VERSION=v1
     networks:
