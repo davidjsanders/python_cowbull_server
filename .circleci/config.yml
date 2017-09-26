@@ -52,7 +52,7 @@ jobs:
             export CLOUDSDK_CORE_DISABLE_PROMPTS=1
             mkdir -p vendor/gae
             pip install -t vendor/gae/lib -r requirements.txt
-            gcloud app deploy --version=$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM --quiet
+            gcloud app deploy --version="CIGEN-"$MAJOR_VERSION"-"$MINOR_VERSION"-"$CIRCLE_BUILD_NUM --quiet
 
       - setup_remote_docker
 
