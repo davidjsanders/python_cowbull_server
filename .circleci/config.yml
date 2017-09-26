@@ -52,7 +52,7 @@ jobs:
             export CLOUDSDK_CORE_DISABLE_PROMPTS=1
             mkdir -p vendor/gae
             pip install -t vendor/gae/lib -r requirements.txt
-            gcloud app deploy --quiet
+            gcloud app deploy --version=$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM --quiet
 
       - setup_remote_docker
 
@@ -60,14 +60,14 @@ jobs:
           name: build docker image
           command: |
             docker login --username=$doclog --password=$docpass
-            docker build -f vendor/docker/Dockerfile -t dsanderscan/test_cowbull:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM .
+            docker build -f vendor/docker/Dockerfile -t dsanderscan/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM .
 
       - run:
           name: push docker image
           command: |
-            docker tag dsanderscan/test_cowbull:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM dsanderscan/test_cowbull:latest
-            docker push dsanderscan/test_cowbull:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM
-            docker push dsanderscan/test_cowbull:latest
+            docker tag dsanderscan/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM dsanderscan/$IMAGE_NAME:latest
+            docker push dsanderscan/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM
+            docker push dsanderscan/$IMAGE_NAME:latest
 
       - save_cache:
           key: v2-dependencies-{{ checksum "requirements.txt" }}
