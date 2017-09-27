@@ -19,5 +19,5 @@ COPY		python_cowbull_server /cowbull/python_cowbull_server/
 COPY        Routes /cowbull/Routes
 COPY        app.py  /cowbull/
 COPY        LICENSE /cowbull/
-CMD			["gunicorn", "-b", "0.0.0.0:5000", "-w", "4", "app:app"]
-EXPOSE		5000
+CMD			["gunicorn", "-b", "0.0.0.0:8080", "-w", "4", "app:app"]
+EXPOSE		8080
