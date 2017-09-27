@@ -10,8 +10,8 @@ services:
     image: 'dsanderscan/cowbull'
     depends_on:
       - redis
-    ports:
-      - 5000:8080
+#    ports:
+#      - 5000:8080
     environment:
       - LOGGING_LEVEL=10
       - REDIS_HOST=redis
