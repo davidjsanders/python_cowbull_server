@@ -57,6 +57,13 @@ class V1(object):
             methods=["GET"]
         )
 
+        hv2 = controller.as_view('Health2')
+        self.app.add_url_rule(
+            '/_ah/health',
+            view_func=health_view,
+            methods=["GET"]
+        )
+
     def readiness(self, controller=None):
         # Add a readiness view. The code below currently does nothing other than return an
         # HTML 200 status. In a more complex app, it could return a 503 error (service
