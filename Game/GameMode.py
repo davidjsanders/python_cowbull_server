@@ -38,7 +38,7 @@ class GameMode(object):
 
         """
 
-        # load error handler
+        # execute_load error handler
 #        self.handler = ErrorHandler(module="GameMode", method="__init__")
         self.handler = error_handler
         self.handler.module = "GameMode"

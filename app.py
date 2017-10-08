@@ -3,7 +3,7 @@ import logging
 # Import python_cowbull_server initialization package
 # ---------------------------------------------------
 # Import the app from the python_cowbull_server package, which will also
-# load the __init__.py for the package. In effect, this allows sets up
+# execute_load the __init__.py for the package. In effect, this allows sets up
 # key variables, configuration, and other general settings and also
 # defines the Flask app there, making it importable everywhere without
 # circular references.

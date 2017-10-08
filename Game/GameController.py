@@ -11,7 +11,7 @@ from python_cowbull_server import error_handler
 
 class GameController(object):
     """
-    GameController - Provides the controller functions (load, save, and guess) to
+    GameController - Provides the controller functions (execute_load, save, and guess) to
     interact with a CowBull game.
 
     Originally, the GameController was a separate Python
@@ -41,7 +41,7 @@ class GameController(object):
         object or a str representing the name of a GameMode object already defined (e.g.
         passed via game_modes).
         """
-        # load error handler
+        # execute_load error handler
         self.handler = error_handler
         self.handler.module = "GameController"
         self.handler.method = "__init__"
@@ -54,12 +54,12 @@ class GameController(object):
         self.handler.log(message="Parameter mode: Value {} Type {}".format(mode, type(mode)))
         self.handler.log(message="Parameter game_json: Value {} Type {}".format(game_json, type(game_json)))
 
-        # load game_modes
+        # execute_load game_modes
         self.handler.log(message="Setup game modes")
         self._game_modes = None
         self.load_modes(input_modes=game_modes)
 
-        # load any game passed
+        # execute_load any game passed
         self.handler.log(message="Loading any saved game")
         self.game = None
         self.load(game_json=game_json, mode=mode)
@@ -208,7 +208,7 @@ class GameController(object):
         :return: A game object
         """
 
-        self.handler.method = "load"
+        self.handler.method = "execute_load"
         self.handler.log(message="Validating mode value")
         self.handler.log(message="Mode: Value {} Type {}".format(mode, type(mode)))
         _mode = mode or 'Normal' # Default mode to normal if not provided
@@ -237,7 +237,7 @@ class GameController(object):
             if not isinstance(game_json, self.STRINGY):
                 raise TypeError("Game must be passed as a serialized JSON string.")
 
-            self.handler.log(message="Attempting to load")
+            self.handler.log(message="Attempting to execute_load")
             game_dict = json.loads(game_json)
 
             self.handler.log(message="Validating mode exists in JSON")

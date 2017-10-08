@@ -6,7 +6,7 @@ from Game.GameMode import GameMode
 class GameObject(object):
     """
     A GameObject holds the properties (key, status, mode, etc.), states (guesses made, remaining, etc.),
-    and the control methods to load, save, or start a new game. There is no game logic in GameObject.py,
+    and the control methods to execute_load, save, or start a new game. There is no game logic in GameObject.py,
     simply the ability to represent a CowBull game.
 
     See also: GameController --> the control (logic) for the game.
@@ -170,7 +170,7 @@ class GameObject(object):
         # passed a mode to the game object, even if it is the default mode.
         if mode is None:
             raise ValueError(
-                "A GameMode must be provided to start or load a game object"
+                "A GameMode must be provided to start or execute_load a game object"
             )
 
         # If the mode has been passed but it's not a GameMode object, throw a TypeError

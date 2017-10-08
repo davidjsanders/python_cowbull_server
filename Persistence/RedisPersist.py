@@ -21,7 +21,7 @@ class RedisPersist:
 
     def load(self, key=None):
         if key is None:
-            raise ValueError("Key must be present to load game")
+            raise ValueError("Key must be present to execute_load game")
         return_result = self._redis_connection.get(key)
         if return_result is not None:
             if isinstance(return_result, bytes):

@@ -163,7 +163,7 @@ class GameServerController(MethodView):
         # curl -H "Content-type: application/json" ...
         #
         try:
-            self.handler.log(message='Attempting to load JSON', status=0)
+            self.handler.log(message='Attempting to execute_load JSON', status=0)
             json_dict = request.get_json()
             self.handler.log(message='Loaded JSON. Returned: {}'.format(json_dict), status=0)
         except BadRequest as e:
@@ -194,7 +194,7 @@ class GameServerController(MethodView):
         #
         try:
             _key = json_dict["key"]
-            self.handler.log(message='Attempting to load game {}'.format(_key), status=0)
+            self.handler.log(message='Attempting to execute_load game {}'.format(_key), status=0)
         except TypeError as te:
             return self.handler.error(
                 status=400,

@@ -67,7 +67,7 @@ class V1(object):
     def readiness(self, controller=None):
         # Add a readiness view. The code below currently does nothing other than return an
         # HTML 200 status. In a more complex app, it could return a 503 error (service
-        # unavailable), so that a scheduling engine like Kubernetes or a load balancer
+        # unavailable), so that a scheduling engine like Kubernetes or a execute_load balancer
         # could avoid sending traffic to the node until it responds ready (200).
         # ---------------------------------------------------------------------------
         self.error_handler.method = "readiness"
