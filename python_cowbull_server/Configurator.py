@@ -22,7 +22,7 @@ class Configurator(object):
                 "name": "REDIS_HOST",
                 "description": "The Redis host name, e.g. redis.myredishost.com",
                 "required": True,
-                "default": None,
+                "default": "localhost",
                 "errmsg": "Redis host must be defined in the OS Env. Var. REDIS_HOST"
             },
             {
@@ -185,7 +185,7 @@ class Configurator(object):
             source(name.upper(), None)
         )
 
-        if required and value is None:
+        if required and value is None and default is None:
             raise ValueError(
                 errmsg or
                 "Problem fetching config item: "
