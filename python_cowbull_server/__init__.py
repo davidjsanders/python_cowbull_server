@@ -18,7 +18,7 @@ print('configure the server. Alternately, these can be defined in a ')
 print('file and passed using the env. var. COWBULL_CONFIG. Please ')
 print('note, the file must be a JSON data object.')
 print('')
-print('Please note. Env. Vars can be *ALL* lowercase or *ALL* uppercase.')
+print('Please note. Env. Var. names can be *ALL* lowercase or *ALL* uppercase.')
 
 c.execute_load(app)
 
