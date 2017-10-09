@@ -30,6 +30,12 @@ for name, val in c.dump_variables():
 print('-'*80)
 print('')
 
+if app.config["COWBULL_DRY_RUN"]:
+    print("")
+    print("Dry run env. var. is set. Exiting...")
+    print("")
+    exit(0)
+
 error_handler = c.error_handler
 error_handler.log(
     method="__init__",

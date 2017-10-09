@@ -65,6 +65,14 @@ class Configurator(object):
                 "required": False,
                 "default": True,
                 "caster": bool
+            },
+            {
+                "name": "COWBULL_DRY_RUN",
+                "description": "Do not run the server, simply report the configuration that would "
+                               "be used to run it.",
+                "required": False,
+                "default": False,
+                "caster": bool
             }
         ]
 
