@@ -83,7 +83,7 @@ class Configurator(object):
         )
         self.app.config["LOGGING_LEVEL"] = os.getenv(
             "logging_level",
-            os.getenv("LOGGING_LEVEL", None)
+            os.getenv("LOGGING_LEVEL", logging.WARNING)
         )
 
         self.error_handler = ErrorHandler(
@@ -110,6 +110,7 @@ class Configurator(object):
             source=os.getenv,
             name="COWBULL_CONFIG"
         )
+        self.app.config["COWBULL_CONFIG"] = config_file
 
         self.error_handler.log(
             message="Loading configuration from: {}".format(
@@ -128,7 +129,6 @@ class Configurator(object):
                 _file.close()
 
         self.load_variables(source=source)
-        self.dump_variables()
 
     def get_variables(self):
         return [
@@ -142,11 +142,13 @@ class Configurator(object):
                + [(i["name"], i["description"]) for i in self.env_vars]
 
     def dump_variables(self):
-        for item in self.env_vars:
-            self.error_handler.log(
-                method="Config Variable",
-                message="{}={}".format(item["name"], self.app.config[item["name"]])
-            )
+        return [
+                   ("LOGGING_LEVEL", self.app.config["LOGGING_LEVEL"]),
+                   ("LOGGING_FORMAT", self.app.config["LOGGING_FORMAT"]),
+                   ("COWBULL_CONFIG", self.app.config["COWBULL_CONFIG"])
+               ] \
+               + \
+               [(i["name"], self.app.config[i["name"]]) for i in self.env_vars]
 
     def load_variables(self, source=None):
         if source:

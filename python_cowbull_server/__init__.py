@@ -15,17 +15,20 @@ print('')
 print('-'*80)
 print('The following environment variables may be set to dynamically')
 print('configure the server. Alternately, these can be defined in a ')
-print('file and passed using the env. var. COWBULL_CONFIG.')
+print('file and passed using the env. var. COWBULL_CONFIG. Please ')
+print('note, the file must be a JSON data object.')
 print('')
 print('Please note. Env. Vars can be *ALL* lowercase or *ALL* uppercase.')
-print('-'*80)
-print('')
-for name, desc in c.get_variables():
-    print(name, '-->', desc)
-print('-'*80)
-print('')
 
 c.execute_load(app)
+
+print('-'*80)
+print('| Current configuration set:')
+print('-'*80)
+for name, val in c.dump_variables():
+    print("| {:20s} | {}".format(name, val))
+print('-'*80)
+print('')
 
 error_handler = c.error_handler
 error_handler.log(
