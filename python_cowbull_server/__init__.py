@@ -26,7 +26,9 @@ print('-'*80)
 print('| Current configuration set:')
 print('-'*80)
 for name, val in c.dump_variables():
-    print("| {:20s} | {}".format(name, val))
+    outstr = "| {:20s} | {}".format(name, val)
+    print(outstr)
+    logging.debug(outstr)
 print('-'*80)
 print('')
 
