@@ -4,6 +4,9 @@ from flask import request
 from flask.views import MethodView
 from flask_helpers.build_response import build_response
 
+# Import the Flask app object
+from python_cowbull_server import app, error_handler
+
 # Import the Game Controller
 from Game.GameController import GameController
 
@@ -11,7 +14,9 @@ from Game.GameController import GameController
 class GameModes(MethodView):
     def get(self):
         logging.debug("GameModes: GET: Initializing GameObject")
-        game_controller = GameController()
+        game_controller = GameController(
+            game_modes=app.config["COWBULL_CUSTOM_MODES"],
+        )
         logging.debug("GameModes: GET: GameObject initialized to {}".format(game_controller.save()))
 
         logging.debug("GameModes: GET: Checking if textmode flag set")

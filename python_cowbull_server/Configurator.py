@@ -73,6 +73,17 @@ class Configurator(object):
                 "required": False,
                 "default": False,
                 "caster": bool
+            },
+            {
+                "name": "COWBULL_CUSTOM_MODES",
+                "description": "A file which defines additional "
+                               "modes to be defined in addition to the default modes. The "
+                               "file must be a list of JSON objects containing mode "
+                               "definitions. Each object must contain (at a minimum): mode, digits, and "
+                               "priority",
+                "required": False,
+                "default": None,
+                "caster": self._load_from_json
             }
         ]
 
@@ -145,7 +156,7 @@ class Configurator(object):
                    ("LOGGING_FORMAT", "The format for logs. The default is >> "
                                       "%(asctime)s %(levelname)s: %(message)s"),
                    ("COWBULL_CONFIG", "A path and filename of a configuration file "
-                                     "used to set env. vars. e.g. /path/to/the/file.cfg")
+                                      "used to set env. vars. e.g. /path/to/the/file.cfg")
                ]\
                + [(i["name"], i["description"]) for i in self.env_vars]
 
@@ -157,6 +168,26 @@ class Configurator(object):
                ] \
                + \
                [(i["name"], self.app.config[i["name"]]) for i in self.env_vars]
+
+    def print_variables(self):
+        print('')
+        print('=' * 80)
+        print('=', ' '*30, 'CONFIGURATION', ' '*31, '=')
+        print('=' * 80)
+        print('The following environment variables may be set to dynamically configure the')
+        print('server. Alternately, these can be defined in a file and passed using the env.')
+        print('var. COWBULL_CONFIG. Please note, the file must be a JSON data object.')
+        print('')
+        print('Please note. Env. Var. names can be *ALL* lowercase or *ALL* uppercase.')
+        print('')
+        print('-' * 80)
+        print('| Current configuration set:')
+        print('-' * 80)
+        for name, val in self.dump_variables():
+            outstr = "| {:20s} | {}".format(name, val)
+            print(outstr)
+        print('-' * 80)
+        print('')
 
     def load_variables(self, source=None):
         if source:
@@ -210,3 +241,32 @@ class Configurator(object):
 
         self.app.config[name] = value
         return value
+
+    def _load_from_json(self, json_file_name):
+        if not json_file_name:
+            return None
+
+        f = None
+        return_value = None
+
+        try:
+            f = open(json_file_name, 'r')
+            return_value = json.load(f)
+        except Exception as e:
+            self.error_handler.error(
+                module="Configurator.py",
+                method="_load_from_json",
+                status=500,
+                exception=repr(e),
+                message="An exception occurred!"
+            )
+            raise IOError(
+                "A JSON file ({}) cannot be loaded. Exception: {}".format(
+                    json_file_name,
+                    repr(e)
+                )
+            )
+        finally:
+            if f:
+                f.close()
+        return return_value

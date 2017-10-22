@@ -340,11 +340,14 @@ class GameController(object):
 
             for mode in input_modes:
                 if not isinstance(mode, GameMode):
-                    raise TypeError("Expected list to contain only GameMode objects")
+                    _mode = GameMode(**mode)
+                else:
+                    _mode = mode
+#                    raise TypeError("Expected list to contain only GameMode objects")
                 self.handler.log(
                     message="Appending mode: {}".format(mode)
                 )
-                _modes.append(mode)
+                _modes.append(_mode)
 
         self.handler.log(message="Deep copying modes")
         self._game_modes = copy.deepcopy(_modes)

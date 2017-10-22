@@ -92,7 +92,10 @@ class GameServerController(MethodView):
 
         try:
             self.handler.log(message="Creating game with mode {} ({})".format(game_mode, type(game_mode)))
-            game_controller = GameController(mode=game_mode)
+            game_controller = GameController(
+                game_modes=app.config["COWBULL_CUSTOM_MODES"],
+                mode=game_mode
+            )
             self.handler.log(message='New game created with key {}'.format(game_controller.game.key), status=0)
         except ValueError as ve:
             return self.handler.error(
@@ -246,6 +249,7 @@ class GameServerController(MethodView):
             self.handler.log(message="Loaded game mode {}.".format(str(_mode["mode"])))
 
             _game = GameController(
+                game_modes=app.config["COWBULL_CUSTOM_MODES"],
                 game_json=json.dumps(_loaded_game),
                 mode=str(_mode["mode"])
             )
