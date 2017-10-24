@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 rg="clusterResourceGroup"
 clusterName="k8Cluster"
 masters="1"
