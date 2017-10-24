@@ -5,6 +5,7 @@ masters="1"
 agents="1"
 location="eastus"
 machineType="Standard_A2"
+dnsPrefix="dasanderk8"
 echo ""
 echo "Spinning up Azure ACS Kubernetes cluster"
 echo "========================================"
@@ -33,6 +34,7 @@ az acs create \
   --master-count $masters \
   --agent-count $agents \
   --generate-ssh-keys \
+  --dns-prefix $dnsPrefix \
   --agent-vm-size $machineType
 echo "3. Add private key. Enter your credentials..."
 ssh-add -k ~/.ssh/id_rsa
