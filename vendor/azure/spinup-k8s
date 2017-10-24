@@ -13,10 +13,15 @@ echo ""
 echo "NOTE: Your input will be required if ~/.ssh/id_rsa"
 echo "      is password protected."
 echo ""
-echo "1. Create the resource group "$rg" in "$location
+echo "1. Add private key: ~/.ssh/id_rsa"
+ssh-add -k ~/.ssh/id_rsa
+echo ""
+echo "** No more input will be required from this point **"
+echo ""
+echo "2. Create the resource group "$rg" in "$location
 az group create --name $rg --location $location
 echo ""
-echo "2. Create the cluster. --resource-group "$rg" --clusterName "$clusterName" --master-count "$masters" --agent-count "$agents
+echo "3. Create the cluster. --resource-group "$rg" --clusterName "$clusterName" --master-count "$masters" --agent-count "$agents
 az acs create \
   --orchestrator-type kubernetes \
   --resource-group $rg \
@@ -27,10 +32,7 @@ az acs create \
   --dns-prefix $dnsPrefix \
   --agent-vm-size $machineType
 echo ""
-echo "3. Add private key. Enter your credentials..."
-ssh-add -k ~/.ssh/id_rsa
-echo ""
-echo "4. Get kubernetes credentials"
+echo "4. Get kubernetes credentials to configure kubectl"
 az acs kubernetes get-credentials --resource-group=$rg --name=$clusterName
 echo ""
 echo "Step 1 - Spinning up Azure ACS Kubernetes cluster **COMPLETE**"
