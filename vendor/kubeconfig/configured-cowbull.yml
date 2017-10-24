@@ -35,6 +35,10 @@ spec:
         env:
         - name: "REDIS_HOST"
           value: "redis-master"
+        - name: "LOGGING_LEVEL"
+          value: "10"
+        - name: "COWBULL_CONFIG"
+          value: "/cowbull/config/cowbull.cfg"
         resources:
           requests:
             cpu: '0.1'
