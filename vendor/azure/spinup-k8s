@@ -1,31 +1,21 @@
 #!/usr/bin/env bash
-rg="clusterResourceGroup"
-clusterName="k8Cluster"
-masters="1"
-agents="1"
-location="eastus"
-machineType="Standard_A2"
-dnsPrefix="dasanderk8"
+#rg="clusterResourceGroup"
+#clusterName="k8Cluster"
+#masters="1"
+#agents="1"
+#location="eastus"
+#machineType="Standard_A2"
+#dnsPrefix="dasanderk8"
 echo ""
-echo "Spinning up Azure ACS Kubernetes cluster"
-echo "========================================"
+echo "Step 1 - Spinning up Azure ACS Kubernetes cluster"
+echo "-------------------------------------------------"
 echo ""
-echo ""
-echo "Creating the following resources:"
-echo "---------------------------------"
-echo "1.   resource group:   "$rg
-echo "2.   cluster name  :   "$clusterName
-echo "3.   master count  :   "$masters
-echo "4.   agent count   :   "$agents
-echo "5.   location      :   "$location
-echo "6.   machine type  :   "$machineType
-echo ""
-echo ""
-echo "Execution steps..."
-echo "------------------"
+echo "NOTE: Your input will be required if ~/.ssh/id_rsa"
+echo "      is password protected."
 echo ""
 echo "1. Create the resource group "$rg" in "$location
 az group create --name $rg --location $location
+echo ""
 echo "2. Create the cluster. --resource-group "$rg" --clusterName "$clusterName" --master-count "$masters" --agent-count "$agents
 az acs create \
   --orchestrator-type kubernetes \
@@ -36,9 +26,13 @@ az acs create \
   --generate-ssh-keys \
   --dns-prefix $dnsPrefix \
   --agent-vm-size $machineType
+echo ""
 echo "3. Add private key. Enter your credentials..."
 ssh-add -k ~/.ssh/id_rsa
+echo ""
 echo "4. Get kubernetes credentials"
 az acs kubernetes get-credentials --resource-group=$rg --name=$clusterName
 echo ""
-echo "Done: cluster ready"
+echo "Step 1 - Spinning up Azure ACS Kubernetes cluster **COMPLETE**"
+echo "--------------------------------------------------------------"
+echo ""
