@@ -21,6 +21,3 @@ az acs create \
   --dns-prefix $dnsPrefix \
   --agent-vm-size $machineType
 echo ""
-echo "3. Get kubernetes credentials to configure kubectl"
-az acs kubernetes get-credentials --resource-group=$rg --name=$clusterName
-echo ""
