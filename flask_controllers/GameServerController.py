@@ -18,7 +18,8 @@ from werkzeug.exceptions import BadRequest
 from Game.GameController import GameController
 
 # Import a persistence package
-from Persistence.RedisPersist import RedisPersist as PersistenceEngine
+from Persistence.RedisPersist import RedisPersist
+from Persistence.MongoPersist import MongoPersist
 
 # Import the Flask app object
 from python_cowbull_server import app, error_handler
@@ -51,21 +52,34 @@ class GameServerController(MethodView):
         # and if they haven't (for whatever reason) an exception WILL be raised.
         #
         self.game_version = app.config.get("GAME_VERSION")
-        self.redis_host = app.config.get("REDIS_HOST")
-        self.redis_port = app.config.get("REDIS_PORT")
-        self.redis_db = app.config.get("REDIS_DB")
-        self.redis_auth = app.config.get("REDIS_USEAUTH")
+        #
+        # Persistence Engine selector
+        #
+        self.persistence_engine = app.config.get("PERSISTENCE_ENGINE", "redis")
+        if self.persistence_engine.lower() == "redis":
+            self.persister = RedisPersist
+            self.persistence_host = app.config.get("REDIS_HOST")
+            self.persistence_port = app.config.get("REDIS_PORT")
+            self.persistence_db = app.config.get("REDIS_DB")
+            self.persistence_auth = app.config.get("REDIS_USEAUTH")
+        else:
+            self.persister = MongoPersist
+            self.persistence_host = app.config.get("MONGODB_HOST")
+            self.persistence_port = app.config.get("MONGODB_PORT")
+            self.persistence_db = app.config.get("MONGODB_DB")
+            self.persistence_auth = False
 
         #
         # Log the configuration to the handler.
         #
         self.handler.log(
-            message="Redis configured for: {}:{}/{} -- auth? {}"\
+            message="{} configured for: {}:{}/{} -- auth? {}"
                 .format(
-                    self.redis_host,
-                    self.redis_port,
-                    self.redis_db,
-                    self.redis_auth
+                    self.persistence_engine,
+                    self.persistence_host,
+                    self.persistence_port,
+                    self.persistence_db,
+                    self.persistence_auth
                 ),
             status=0
         )
@@ -110,10 +124,10 @@ class GameServerController(MethodView):
         # from to ensure uniform consistency in persistence handling regardless
         # of the engine (Redis, Mongo, etc.) used.
         try:
-            persister = PersistenceEngine(
-                host=self.redis_host,
-                port=self.redis_port,
-                db=self.redis_db
+            persister = self.persister(
+                host=self.persistence_host,
+                port=self.persistence_port,
+                db=self.persistence_db
             )
             self.handler.log(message='Persister instantiated', status=0)
         except ConnectionError as ce:
@@ -183,7 +197,11 @@ class GameServerController(MethodView):
         #
         try:
             self.handler.log(message='Getting persister', status=0)
-            persister = PersistenceEngine(host=self.redis_host, port=self.redis_port, db=self.redis_db)
+            persister = self.persister(
+                host=self.persistence_host,
+                port=self.persistence_port,
+                db=self.persistence_db
+            )
         except ConnectionError as ce:
             return self.handler.error(
                 status=503,

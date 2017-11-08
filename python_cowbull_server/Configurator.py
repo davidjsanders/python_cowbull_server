@@ -19,9 +19,29 @@ class Configurator(object):
         self.error_handler = None
         self.env_vars = [
             {
+                "name": "MONGODB_HOST",
+                "description": "The MongoDB host name, e.g. mongo.mymongohost.com",
+                "required": False,
+                "default": "localhost",
+                "errmsg": "Redis host must be defined in the OS Env. Var. REDIS_HOST"
+            },
+            {
+                "name": "MONGODB_PORT",
+                "description": "The MongoDB port number, e.g. 21706",
+                "required": False,
+                "default": 27017,
+                "caster": int
+            },
+            {
+                "name": "MONGODB_DB",
+                "description": "The Mongo database, e.g. mydb",
+                "required": False,
+                "default": "cowbull"
+            },
+            {
                 "name": "REDIS_HOST",
                 "description": "The Redis host name, e.g. redis.myredishost.com",
-                "required": True,
+                "required": False,
                 "default": "localhost",
                 "errmsg": "Redis host must be defined in the OS Env. Var. REDIS_HOST"
             },
@@ -45,6 +65,13 @@ class Configurator(object):
                 "required": False,
                 "default": False,
                 "caster": bool
+            },
+            {
+                "name": "PERSISTENCE_ENGINE",
+                "description": "The persistence engine to use. Currently: redis or mongodb",
+                "required": False,
+                "default": "redis",
+                "choices": ["redis", "mongodb"]
             },
             {
                 "name": "FLASK_HOST",
@@ -219,7 +246,8 @@ class Configurator(object):
             required=None,
             default=None,
             errmsg=None,
-            caster=None
+            caster=None,
+            choices=None
     ):
         value = source(
             name.lower(),
@@ -238,6 +266,17 @@ class Configurator(object):
 
         if caster:
             value = caster(value)
+
+        if choices:
+            if value not in choices:
+                raise ValueError(
+                    errmsg or
+                    "The configuration value for {}({}) is not in the list of choices: ()".format(
+                        name,
+                        value,
+                        choices
+                    )
+                )
 
         self.app.config[name] = value
         return value

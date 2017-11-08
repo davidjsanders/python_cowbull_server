@@ -33,6 +33,8 @@ spec:
       - name: cowbull
         image: dsanderscan/cowbull:latest
         env:
+        - name: "PERSISTENCE_ENGINE"
+          value: "redis"
         - name: "REDIS_HOST"
           value: "redis-master"
         resources:
