@@ -1,11 +1,13 @@
 import json
 import pymongo
+import logging
 
 
 class MongoPersist:
     def __init__(self, host="localhost", port=27017, db="cowbull"):
         self.connection = pymongo.MongoClient(host=host, port=port)
         self.mdb = self.connection[db]
+        logging.WARNING("Persistence engine called: MongoDB")
 
     def save(self, key=None, jsonstr=None):
         if key is None:
