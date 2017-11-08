@@ -14,7 +14,6 @@ spec:
     - protocol: TCP
       targetPort: 8080
       port: 8080
-  type: LoadBalancer
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -37,6 +36,10 @@ spec:
           value: "redis"
         - name: "REDIS_HOST"
           value: "redis-master"
+        - name: "LOGGING_LEVEL"
+          value: "10"
+        - name: "COWBULL_CONFIG"
+          value: "/cowbull/config/cowbull.cfg"
         resources:
           requests:
             cpu: '0.1'
