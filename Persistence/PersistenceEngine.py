@@ -1,8 +1,3 @@
-from Persistence.RedisPersist import RedisPersist
-from Persistence.MongoPersist import MongoPersist
-from Persistence.GCPStoragePersist import GCPStoragePersist
-
-
 class PersistenceEngine(object):
     def __init__(self, **kwargs):
         engine_name = kwargs.get('engine_name', None)
@@ -23,17 +18,21 @@ class PersistenceEngine(object):
         self._persister = None
 
         if self._engine_name.lower() == 'mongodb':
+            from Persistence.MongoPersist import MongoPersist
             self._persister = MongoPersist
         elif self._engine_name.lower() == 'gcpstorage':
+            from Persistence.GCPStoragePersist import GCPStoragePersist
             self._persister = GCPStoragePersist
         elif self._engine_name.lower() == 'redis':
+            from Persistence.RedisPersist import RedisPersist
             self._persister = RedisPersist
         else:
             raise ValueError(
                 "The persistence engine provided ('{}') is "
-                "unknown and not supported"
+                "unknown and not supported. Valid vaules are: "
+                "'mongodb', 'redis', or 'gcpstorage'"
                     .format(
-                    self.persister_config.engine_name
+                    self._engine_name
                 )
             )
 

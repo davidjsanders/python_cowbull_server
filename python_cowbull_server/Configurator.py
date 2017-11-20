@@ -34,61 +34,6 @@ class Configurator(object):
                 "caster": PersistenceEngine
             },
             {
-                "name": "MONGODB_HOST",
-                "description": "The MongoDB host name, e.g. mongo.mymongohost.com",
-                "required": False,
-                "default": "localhost",
-                "errmsg": "Redis host must be defined in the OS Env. Var. REDIS_HOST"
-            },
-            {
-                "name": "MONGODB_PORT",
-                "description": "The MongoDB port number, e.g. 21706",
-                "required": False,
-                "default": 27017,
-                "caster": int
-            },
-            {
-                "name": "MONGODB_DB",
-                "description": "The Mongo database, e.g. mydb",
-                "required": False,
-                "default": "cowbull"
-            },
-            {
-                "name": "REDIS_HOST",
-                "description": "The Redis host name, e.g. redis.myredishost.com",
-                "required": False,
-                "default": "localhost",
-                "errmsg": "Redis host must be defined in the OS Env. Var. REDIS_HOST"
-            },
-            {
-                "name": "REDIS_PORT",
-                "description": "The Redis port, defaults to 6379",
-                "required": False,
-                "default": 6379,
-                "caster": int
-            },
-            {
-                "name": "REDIS_DB",
-                "description": "The Redis database number, defaults to 0",
-                "required": False,
-                "default": 0,
-                "caster": int
-            },
-            {
-                "name": "REDIS_AUTH_ENABLED",
-                "description": "A boolean indicator to state whether Redis authentication is enabled",
-                "required": False,
-                "default": False,
-                "caster": bool
-            },
-            {
-                "name": "PERSISTENCE_ENGINE",
-                "description": "The persistence engine to use. Currently: redis or mongodb",
-                "required": False,
-                "default": "redis",
-                "choices": ["redis", "mongodb"]
-            },
-            {
                 "name": "FLASK_HOST",
                 "description": "For debug purposes, defines the Flask host. Default is 0.0.0.0",
                 "required": False,

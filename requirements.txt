@@ -1,5 +1,7 @@
 Flask==0.12.1
+GoogleAppEngineCloudStorageClient==1.9.22.1
 google-cloud-storage==1.6.0
+google-cloud-pubsub==0.29.0
 gunicorn==19.7.1
 itsdangerous==0.24
 Jinja2==2.9.6
