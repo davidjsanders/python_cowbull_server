@@ -281,7 +281,8 @@ class Configurator(object):
 
         if caster:
             if caster == PersistenceEngine:
-                value = json.loads(value)
+                if not isinstance(value, dict):
+                    value = json.loads(value)
                 value = caster(**value)
             else:
                 value = caster(value)
