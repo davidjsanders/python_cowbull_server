@@ -5,6 +5,7 @@ import sys
 
 from flask_helpers.ErrorHandler import ErrorHandler
 from flask import Flask
+from Persistence.PersistenceEngine import PersistenceEngine
 
 
 class Configurator(object):
@@ -18,6 +19,20 @@ class Configurator(object):
         self.configuration = {}
         self.error_handler = None
         self.env_vars = [
+            {
+                "name": "PERSISTER",
+                "description": "The persistence engine object",
+                "required": False,
+                "default": {
+                    "engine": "redis",
+                    "parameters": {
+                        "host": "localhost",
+                        "port": 6379,
+                        "db": 0
+                    }
+                },
+                "caster": PersistenceEngine
+            },
             {
                 "name": "MONGODB_HOST",
                 "description": "The MongoDB host name, e.g. mongo.mymongohost.com",
@@ -265,7 +280,11 @@ class Configurator(object):
             value = default
 
         if caster:
-            value = caster(value)
+            if caster == PersistenceEngine:
+                value = json.loads(value)
+                value = caster(**value)
+            else:
+                value = caster(value)
 
         if choices:
             if value not in choices:
