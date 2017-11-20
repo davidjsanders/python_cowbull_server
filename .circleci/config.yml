@@ -8,8 +8,7 @@ jobs:
     working_directory: ~/python_cowbull_server
 
     environment:
-      - REDIS_HOST: localhost
-      - REDIS_PORT: 6379
+      - PERSISTER: '{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0}}'
 
     steps:
       - checkout
