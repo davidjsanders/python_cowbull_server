@@ -48,7 +48,9 @@ class PersistenceEngine(object):
 
     @property
     def persister(self):
-        return self._persister
+        return self._persister(
+            **self.parameters
+        )
 
     def __repr__(self):
         return "<persister>{}".format(self._engine_name)

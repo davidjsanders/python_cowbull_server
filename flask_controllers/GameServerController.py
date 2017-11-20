@@ -112,7 +112,7 @@ class GameServerController(MethodView):
         # from to ensure uniform consistency in persistence handling regardless
         # of the engine (Redis, Mongo, etc.) used.
         try:
-            persister = self.persistence_engine.persister()
+            persister = self.persistence_engine.persister
             self.handler.log(message='Persister instantiated', status=0)
         except ConnectionError as ce:
             return self.handler.error(status=503, exception=str(ce), message="There is no redis service available!")
@@ -181,7 +181,7 @@ class GameServerController(MethodView):
         #
         try:
             self.handler.log(message='Getting persister', status=0)
-            persister = self.persistence_engine.persister()
+            persister = self.persistence_engine.persister
         except ConnectionError as ce:
             return self.handler.error(
                 status=503,
