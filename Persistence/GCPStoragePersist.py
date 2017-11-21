@@ -43,7 +43,6 @@ class GCPStoragePersist:
         body = {
             'name': key,
             'contentType': 'application/json',
-            'uploadType': 'plain/text',
             'mimeType': 'application/json'
         }
         req = self.storage_client.objects().insert(
