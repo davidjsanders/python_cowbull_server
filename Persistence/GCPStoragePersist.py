@@ -1,5 +1,6 @@
 from flask_helpers.ErrorHandler import ErrorHandler
 from io import StringIO
+from six import text_type
 
 import googleapiclient.discovery
 import googleapiclient.http
@@ -37,7 +38,7 @@ class GCPStoragePersist:
         if jsonstr is None:
             raise ValueError("JSON is badly formed or not present")
 
-        contents = StringIO(initial_value=jsonstr)
+        contents = StringIO(initial_value=text_type(jsonstr))
 
         body = {
             'name': key,
