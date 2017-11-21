@@ -220,7 +220,10 @@ class Configurator(object):
         if caster:
             if caster == PersistenceEngine:
                 if not isinstance(value, dict):
-                    value = json.loads(value)
+                    #
+                    # Added .replace to remove single quotes being added by PyCharm
+                    #
+                    value = json.loads(str(value).replace("'", ""))
                 value = caster(**value)
             else:
                 value = caster(value)
