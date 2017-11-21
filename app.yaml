@@ -9,7 +9,7 @@ handlers:
 
 env_variables:
   OLD_COWBULL_CONFIG: "config/cowbull.cfg"
-  PERSISTER: '{"engine_name": "gcpstorage", "parameters": {"bucket": "dasander-python-cowbull-game-saves"}}'
+  PERSISTER: '{"engine_name": "gcpstorage", "parameters": {"bucket": "dasander-python-cowbull-save-games"}}'
 #  PERSISTER: '{"engine_name": "redis", "parameters": {"host": "redis-11039.c8.us-east-1-2.ec2.cloud.redislabs.com", "port": 11039, "db": 0}}'
   LOGGING_LEVEL: "10"
   LOGGING_FORMAT: "%(asctime)s %(levelname)s: %(message)s"
