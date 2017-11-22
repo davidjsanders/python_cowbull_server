@@ -5,11 +5,11 @@ from six import text_type
 
 import googleapiclient.discovery
 import googleapiclient.http
-import json
-import tempfile
 
 
 class GCPStoragePersist:
+
+    #TODO : Refine error checking and logging
 
     def __init__(self, bucket=None):
         if not bucket:
@@ -17,19 +17,14 @@ class GCPStoragePersist:
 
         self.handler = ErrorHandler(
             module="GCPStoragePersist",
-            method="__init__"
+            method="__init__",
         )
 
         self.handler.log(message="Requesting storage client.", status=0)
-        self.storage_client = googleapiclient.discovery.build(
-            'storage',
-            'v1',
-            cache_discovery=False
-        )
-        self.handler.log(message="Setting bucket to {}".format(bucket), status=0)
-        self.bucket = bucket
+        self.storage_client = googleapiclient.discovery.build('storage','v1',cache_discovery=False)
 
-        self.handler.log(message="Loading configuration from environment.", status=0)
+        self.handler.log(message="Storage client received. Setting bucket to {}".format(bucket), status=0)
+        self.bucket = bucket
 
     def save(self, key=None, jsonstr=None):
         self.handler.method = "save"
@@ -42,6 +37,7 @@ class GCPStoragePersist:
 
         contents = StringIO(initial_value=text_type(jsonstr))
 
+        self.handler.log(message="Forming GCP Storage request")
         body = {
             'name': key,
             'contentType': 'application/json',
@@ -53,13 +49,15 @@ class GCPStoragePersist:
             media_mime_type='application/json',
             media_body=googleapiclient.http.MediaIoBaseUpload(contents, 'application/json')
         )
-        self.handler.log(message="Executing GCP Storage request", status=0)
+
+        self.handler.log(message="Executing GCP Storage request")
         try:
             resp = req.execute()
             print(resp)
         except Exception as e:
-            print(e)
-        self.handler.log(message="Closed temp file/stream with game data", status=0)
+            self.handler.log(message="Exception: {}".format(repr(e)))
+
+        self.handler.log(message="Closed temp file/stream with game data")
 
     def load(self, key=None):
         self.handler.method = "load"
@@ -109,13 +107,9 @@ class GCPStoragePersist:
             if return_result is not None:
                 if isinstance(return_result, bytes):
                     return_result = str(return_result.decode('utf-8'))
+
+            self.handler.log(message="Returning result: {}".format(return_result))
         except Exception as e:
             self.handler.log(message="Exception: {}".format(repr(e)))
 
-        return return_result
-
-
-        return_result = contents.read()
-        contents.close()
-        self.handler.log(message="Returning result: {}".format(return_result))
         return return_result

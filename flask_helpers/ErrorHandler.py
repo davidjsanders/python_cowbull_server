@@ -5,9 +5,8 @@ from flask import Response
 
 
 class ErrorHandler(object):
-    defaults = {}
-
     def __init__(self, **kwargs):
+        self.defaults = {}
         self.defaults["module"] = kwargs.get("module", None)
         self.defaults["method"] = kwargs.get("method", None)
         self.basicConfig = logging.basicConfig
