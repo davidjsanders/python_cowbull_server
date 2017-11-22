@@ -36,13 +36,14 @@ class GCPStoragePersist:
                 secret_name,
                 ["https://www.googleapis.com/auth/compute"]
             )
+            self.handler.log(message="Credentials received: {}".format(credentials))
             self.storage_client = googleapiclient.discovery.build(
                 'storage',
                 'v1',
                 credentials=credentials,
                 cache_discovery=False
             )
-            self._load_credentials()
+            self.handler.log(message="Storage client retrieved.")
 
 
         self.handler.log(message="Storage client received. Setting bucket to {}".format(bucket), status=0)
