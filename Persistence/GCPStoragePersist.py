@@ -13,9 +13,6 @@ class GCPStoragePersist:
 
     #TODO : Refine error checking and logging
 
-    def _load_credentials(self):
-        self.handler.log(message="Getting authentication credentials")
-
     def __init__(self, bucket=None):
         if not bucket:
             raise ValueError('A bucket name must be provided!')
@@ -34,6 +31,8 @@ class GCPStoragePersist:
             self.handler.log(message="Requesting storage client with secret credentials.", status=0)
             credentials = service_account.Credentials.from_service_account_file(secret_name)
             self.handler.log(message="Credentials received: {}".format(credentials))
+
+            self.handler.log(message="Requesting discovery of storage client.")
             self.storage_client = googleapiclient.discovery.build(
                 'storage',
                 'v1',
