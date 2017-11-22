@@ -6,6 +6,7 @@ from six import text_type
 import googleapiclient.discovery
 import googleapiclient.http
 import json
+import tempfile
 
 
 class GCPStoragePersist:
@@ -67,40 +68,52 @@ class GCPStoragePersist:
         if key is None:
             raise ValueError("Key must be present to execute_load game")
 
-        contents = BytesIO()
-        self.handler.log(message="Requesting object {}".format(key))
+        self.handler.log(message="Creating temporary file to hold results")
+        filename = '{}.tmp'.format(key)
 
+        return_result = None
         try:
-            self.handler.log(message="In try for ".format(key))
-            return_result = self.storage_client.objects().get_media(
+            self.handler.log(message="Opening file in write mode")
+            tmpfile = BytesIO()
+            self.handler.log(message="File opened")
+
+            self.handler.log(message="Issuing get_media request on {}".format(key))
+            req = self.storage_client.objects().get_media(
                 bucket=self.bucket,
                 object=key
             )
-            self.handler.log(message="After fetch for ".format(key))
-        except Exception as e:
-            print(repr(e))
+            self.handler.log(message="Request on {} formed".format(key))
 
-        self.handler.log(message="Requesting downloader for {}".format(key))
-        try:
-            downloader = googleapiclient.http.MediaIoBaseDownload(contents, return_result)
-        except Exception as e:
-            print(repr(e))
+            self.handler.log(message="Creating downloader")
+            downloader = googleapiclient.http.MediaIoBaseDownload(
+                tmpfile,
+                req
+            )
+            self.handler.log(message="Downloader created")
 
-        self.handler.log(message="Downloader --> {}".format(downloader))
-
-        done = False
-        while done is False:
-            self.handler.log(message="Fetching output")
-            try:
+            self.handler.log(message="Downloading from downloader")
+            done = False
+            while not done:
+                self.handler.log(message="Fetching chunk")
                 status, done = downloader.next_chunk()
-            except Exception as e:
-                print(repr(e))
-            self.handler.log(message="Fetching. Status is {}".format(status))
+                self.handler.log(message="Fetch status: {}%".format(status.progress()*100))
+            self.handler.log(message="Download complete")
 
-        self.handler.log(message="Checking datatype of return object")
-        if return_result is not None:
-            if isinstance(return_result, bytes):
-                return_result = str(return_result.decode('utf-8'))
+            self.handler.log(message="Getting JSON")
+            return_result = tmpfile.getvalue()
+            self.handler.log(message="JSON is {} (type {})".format(
+                return_result, type(return_result)
+            ))
+
+            self.handler.log(message="Converting bytes result to unicode (if reqd)")
+            if return_result is not None:
+                if isinstance(return_result, bytes):
+                    return_result = str(return_result.decode('utf-8'))
+        except Exception as e:
+            self.handler.log(message="Exception: {}".format(repr(e)))
+
+        return return_result
+
 
         return_result = contents.read()
         contents.close()
