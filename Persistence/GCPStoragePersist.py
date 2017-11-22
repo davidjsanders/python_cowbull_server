@@ -5,11 +5,15 @@ from six import text_type
 
 import googleapiclient.discovery
 import googleapiclient.http
+import os
 
 
 class GCPStoragePersist:
 
     #TODO : Refine error checking and logging
+
+    def _load_credentials(self):
+        self.handler.log(message="Getting authentication credentials")
 
     def __init__(self, bucket=None):
         if not bucket:
@@ -20,8 +24,21 @@ class GCPStoragePersist:
             method="__init__",
         )
 
-        self.handler.log(message="Requesting storage client.", status=0)
-        self.storage_client = googleapiclient.discovery.build('storage','v1',cache_discovery=False)
+        self.handler.log(message="Validating if credentials are defined or if defaults should be used")
+        secret_name = "/cowbull/secrets/k8storageservice.json"
+        if not os.path.isfile(secret_name):
+            self.handler.log(message="Requesting storage client with default credentials.", status=0)
+            self.storage_client = googleapiclient.discovery.build('storage', 'v1', cache_discovery=False)
+        else:
+            self.handler.log(message="Requesting storage client with secret credentials.", status=0)
+            self.storage_client = googleapiclient.discovery.build(
+                'storage',
+                'v1',
+                credentials=secret_name,
+                cache_discovery=False
+            )
+            self._load_credentials()
+
 
         self.handler.log(message="Storage client received. Setting bucket to {}".format(bucket), status=0)
         self.bucket = bucket
