@@ -1,7 +1,7 @@
 from flask_helpers.ErrorHandler import ErrorHandler
+from google.oauth2 import service_account
 from io import StringIO
 from io import BytesIO
-from oauth2client.service_account import ServiceAccountCredentials
 from six import text_type
 
 import googleapiclient.discovery
@@ -32,10 +32,7 @@ class GCPStoragePersist:
             self.storage_client = googleapiclient.discovery.build('storage', 'v1', cache_discovery=False)
         else:
             self.handler.log(message="Requesting storage client with secret credentials.", status=0)
-            credentials = ServiceAccountCredentials.from_json_keyfile_name(
-                secret_name,
-                ["https://www.googleapis.com/auth/compute"]
-            )
+            credentials = service_account.Credentials.from_service_account_file(secret_name)
             self.handler.log(message="Credentials received: {}".format(credentials))
             self.storage_client = googleapiclient.discovery.build(
                 'storage',
