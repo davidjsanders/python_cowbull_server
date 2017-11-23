@@ -53,6 +53,7 @@ class GameServerController(MethodView):
         # Persistence Engine selector, v2.0
         #
         self.persistence_engine = app.config.get("PERSISTER", None)
+        self.handler.log(message="Persistence engine set to: {}".format(self.persistence_engine.engine_name))
         if not self.persistence_engine:
             raise ValueError(
                 "No persistence engine is defined and for some unknown "
@@ -112,17 +113,26 @@ class GameServerController(MethodView):
         # from to ensure uniform consistency in persistence handling regardless
         # of the engine (Redis, Mongo, etc.) used.
         try:
+            self.handler.log(message="Fetching persistence engine")
             persister = self.persistence_engine.persister
             self.handler.log(message='Persister instantiated', status=0)
         except ConnectionError as ce:
             return self.handler.error(status=503, exception=str(ce), message="There is no redis service available!")
         except AttributeError as ae:
             return self.handler.error(status=503, exception=str(ae), message="An internal error occurred - attribute missing for redis - check GameServerController:__init__")
+        except Exception as e:
+            return self.handler.error(status=500, exception=str(e),
+                                      message="An internal error occurred - {}".format(repr(e)))
 
         #
         # Save the newly created game to the persistence engine
         #
-        persister.save(game_controller.game.key, game_controller.save())
+        self.handler.log(message="Saving game to persister")
+        try:
+            persister.save(game_controller.game.key, game_controller.save())
+        except Exception as e:
+            return self.handler.error(status=500, exception=str(e),
+                                      message="An internal error occurred - {}".format(repr(e)))
         self.handler.log(message='Game {} persisted.'.format(game_controller.game.key), status=0)
 
         #

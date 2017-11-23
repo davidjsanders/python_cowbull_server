@@ -1,12 +1,12 @@
 class PersistenceEngine(object):
+    valid_engines = ["mongodb", "redis", "gcpstorage", "gcpdatastore"]
     def __init__(self, **kwargs):
         engine_name = kwargs.get('engine_name', None)
         parameters = kwargs.get('parameters', None)
 
-        if not engine_name or not parameters:
+        if not engine_name:
             raise ValueError(
-                "'engine_name' and 'parameters' must be defined "
-                "for the persistence engine"
+                "'engine_name' must be defined for the persistence engine"
             )
         if not isinstance(parameters, dict):
             raise TypeError(
@@ -23,6 +23,9 @@ class PersistenceEngine(object):
         elif self._engine_name.lower() == 'gcpstorage':
             from Persistence.GCPStoragePersist import GCPStoragePersist
             self._persister = GCPStoragePersist
+        elif self._engine_name.lower() == 'gcpdatastore':
+            from Persistence.GCPDatastorePersist import GCPDatastorePersist
+            self._persister = GCPDatastorePersist
         elif self._engine_name.lower() == 'redis':
             from Persistence.RedisPersist import RedisPersist
             self._persister = RedisPersist
@@ -30,9 +33,10 @@ class PersistenceEngine(object):
             raise ValueError(
                 "The persistence engine provided ('{}') is "
                 "unknown and not supported. Valid vaules are: "
-                "'mongodb', 'redis', or 'gcpstorage'"
+                "{}"
                     .format(
-                    self._engine_name
+                        self._engine_name,
+                        PersistenceEngine.valid_engines
                 )
             )
 
