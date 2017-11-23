@@ -11,7 +11,7 @@ class CowbullSaveGame(ndb.Model):
 
 
 
-class GCPDatastorePersist:
+class Persister:
     def __init__(self):
         self.handler = ErrorHandler(
             module="GCPDatastorePersist",

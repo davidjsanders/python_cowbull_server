@@ -9,7 +9,7 @@ import googleapiclient.http
 import os
 
 
-class GCPStoragePersist:
+class Persister:
 
     #TODO : Refine error checking and logging
 

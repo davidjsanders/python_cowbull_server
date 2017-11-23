@@ -2,7 +2,7 @@ from flask_helpers.ErrorHandler import ErrorHandler
 import redis
 
 
-class RedisPersist:
+class Persister:
     _redis_connection = None
 
     def __init__(self, host="localhost", port=6379, db=0):

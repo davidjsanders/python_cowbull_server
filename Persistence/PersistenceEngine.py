@@ -1,4 +1,8 @@
 from flask_helpers.ErrorHandler import ErrorHandler
+from os import listdir
+from os import getcwd
+from sys import path
+import importlib
 
 
 class PersistenceEngine(object):
@@ -27,34 +31,27 @@ class PersistenceEngine(object):
         self._parameters = parameters
         self._persister = None
 
-        if self._engine_name.lower() == 'mongodb':
-            self.handler.log(message="Setting persistence engine to MongoDB")
-            from Persistence.MongoPersist import MongoPersist
-            self._persister = MongoPersist
-        elif self._engine_name.lower() == 'gcpstorage':
-            self.handler.log(message="Setting persistence engine to GCP Storage")
-            from Persistence.GCPStoragePersist import GCPStoragePersist
-            self._persister = GCPStoragePersist
-        elif self._engine_name.lower() == 'gcpdatastore':
-            self.handler.log(message="Setting persistence engine to GCP Datastore")
-            from Persistence.GCPDatastorePersist import GCPDatastorePersist
-            self._persister = GCPDatastorePersist
-        elif self._engine_name.lower() == 'redis':
-            self.handler.log(message="Setting persistence engine to Redis")
-            from Persistence.RedisPersist import RedisPersist
-            self._persister = RedisPersist
-        else:
-            self.handler.log(message="Persistence engine {} provided is unknown!".format(self._engine_name))
-            raise ValueError(
-                "The persistence engine provided ('{}') is "
-                "unknown and not supported. Valid vaules are: "
-                "{}"
-                    .format(
-                        self._engine_name,
-                        PersistenceEngine.valid_engines
-                )
-            )
+        # Step 1 - Build path
+        cwd = getcwd()
+        extension_path = "{}/{}".format(cwd, "./PersistenceExtensions")
+        path.append(extension_path)
 
+        # Step 2 - get the persisters and choose the right one
+        persisters = [file[:-3] for file in listdir(extension_path) if file.endswith(".py")]
+
+        validators = [file.lower() for file in persisters]
+        try:
+            self._engine_name = persisters[validators.index(self._engine_name)]
+            self._persister = importlib.import_module(self._engine_name)
+            self.handler.log(message="Persistence engine set to {}".format(self._engine_name))
+        except ValueError as v:
+            self._engine_name = "RedisPersist"
+            from Persistence import RedisPersist
+            self._persister = RedisPersist
+            self.handler.log(message="Persistence engine defaulted to Redis")
+        except Exception as e:
+            raise
+        return
 
     @property
     def engine_name(self):
@@ -66,7 +63,7 @@ class PersistenceEngine(object):
 
     @property
     def persister(self):
-        return self._persister(
+        return self._persister.Persister(
             **self.parameters
         )
 

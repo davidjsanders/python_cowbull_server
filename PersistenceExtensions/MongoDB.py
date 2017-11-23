@@ -3,7 +3,7 @@ import json
 import pymongo
 
 
-class MongoPersist:
+class Persister:
     def __init__(self, host="localhost", port=27017, db="cowbull"):
         self.handler = ErrorHandler(
             module="MongoPersist",
