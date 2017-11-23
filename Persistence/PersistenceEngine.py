@@ -6,8 +6,6 @@ import importlib
 
 
 class PersistenceEngine(object):
-    valid_engines = ["mongodb", "redis", "gcpstorage", "gcpdatastore"]
-
     def __init__(self, **kwargs):
         self.handler = ErrorHandler(
             module="PersistenceEngine",
@@ -32,25 +30,44 @@ class PersistenceEngine(object):
         self._persister = None
 
         # Step 1 - Build path
+        self.handler.log(message="Build import path")
         cwd = getcwd()
-        extension_path = "{}/{}".format(cwd, "./PersistenceExtensions")
+        extension_path = "{}/{}".format(cwd, "PersistenceExtensions")
+        self.handler.log(message="Added {} to import path".format(extension_path))
+
         path.append(extension_path)
 
         # Step 2 - get the persisters and choose the right one
+        self.handler.log(message="Building persisters and validators")
         persisters = [file[:-3] for file in listdir(extension_path) if file.endswith(".py")]
-
         validators = [file.lower() for file in persisters]
+        self.handler.log(message="Persisters: {}".format(persisters))
+        self.handler.log(message="Validators: {}".format(validators))
+
         try:
+            self.handler.log(message="Set persister")
             self._engine_name = persisters[validators.index(self._engine_name)]
+
+            self.handler.log(message="Importing Persister from {}".format(self._engine_name))
             self._persister = importlib.import_module(self._engine_name)
+
             self.handler.log(message="Persistence engine set to {}".format(self._engine_name))
         except ValueError as v:
+            if self._engine_name.lower() == 'redis':
+                self.handler.log(message="Redis selected")
+            else:
+                self.handler.log(message="Persister {} not found, defaulting to Redis".format(self._engine_name))
+
             self._engine_name = "RedisPersist"
-            from Persistence import RedisPersist
-            self._persister = RedisPersist
+
+            self.handler.log(message="Importing RedisPersist")
+            from Persistence import Redis
+            self._persister = Redis
             self.handler.log(message="Persistence engine defaulted to Redis")
         except Exception as e:
             raise
+        self.handler.log(message="Instantiating Persister")
+        self._persister = self._persister.Persister(**self._parameters)
         return
 
     @property
@@ -63,9 +80,7 @@ class PersistenceEngine(object):
 
     @property
     def persister(self):
-        return self._persister.Persister(
-            **self.parameters
-        )
+        return self._persister
 
     def __repr__(self):
         return "<persister>{}".format(self._engine_name)
