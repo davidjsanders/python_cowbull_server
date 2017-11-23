@@ -7,6 +7,7 @@ RUN			apt-get update && \
 			chown cowbull /cowbull
 WORKDIR		/cowbull
 COPY		requirements.txt /cowbull
+RUN		    pip install -q setuptools
 RUN		    pip install -q -r /cowbull/requirements.txt
 USER		cowbull
 ENV			PYTHONPATH="/cowbull"
