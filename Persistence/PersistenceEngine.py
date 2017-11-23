@@ -1,6 +1,16 @@
+from flask_helpers.ErrorHandler import ErrorHandler
+
+
 class PersistenceEngine(object):
     valid_engines = ["mongodb", "redis", "gcpstorage", "gcpdatastore"]
+
     def __init__(self, **kwargs):
+        self.handler = ErrorHandler(
+            module="PersistenceEngine",
+            method="__init__"
+        )
+
+        self.handler.log(message="Getting persistence engine arguments")
         engine_name = kwargs.get('engine_name', None)
         parameters = kwargs.get('parameters', None)
 
@@ -18,18 +28,23 @@ class PersistenceEngine(object):
         self._persister = None
 
         if self._engine_name.lower() == 'mongodb':
+            self.handler.log(message="Setting persistence engine to MongoDB")
             from Persistence.MongoPersist import MongoPersist
             self._persister = MongoPersist
         elif self._engine_name.lower() == 'gcpstorage':
+            self.handler.log(message="Setting persistence engine to GCP Storage")
             from Persistence.GCPStoragePersist import GCPStoragePersist
             self._persister = GCPStoragePersist
         elif self._engine_name.lower() == 'gcpdatastore':
+            self.handler.log(message="Setting persistence engine to GCP Datastore")
             from Persistence.GCPDatastorePersist import GCPDatastorePersist
             self._persister = GCPDatastorePersist
         elif self._engine_name.lower() == 'redis':
+            self.handler.log(message="Setting persistence engine to Redis")
             from Persistence.RedisPersist import RedisPersist
             self._persister = RedisPersist
         else:
+            self.handler.log(message="Persistence engine {} provided is unknown!".format(self._engine_name))
             raise ValueError(
                 "The persistence engine provided ('{}') is "
                 "unknown and not supported. Valid vaules are: "
