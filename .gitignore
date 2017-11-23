@@ -1,6 +1,8 @@
 #
 # D Sanders, 30 Apr 2017
 #
+.project
+.pydevproject
 .idea/
 *.json
 lib/
