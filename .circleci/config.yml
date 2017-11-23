@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/python:3.6.1
+      - image: circleci/python:2.7
       - image: redis
 
     working_directory: ~/python_cowbull_server
@@ -22,9 +22,9 @@ jobs:
       - run:
           name: install dependencies
           command: |
-            python3 -m venv venv
+            virtualenv venv
             . venv/bin/activate
-            pip install -r requirements.txt
+            pip2 install -r requirements.txt
 
       - run:
           name: run tests
@@ -50,7 +50,7 @@ jobs:
           command: |
             export CLOUDSDK_CORE_DISABLE_PROMPTS=1
             mkdir -p vendor/gae
-            pip install -t vendor/gae/lib -r requirements.txt
+            pip2 install -t vendor/gae/lib -r requirements.txt
             gcloud app deploy --version="cigen-"$MAJOR_VERSION"-"$MINOR_VERSION"-"$CIRCLE_BUILD_NUM --quiet
 
       - setup_remote_docker
