@@ -54,6 +54,9 @@ class Persister:
         if jsonstr is None:
             raise ValueError("JSON is badly formed or not present")
 
+        self.handler.log(message="Saving key {} with json {}".format(key, jsonstr))
+
+        self.handler.log(message="Creating StreamIO object")
         contents = StringIO(initial_value=text_type(jsonstr))
 
         self.handler.log(message="Forming GCP Storage request")
@@ -62,17 +65,20 @@ class Persister:
             'contentType': 'application/json',
             'mimeType': 'application/json'
         }
+
+        self.handler.log(message="Creating insert request")
         req = self.storage_client.objects().insert(
             bucket=self.bucket,
             body=body,
             media_mime_type='application/json',
             media_body=googleapiclient.http.MediaIoBaseUpload(contents, 'application/json')
         )
+        self.handler.log(message="Insert request returned {}".format(req))
 
         self.handler.log(message="Executing GCP Storage request")
         try:
             resp = req.execute()
-            print(resp)
+            self.handler.log(message="Response from execute: {}".format(resp))
         except Exception as e:
             self.handler.log(message="Exception: {}".format(repr(e)))
 
