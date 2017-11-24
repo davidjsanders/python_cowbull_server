@@ -16,6 +16,7 @@ COPY        flask_controllers /cowbull/flask_controllers/
 COPY        flask_helpers /cowbull/flask_helpers
 COPY		Game	/cowbull/Game/
 COPY        Persistence /cowbull/Persistence/
+COPY        PersistenceExtensions /cowbull/PersistenceExtensions/
 COPY		python_cowbull_server /cowbull/python_cowbull_server/
 COPY        Routes /cowbull/Routes
 COPY        app.py  /cowbull/
