@@ -109,10 +109,11 @@ class PersistenceEngine(object):
         self.handler.log(message="Step 2 - Validating persister can save data")
 
     def _validate_persister_functions(self):
-        _key = uuid4()
-        self._persister.save(_key, str(_key))
+        _key = "abcdefghijklmnop"
+        _content = "qrstuvwxyz"
+        self._persister.save(_key, str(_content))
         _fetch_key = self._persister.load(_key)
-        if str(_key) != _fetch_key:
+        if str(_content) != str(_fetch_key):
             raise ValueError("Persister {} was unable to save {} ({})!".format(
                 self._engine_name,
                 _key,
