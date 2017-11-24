@@ -36,7 +36,6 @@ class GameServerController(MethodView):
         # std i/o. The error handler logs the error and forms an HTML response
         # using Flask's Response class.
         #
-#        self.handler = ErrorHandler(module="GameServerController", method="__init__")
         self.handler = error_handler
         self.handler.module = "GameServerController"
         self.handler.method = "__init__"
@@ -90,6 +89,7 @@ class GameServerController(MethodView):
         # Check if a game mode has been passed as a query parameter. If it has,
         # use it to create the game. If it hasn't, then let the game decide.
         #
+        self.handler.log(message='Fetching arguments (if any) passed to get')
         game_mode = request.args.get('mode', default=None, type=None)
         self.handler.log("game_mode value from request.args.get: {}, type: {}".format(game_mode, type(game_mode)))
 
@@ -107,13 +107,11 @@ class GameServerController(MethodView):
                 message="{}: game mode {}!".format(str(ve), game_mode)
             )
 
-        # Get a persistence engine. Currently, this is set to be redis but can
-        # easily be changed simply by changing the import statement above. Ideally
-        # an abstract class would be created which concrete classes could inherit
-        # from to ensure uniform consistency in persistence handling regardless
-        # of the engine (Redis, Mongo, etc.) used.
+        # Get a persistence engine. The persister is set in configuration
+        # and dynamically loaded at the start of the transaction. See
+        # Persistence/PersistenceEngine.py for more info.
         try:
-            self.handler.log(message="Fetching persistence engine")
+            self.handler.log(message="Fetching persistence engine - {}".format(self.persistence_engine.engine_name))
             persister = self.persistence_engine.persister
             self.handler.log(message='Persister instantiated', status=0)
         except ConnectionError as ce:

@@ -2,6 +2,7 @@ from flask_helpers.ErrorHandler import ErrorHandler
 from os import listdir
 from os import getcwd
 from sys import path
+from uuid import uuid4
 import importlib
 
 
@@ -66,8 +67,13 @@ class PersistenceEngine(object):
             self.handler.log(message="Persistence engine defaulted to Redis")
         except Exception as e:
             raise
+
+        self.handler.log(message="Validate Persister dynamic module")
+        self._validate_persister_methods()
+
         self.handler.log(message="Instantiating Persister")
         self._persister = self._persister.Persister(**self._parameters)
+        self._validate_persister_functions()
         return
 
     @property
@@ -84,3 +90,33 @@ class PersistenceEngine(object):
 
     def __repr__(self):
         return "<persister>{}".format(self._engine_name)
+
+    #
+    # 'Private' methods
+    #
+    def _validate_persister_methods(self):
+        self.handler.log(message="Validate Persister")
+        self.handler.log(message="Step 1 - Validating persister contains save and load methods")
+
+        if not set(["save", "load"]) <= set([
+            i[0] for i in self._persister.Persister.__dict__.items() if not i[0].startswith("_")
+        ]):
+            raise NotImplementedError(
+                "The persistence engine ({}) does not implement save or load, so cannot be used."
+                .format(self._engine_name)
+            )
+
+        self.handler.log(message="Step 2 - Validating persister can save data")
+
+    def _validate_persister_functions(self):
+        _key = uuid4()
+        self._persister.save(_key, str(_key))
+        _fetch_key = self._persister.load(_key)
+        if str(_key) != _fetch_key:
+            raise ValueError("Persister {} was unable to save {} ({})!".format(
+                self._engine_name,
+                _key,
+                type(_key)
+            ))
+        else:
+            self.handler.log(message="Confirmed save and load methods work correctly.")

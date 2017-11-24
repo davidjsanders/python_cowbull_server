@@ -18,9 +18,6 @@ class Persister:
             db=db
         )
 
-        self.handler.log(message="Testing redis connection with dummy key")
-        self._redis_connection.set('tmp_validate', 'tmp_validate', ex=60)
-
     def save(self, key=None, jsonstr=None):
         self.handler.method = "save"
 
