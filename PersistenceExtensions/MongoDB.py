@@ -10,7 +10,7 @@ class Persister:
             method="__init__",
         )
 
-        self.handler.log(message="Persistence engine MongoDB establishing client to database.")
+        self.handler.log(message="Persistence engine MongoDB establishing client to database: {} {}.".format(host, port))
         self.connection = pymongo.MongoClient(host=host, port=port)
 
         self.handler.log(message="Establishing connection.")
