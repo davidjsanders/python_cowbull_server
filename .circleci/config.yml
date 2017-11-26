@@ -45,7 +45,7 @@ jobs:
             docker run --name test2 -it --link redis \
               -e PERSISTER='{"engine_name": "redis", "parameters": {"host": "redis"}}' \
               -d dsanderscan/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM \
-              python -m unittest -v tests
+              echo "Tests starting";python -m unittest -v tests;echo "Tests complete"
             echo "Test results status: $?"
 
       - run:
