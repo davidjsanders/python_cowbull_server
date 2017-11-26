@@ -1,8 +1,8 @@
 from flask_helpers.ErrorHandler import ErrorHandler
+from Persistence.AbstractPersister import AbstractPersister
 from os import listdir
 from os import getcwd
 from sys import path
-from uuid import uuid4
 import importlib
 
 
@@ -40,8 +40,8 @@ class PersistenceEngine(object):
 
         # Step 2 - get the persisters and choose the right one
         self.handler.log(message="Building persisters and validators")
-        persisters = [file[:-3] for file in listdir(extension_path) if file.endswith(".py")]
-        validators = [file.lower() for file in persisters]
+        persisters = [filefound[:-3] for filefound in listdir(extension_path) if filefound.endswith(".py")]
+        validators = [filefound.lower() for filefound in persisters]
         self.handler.log(message="Persisters: {}".format(persisters))
         self.handler.log(message="Validators: {}".format(validators))
 
@@ -53,7 +53,7 @@ class PersistenceEngine(object):
             self._persister = importlib.import_module(self._engine_name)
 
             self.handler.log(message="Persistence engine set to {}".format(self._engine_name))
-        except ValueError as v:
+        except ValueError:
             if self._engine_name.lower() == 'redis':
                 self.handler.log(message="Redis selected")
             else:
@@ -65,15 +65,18 @@ class PersistenceEngine(object):
             from Persistence import Redis
             self._persister = Redis
             self.handler.log(message="Persistence engine defaulted to Redis")
-        except Exception as e:
+        except Exception:
             raise
 
-        self.handler.log(message="Validate Persister dynamic module")
-        self._validate_persister_methods()
+        if not issubclass(self._persister.Persister, AbstractPersister):
+            raise TypeError("The persister must be a subclass of an AbstractPersister!")
+        else:
+            self.handler.log(
+                message="{} validated as a concrete implementation of an AbstractPersister".format(self._engine_name)
+            )
 
         self.handler.log(message="Instantiating Persister")
         self._persister = self._persister.Persister(**self._parameters)
-        #self._validate_persister_functions()
         return
 
     @property
@@ -94,20 +97,6 @@ class PersistenceEngine(object):
     #
     # 'Private' methods
     #
-    def _validate_persister_methods(self):
-        self.handler.log(message="Validate Persister")
-        self.handler.log(message="Step 1 - Validating persister contains save and load methods")
-
-        if not set(["save", "load"]) <= set([
-            i[0] for i in self._persister.Persister.__dict__.items() if not i[0].startswith("_")
-        ]):
-            raise NotImplementedError(
-                "The persistence engine ({}) does not implement save or load, so cannot be used."
-                .format(self._engine_name)
-            )
-
-        self.handler.log(message="Step 2 - Validating persister can save data")
-
     def _validate_persister_functions(self):
         _key = "abc"
         _content = '{"foo":"bar"}'

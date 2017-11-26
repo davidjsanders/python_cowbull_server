@@ -1,16 +1,15 @@
 from flask_helpers.ErrorHandler import ErrorHandler
+from Persistence.AbstractPersister import AbstractPersister
 import redis
 
 
-class Persister:
+class Persister(AbstractPersister):
     _redis_connection = None
 
     def __init__(self, host="localhost", port=6379, db=0):
-        self.handler = ErrorHandler(
-            module="RedisPersist",
-            method="__init__",
-        )
+        super(Persister, self).__init__()
 
+        self.handler.module="Redis Persister"
         self.handler.log(message="Preparing redis connection")
         self._redis_connection = redis.StrictRedis(
             host=host,
@@ -20,6 +19,8 @@ class Persister:
 
     def save(self, key=None, jsonstr=None):
         self.handler.method = "save"
+
+        super(Persister, self).save(key=key, jsonstr=jsonstr)
 
         self.handler.log(message="Validating key: {}".format(key))
         if key is None:
@@ -35,6 +36,8 @@ class Persister:
 
     def load(self, key=None):
         self.handler.method = "load"
+
+        super(Persister, self).load(key=key)
 
         self.handler.log(message="Validating key: {}".format(key))
         if key is None:

@@ -1,5 +1,6 @@
 from flask_helpers.ErrorHandler import ErrorHandler
 from google.appengine.ext import ndb
+from Persistence.AbstractPersister import AbstractPersister
 
 
 class CowbullSaveGame(ndb.Model):
@@ -11,13 +12,11 @@ class CowbullSaveGame(ndb.Model):
 
 
 
-class Persister:
+class Persister(AbstractPersister):
     def __init__(self):
-        self.handler = ErrorHandler(
-            module="GCPDatastorePersist",
-            method="__init__",
-        )
+        super(Persister, self).__init__()
 
+        self.handler.method="GCPDatastorePersist"
         self.handler.log(message="Preparing datastore client")
 
         try:
@@ -31,6 +30,7 @@ class Persister:
         self.kind = 'CowbullSaveGame'
 
     def save(self, key=None, jsonstr=None):
+        super(Persister, self).save(key=key, jsonstr=jsonstr)
         self.handler.method = "save"
         self.handler.log(message="Validating parameters: {} --> {}".format(key, jsonstr))
         if key is None:
@@ -50,6 +50,7 @@ class Persister:
         sg.put()
 
     def load(self, key=None):
+        super(Persister, self).load(key=key)
         self.handler.method = "load"
 
         self.handler.log(message="Validating parameters: {}".format(key))

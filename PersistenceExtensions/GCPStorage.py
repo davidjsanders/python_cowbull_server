@@ -2,6 +2,7 @@ from flask_helpers.ErrorHandler import ErrorHandler
 from google.oauth2 import service_account
 from io import StringIO
 from io import BytesIO
+from Persistence.AbstractPersister import AbstractPersister
 from six import text_type
 
 import googleapiclient.discovery
@@ -9,7 +10,7 @@ import googleapiclient.http
 import os
 
 
-class Persister:
+class Persister(AbstractPersister):
 
     #TODO : Refine error checking and logging
 
@@ -17,11 +18,9 @@ class Persister:
         if not bucket:
             raise ValueError('A bucket name must be provided!')
 
-        self.handler = ErrorHandler(
-            module="GCPStoragePersist",
-            method="__init__",
-        )
+        super(Persister, self).__init__()
 
+        self.handler.module="GCPStoragePersist"
         self.handler.log(message="Validating if credentials are defined or if defaults should be used")
         secret_name = "/cowbull/secrets/k8storageservice.json"
         if not os.path.isfile(secret_name):
@@ -46,6 +45,7 @@ class Persister:
         self.bucket = bucket
 
     def save(self, key=None, jsonstr=None):
+        super(Persister, self).save(key=key, jsonstr=jsonstr)
         self.handler.method = "save"
         self.handler.log(message="In GCPStoragePersist - save method. Validating inputs.")
 
@@ -85,6 +85,7 @@ class Persister:
         self.handler.log(message="Closed temp file/stream with game data")
 
     def load(self, key=None):
+        super(Persister, self).load(key=key)
         self.handler.method = "load"
         self.handler.log(message="In GCPStoragePersist - load method. Validating inputs.")
 

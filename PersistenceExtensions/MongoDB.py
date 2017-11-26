@@ -1,15 +1,14 @@
 from flask_helpers.ErrorHandler import ErrorHandler
+from Persistence.AbstractPersister import AbstractPersister
 import json
 import pymongo
 
 
-class Persister:
+class Persister(AbstractPersister):
     def __init__(self, host="localhost", port=27017, db="cowbull"):
-        self.handler = ErrorHandler(
-            module="MongoPersist",
-            method="__init__",
-        )
+        super(Persister, self).__init__()
 
+        self.handler.module="MongoDB Persister"
         self.handler.log(message="Persistence engine MongoDB establishing client to database: {} {}.".format(host, port))
         self.connection = pymongo.MongoClient(host=host, port=port)
 
@@ -19,6 +18,7 @@ class Persister:
         self.handler.log(message="Persistence engine initialization complete.")
 
     def save(self, key=None, jsonstr=None):
+        super(Persister, self).save(key=key, jsonstr=jsonstr)
         self.handler.method="save"
 
         self.handler.log(message="Validating key: {}".format(key))
@@ -50,6 +50,7 @@ class Persister:
             games.insert_one({"_id": key, "game": json.loads(jsonstr)})
 
     def load(self, key=None):
+        super(Persister, self).load(key=key)
         self.handler.method="load"
 
         self.handler.log(message="Validating key: {}".format(key))
