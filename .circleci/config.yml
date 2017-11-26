@@ -49,14 +49,6 @@ jobs:
             echo $circlecibuilder | base64 --decode --ignore-garbage > auth.json
             gcloud auth activate-service-account $circleciuser --key-file auth.json --project=$gproject
 
-      - run:
-          name: Build GAE project and deploy
-          command: |
-            export CLOUDSDK_CORE_DISABLE_PROMPTS=1
-            mkdir -p vendor/gae
-            pip2 install -t vendor/gae/lib -r requirements.txt
-            gcloud app deploy --version="cigen-"$MAJOR_VERSION"-"$MINOR_VERSION"-"$CIRCLE_BUILD_NUM --quiet
-
       - setup_remote_docker
 
       - run:
@@ -64,6 +56,7 @@ jobs:
           command: |
             docker login --username=$doclog --password=$docpass
             docker build -f vendor/docker/Dockerfile -t dsanderscan/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM .
+            docker push dsanderscan/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM
 
       - run:
           name: run docker tests
@@ -74,10 +67,18 @@ jobs:
             set -o pipefail
             docker run --rm -it --link redis \
               --env PERSISTER='{"engine_name": "redis", "parameters": {"host": "redis"}}' \
-              dsanderscan/cowbull python -m unittest -v
+              $IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM python -m unittest -v
             docker run --rm -it --link mongo \
               --env PERSISTER='{"engine_name": "mongodb", "parameters": {"host": "mongo"}}' \
-              dsanderscan/cowbull python -m unittest -v
+              $IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM python -m unittest -v
+
+      - run:
+          name: Build GAE project and deploy
+          command: |
+            export CLOUDSDK_CORE_DISABLE_PROMPTS=1
+            mkdir -p vendor/gae
+            pip2 install -t vendor/gae/lib -r requirements.txt
+            gcloud app deploy --version="cigen-"$MAJOR_VERSION"-"$MINOR_VERSION"-"$CIRCLE_BUILD_NUM --quiet
 
       - run:
           name: push docker image
