@@ -42,10 +42,10 @@ jobs:
             docker build -f vendor/docker/Dockerfile -t dsanderscan/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM .
             set -o pipefail
             docker run --name redis -d redis
-            docker run --name test2 -t --link redis \
+            docker run --name test2 -it --link redis \
               -e PERSISTER='{"engine_name": "redis", "parameters": {"host": "redis"}' \
               -d dsanderscan/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM \
-              echo "running tests..."; python -m unittest -v tests 1> >(tee -a /tmp/dockertest-report.log >&2)
+              echo "running tests..."; python -m unittest -v tests
             echo "Test results status: $?"
 
       - run:
