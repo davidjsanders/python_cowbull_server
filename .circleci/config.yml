@@ -65,6 +65,7 @@ jobs:
             echo "Stage 2 tests - integration"
             echo
             set -o pipefail
+            docker pull dsanderscan/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM
             docker run --rm -it --link redis \
               --env PERSISTER='{"engine_name": "redis", "parameters": {"host": "redis"}}' \
               $IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM python -m unittest -v
@@ -84,7 +85,6 @@ jobs:
           name: push docker image
           command: |
             docker tag dsanderscan/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM dsanderscan/$IMAGE_NAME:latest
-            docker push dsanderscan/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM
             docker push dsanderscan/$IMAGE_NAME:latest
 
       - save_cache:
