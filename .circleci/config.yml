@@ -56,13 +56,13 @@ jobs:
           command: |
             docker login --username=$doclog --password=$docpass
             docker build -f vendor/docker/Dockerfile -t dsanderscan/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM .
-            docker run --name redis2 -d redis
-            docker run --name mongo2 --network container:redis2 -d mongo
-            docker run --rm -it --network container:redis2 \
-              --env PERSISTER='{"engine_name": "redis", "parameters": {"host": "redis2"}}' \
+            docker run --name redis -p 6379:6379 -d redis
+            docker run --name mongo =p 27017:27017 --network container:redis -d mongo
+            docker run --rm -it --network container:redis \
+              --env PERSISTER='{"engine_name": "redis", "parameters": {"host": "redis"}}' \
               dsanderscan/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM python -m unittest -v
-            docker run --rm -it --network container:redis2  \
-              --env PERSISTER='{"engine_name": "mongodb", "parameters": {"host": "mongo2"}}' \
+            docker run --rm -it --network container:redis  \
+              --env PERSISTER='{"engine_name": "mongodb", "parameters": {"host": "mongo"}}' \
               dsanderscan/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM python -m unittest -v
 
       - run:
