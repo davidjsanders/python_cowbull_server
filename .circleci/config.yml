@@ -4,6 +4,7 @@ jobs:
     docker:
       - image: circleci/python:2.7
       - image: redis
+      - image: mongo
 
     working_directory: ~/python_cowbull_server
 
@@ -27,8 +28,11 @@ jobs:
             pip2 install -r requirements.txt
 
       - run:
-          name: run tests
+          name: run unit tests
           command: |
+            echo ""
+            echo "Stage 1 tests - unit"
+            echo
             . venv/bin/activate
             set -o pipefail
             python -m unittest -v tests 2> >(tee -a /tmp/unittest-report.log >&2)
@@ -60,6 +64,20 @@ jobs:
           command: |
             docker login --username=$doclog --password=$docpass
             docker build -f vendor/docker/Dockerfile -t dsanderscan/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM .
+
+      - run:
+          name: run docker tests
+          command: |
+            echo ""
+            echo "Stage 2 tests - integration"
+            echo
+            set -o pipefail
+            docker run --rm -it --link redis \
+              --env PERSISTER='{"engine_name": "redis", "parameters": {"host": "redis"}}' \
+              dsanderscan/cowbull python -m unittest -v
+            docker run --rm -it --link mongo \
+              --env PERSISTER='{"engine_name": "mongodb", "parameters": {"host": "mongo"}}' \
+              dsanderscan/cowbull python -m unittest -v
 
       - run:
           name: push docker image
