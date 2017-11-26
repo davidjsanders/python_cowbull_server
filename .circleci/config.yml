@@ -4,7 +4,6 @@ jobs:
     docker:
       - image: circleci/python:2.7
       - image: redis
-      - image: mongo
 
     working_directory: ~/python_cowbull_server
 
@@ -26,17 +25,12 @@ jobs:
             virtualenv venv
             . venv/bin/activate
             pip2 install -r requirements.txt
-
       - run:
-          name: run unit tests
+          name: run tests
           command: |
-            echo ""
-            echo "Stage 1 tests - unit"
-            echo
             . venv/bin/activate
             set -o pipefail
             python -m unittest -v tests 2> >(tee -a /tmp/unittest-report.log >&2)
-
       - run:
           name: install Google Cloud dependencies
           command: |
@@ -48,23 +42,6 @@ jobs:
             sudo apt-get update && sudo apt-get install google-cloud-sdk --yes
             echo $circlecibuilder | base64 --decode --ignore-garbage > auth.json
             gcloud auth activate-service-account $circleciuser --key-file auth.json --project=$gproject
-
-      - setup_remote_docker
-
-      - run:
-          name: build and test docker image
-          command: |
-            docker login --username=$doclog --password=$docpass
-            docker build -f vendor/docker/Dockerfile -t dsanderscan/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM .
-            docker run --name redis -p 6379:6379 -d redis
-            docker run --name mongo =p 27017:27017 --network container:redis -d mongo
-            docker run --rm -it --network container:redis \
-              --env PERSISTER='{"engine_name": "redis", "parameters": {"host": "redis"}}' \
-              dsanderscan/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM python -m unittest -v
-            docker run --rm -it --network container:redis  \
-              --env PERSISTER='{"engine_name": "mongodb", "parameters": {"host": "mongo"}}' \
-              dsanderscan/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM python -m unittest -v
-
       - run:
           name: Build GAE project and deploy
           command: |
@@ -72,14 +49,19 @@ jobs:
             mkdir -p vendor/gae
             pip2 install -t vendor/gae/lib -r requirements.txt
             gcloud app deploy --version="cigen-"$MAJOR_VERSION"-"$MINOR_VERSION"-"$CIRCLE_BUILD_NUM --quiet
+      - setup_remote_docker
 
+      - run:
+          name: build docker image
+          command: |
+            docker login --username=$doclog --password=$docpass
+            docker build -f vendor/docker/Dockerfile -t dsanderscan/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM .
       - run:
           name: push docker image
           command: |
             docker tag dsanderscan/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM dsanderscan/$IMAGE_NAME:latest
             docker push dsanderscan/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM
             docker push dsanderscan/$IMAGE_NAME:latest
-
       - save_cache:
           key: v2-dependencies-{{ checksum "requirements.txt" }}
           paths:
