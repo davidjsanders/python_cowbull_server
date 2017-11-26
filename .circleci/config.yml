@@ -58,10 +58,10 @@ jobs:
             docker build -f vendor/docker/Dockerfile -t dsanderscan/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM .
             docker run --rm -it --link redis \
               --env PERSISTER='{"engine_name": "redis", "parameters": {"host": "redis"}}' \
-              $IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM python -m unittest -v
+              dsanderscan/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM python -m unittest -v
             docker run --rm -it --link mongo \
               --env PERSISTER='{"engine_name": "mongodb", "parameters": {"host": "mongo"}}' \
-              $IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM python -m unittest -v
+              dsanderscan/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM python -m unittest -v
 
       - run:
           name: Build GAE project and deploy
