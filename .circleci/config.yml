@@ -41,7 +41,7 @@ jobs:
             docker login --username=$doclog --password=$docpass
             docker build -f vendor/docker/Dockerfile -t dsanderscan/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM .
             docker run --name redis -d redis
-            docker run --name test2 --link redis \
+            docker run --name test2 -t --link redis \
               -e PERSISTER='{"engine_name": "redis", "parameters": {"host": "redis"}' \
               -d dsanderscan/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM \
               python -m unittest -v
