@@ -52,7 +52,7 @@ jobs:
       - setup_remote_docker
 
       - run:
-          name: build docker image
+          name: build and test docker image
           command: |
             docker login --username=$doclog --password=$docpass
             docker build -f vendor/docker/Dockerfile -t dsanderscan/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM .
@@ -75,6 +75,7 @@ jobs:
           name: push docker image
           command: |
             docker tag dsanderscan/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM dsanderscan/$IMAGE_NAME:latest
+            docker push dsanderscan/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM
             docker push dsanderscan/$IMAGE_NAME:latest
 
       - save_cache:
