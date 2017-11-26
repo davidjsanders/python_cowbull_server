@@ -43,9 +43,9 @@ jobs:
             set -o pipefail
             docker run --name redis -d redis
             docker run --name test2 -it --link redis \
-              -e PERSISTER='{"engine_name": "redis", "parameters": {"host": "redis"}' \
+              -e PERSISTER='{"engine_name": "redis", "parameters": {"host": "redis"}}' \
               -d dsanderscan/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM \
-              echo "running tests..."; python -m unittest -v tests
+              cd /cowbull;python -m unittest -v tests
             echo "Test results status: $?"
 
       - run:
