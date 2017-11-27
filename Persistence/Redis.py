@@ -7,17 +7,19 @@ import redis
 class Persister(AbstractPersister):
     _redis_connection = None
 
-    def __init__(self, host="localhost", port=6379, db=0):
+    def __init__(self, host="localhost", port=6379, master_port=26379, db=0):
         super(Persister, self).__init__()
 
         self.handler.module="Redis Persister"
         self.handler.log(message="Preparing redis connection")
 
         master_node = None
+        sentinel = None
+        slave_nodes = [(host, port)]
 
         try:
             self.handler.log(message="Checking if redis instance passed is a cluster")
-            sentinel = Sentinel([(host, port)], socket_timeout=0.1)
+            sentinel = Sentinel([(host, master_port)], socket_timeout=0.1)
             master_node = sentinel.discover_master('redis')
             self.handler.log(message="It is a cluster. Setting master node")
         except MasterNotFoundError:
@@ -27,19 +29,16 @@ class Persister(AbstractPersister):
         except Exception:
             raise
 
-        self._redis_connection = redis.StrictRedis(
-            host=host,
-            port=port,
-            db=db
-        )
         if master_node:
             self.handler.log(message="Setting redis master for writes")
-            self._redis_master = redis.StrictRedis(
-                host=master_node[0],
-                port=master_node[1],
+            self._redis_master = sentinel.master_for(host, socket_timeout=0.1)
+            self._redis_connection = sentinel.slave_for(host, socket_timeout=0.1)
+        else:
+            self._redis_connection = redis.StrictRedis(
+                host=host,
+                port=port,
                 db=db
             )
-        else:
             self.handler.log(message="Pointing redis master to connection")
             self._redis_master = self._redis_connection
 
