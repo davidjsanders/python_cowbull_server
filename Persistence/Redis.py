@@ -16,12 +16,14 @@ class Persister(AbstractPersister):
         master_node = None
 
         try:
+            self.handler.log(message="Checking if redis instance passed is a cluster")
             sentinel = Sentinel([(host, port)], socket_timeout=0.1)
             master_node = sentinel.discover_master('redis')
+            self.handler.log(message="It is a cluster. Setting master node")
         except MasterNotFoundError:
-            pass
+            self.handler.log(message="No cluster found; using single redis instance only")
         except ResponseError:
-            pass
+            self.handler.log(message="No cluster found; using single redis instance only")
         except Exception:
             raise
 
@@ -31,12 +33,14 @@ class Persister(AbstractPersister):
             db=db
         )
         if master_node:
+            self.handler.log(message="Setting redis master for writes")
             self._redis_master = redis.StrictRedis(
                 host=master_node[0],
                 port=master_node[1],
                 db=db
             )
         else:
+            self.handler.log(message="Pointing redis master to connection")
             self._redis_master = self._redis_connection
 
     def save(self, key=None, jsonstr=None):
