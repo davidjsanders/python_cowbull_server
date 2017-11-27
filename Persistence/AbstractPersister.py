@@ -24,17 +24,30 @@ class AbstractPersister(ABC):
 
     @abc.abstractmethod
     def load(self, key=None):
-        self.handler.log(
-            module="AbstractPersister",
-            method="load",
-            message="Base class processing - Nothing at present"
-        )
+        save_module_name = self.handler.module
+        self.handler.module = "Base Persister"
+        self.handler.method = "load"
+        self.handler.log(message="Validating key: {}".format(key))
+        if key is None:
+            raise ValueError("Key must be present to load a persisted game.")
+        self.handler.module = save_module_name
 
     @abc.abstractmethod
     def save(self, key=None, jsonstr=None):
-        self.handler.log(
-            module="AbstractPersister",
-            method="save",
-            message="Base class processing - Nothing at present"
-        )
+        save_module_name = self.handler.module
+        self.handler.module = "Base Persister"
+        self.handler.method = "save"
 
+        self.handler.log(message="Base persistence processing")
+
+        self.handler.log(message="Validating key: {}".format(key))
+        if key is None:
+            raise ValueError("Key must be present to persist game.")
+
+        self.handler.log(message="Validating json: {}".format(jsonstr))
+        if jsonstr is None:
+            raise ValueError("JSON is badly formed or not present")
+
+        self.handler.log(message="Saving key {} with {} to persister".format(key, jsonstr))
+
+        self.handler.module = save_module_name

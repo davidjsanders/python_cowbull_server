@@ -125,9 +125,17 @@ class GameServerController(MethodView):
         #
         # Save the newly created game to the persistence engine
         #
+        gen_error_msg = "The request raised an exception while trying to save a new game. " \
+                        "Please try again shortly and the issue has been logged."
         self.handler.log(message="Saving game to persister")
         try:
             persister.save(game_controller.game.key, game_controller.save())
+        except KeyError as ke:
+            return self.handler.error(
+                status=500,
+                exception=str(ke),
+                message=gen_error_msg
+            )
         except Exception as e:
             return self.handler.error(status=500, exception=str(e),
                                       message="An internal error occurred - {}".format(repr(e)))
@@ -226,6 +234,8 @@ class GameServerController(MethodView):
         # response to the user indicating an HTML status, the exception, and an
         # explanatory message. If the data
         #
+        gen_error_msg = "The request raised an exception while trying to load the saved game. " \
+                        "Please try again shortly and the issue has been logged."
         try:
             _persisted_response = persister.load(key=_key)
             if not _persisted_response:
@@ -241,6 +251,18 @@ class GameServerController(MethodView):
                 status=400,
                 exception=str(ke),
                 message="The request must contain a valid game key."
+            )
+        except ValueError as ve:
+            return self.handler.error(
+                status=500,
+                exception=str(ve),
+                message=gen_error_msg
+            )
+        except Exception as e:
+            return self.handler.error(
+                status=400,
+                exception=repr(e),
+                message=gen_error_msg
             )
 
         #
@@ -335,9 +357,22 @@ class GameServerController(MethodView):
         #
         # Save the game
         #
-        self.handler.log(message='Update game (save) after guess', status=0)
+        gen_error_msg = "The request raised an exception while trying to save (update) the game. " \
+                        "Please try again shortly and the issue has been logged."
+        self.handler.log(message="Saving game to persister")
         save_game = _game.save()
-        persister.save(key=_key, jsonstr=save_game)
+        try:
+            persister.save(key=_key, jsonstr=save_game)
+        except KeyError as ke:
+            return self.handler.error(
+                status=500,
+                exception=str(ke),
+                message=gen_error_msg
+            )
+        except Exception as e:
+            return self.handler.error(status=500, exception=str(e),
+                                      message="An internal error occurred - {}".format(repr(e)))
+        self.handler.log(message='Game {} persisted.'.format(_key), status=0)
 
         #
         # Return the analysis of the guess to the user.

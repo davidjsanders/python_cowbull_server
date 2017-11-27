@@ -82,3 +82,7 @@ jobs:
       - store_artifacts:
           path: /tmp/unittest-report.log
           destination: unittest-report
+
+      - store_artifacts:
+          path: /tmp/dockertest-report.log
+          destination: dockertest-report

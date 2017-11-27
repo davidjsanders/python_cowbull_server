@@ -46,13 +46,6 @@ class Persister(AbstractPersister):
 
     def save(self, key=None, jsonstr=None):
         super(Persister, self).save(key=key, jsonstr=jsonstr)
-        self.handler.method = "save"
-        self.handler.log(message="In GCPStoragePersist - save method. Validating inputs.")
-
-        if key is None:
-            raise ValueError("Key must be present to persist game.")
-        if jsonstr is None:
-            raise ValueError("JSON is badly formed or not present")
 
         self.handler.log(message="Saving key {} with json {}".format(key, jsonstr))
 
@@ -81,19 +74,14 @@ class Persister(AbstractPersister):
             self.handler.log(message="Response from execute: {}".format(resp))
         except Exception as e:
             self.handler.log(message="Exception: {}".format(repr(e)))
+            raise
 
         self.handler.log(message="Closed temp file/stream with game data")
 
     def load(self, key=None):
         super(Persister, self).load(key=key)
-        self.handler.method = "load"
-        self.handler.log(message="In GCPStoragePersist - load method. Validating inputs.")
-
-        if key is None:
-            raise ValueError("Key must be present to execute_load game")
 
         self.handler.log(message="Creating temporary file to hold results")
-        filename = '{}.tmp'.format(key)
 
         return_result = None
         try:

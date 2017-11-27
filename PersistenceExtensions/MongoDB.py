@@ -19,15 +19,6 @@ class Persister(AbstractPersister):
 
     def save(self, key=None, jsonstr=None):
         super(Persister, self).save(key=key, jsonstr=jsonstr)
-        self.handler.method="save"
-
-        self.handler.log(message="Validating key: {}".format(key))
-        if key is None:
-            raise ValueError("Key must be present to persist game.")
-
-        self.handler.log(message="Validating jsonstr: {}".format(jsonstr))
-        if jsonstr is None:
-            raise ValueError("JSON is badly formed or not present")
 
         self.handler.log(message="Using the games database")
         games = self.mdb.games
@@ -51,11 +42,6 @@ class Persister(AbstractPersister):
 
     def load(self, key=None):
         super(Persister, self).load(key=key)
-        self.handler.method="load"
-
-        self.handler.log(message="Validating key: {}".format(key))
-        if key is None:
-            raise ValueError("Key must be present to execute_load game")
 
         self.handler.log(message="Connecting to the games database")
         games = self.mdb.games
