@@ -1,5 +1,6 @@
 from flask_helpers.ErrorHandler import ErrorHandler
 from Persistence.AbstractPersister import AbstractPersister
+from redis.sentinel import Sentinel, MasterNotFoundError, SlaveNotFoundError, ResponseError
 import redis
 
 
@@ -11,16 +12,37 @@ class Persister(AbstractPersister):
 
         self.handler.module="Redis Persister"
         self.handler.log(message="Preparing redis connection")
+
+        master_node = None
+
+        try:
+            sentinel = Sentinel([(host, port)], socket_timeout=0.1)
+            master_node = sentinel.discover_master('redis')
+        except MasterNotFoundError:
+            pass
+        except ResponseError:
+            pass
+        except Exception:
+            raise
+
         self._redis_connection = redis.StrictRedis(
             host=host,
             port=port,
             db=db
         )
+        if master_node:
+            self._redis_master = redis.StrictRedis(
+                host=master_node[0],
+                port=master_node[1],
+                db=db
+            )
+        else:
+            self._redis_master = self._redis_connection
 
     def save(self, key=None, jsonstr=None):
         super(Persister, self).save(key=key, jsonstr=jsonstr)
         try:
-            self._redis_connection.set(str(key), str(jsonstr), ex=(60*60))
+            self._redis_master.set(str(key), str(jsonstr), ex=(60*60))
         except redis.exceptions.ConnectionError as rce:
             raise KeyError("Unable to connect to the Redis persistence engine: {}".format(str(rce)))
         self.handler.log(message="Key set.")
