@@ -15,8 +15,8 @@ services:
     environment:
       - LOGGING_LEVEL=10
       - 'PERSISTER={"engine_name": "redis", "parameters": {"host": "redis", "port": 6379, "db": 0}}'
-    volumes:
-      - /home/devdsanders/Documents/dev/cowbull/python_cowbull_server/vendor/docker/:/cowbull/config
+#    volumes:
+#      - /home/devdsanders/Documents/dev/cowbull/python_cowbull_server/vendor/docker/:/cowbull/config
     networks:
       - cowbull_network
     restart: always
