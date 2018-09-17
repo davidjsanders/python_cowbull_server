@@ -7,30 +7,19 @@ services:
       - cowbull_network
     restart: always
   cowbull_svc:
-    image: 'dsanderscan/cowbull'
+    build:
+      context: ../..
+      dockerfile: vendor/docker/Dockerfile
     depends_on:
       - redis
-#    ports:
-#      - 5000:8080
     environment:
-      - LOGGING_LEVEL=10
-      - 'PERSISTER={"engine_name": "redis", "parameters": {"host": "redis-11039.c8.us-east-1-2.ec2.cloud.redislabs.com", "port": 11039, "db": 0}}'
-    volumes:
-      - /home/devdsanders/Documents/dev/cowbull/python_cowbull_server/vendor/docker/:/cowbull/config
+      - LOGGING_LEVEL=30
+      - PYTHONPATH="/cowbull:/cowbull/tests"
+      - 'PERSISTER={"engine_name": "redis", "parameters": {"host": "redis", "port": 6379, "db": 0}}'
     networks:
       - cowbull_network
     restart: always
-  cowbull_webapp:
-    image: 'dsanderscan/cowbull_webapp'
-    depends_on:
-      - cowbull_svc
     ports:
-      - 8080:8080
-    environment:
-      - COWBULL_SERVER=cowbull_svc
-      - COWBULL_PORT=8080
-      - COWBULL_VERSION=v1
-    networks:
-      - cowbull_network
+      - 9180:8080
 networks:
   cowbull_network:

@@ -8,6 +8,7 @@
 *.json
 lib/
 config/
+**/*.old
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
