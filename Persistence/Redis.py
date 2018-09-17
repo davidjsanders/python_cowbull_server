@@ -31,8 +31,8 @@ class Persister(AbstractPersister):
 
         if master_node:
             self.handler.log(message="Setting redis master for writes")
-            self._redis_master = sentinel.master_for(host, socket_timeout=0.1)
-            self._redis_connection = sentinel.slave_for(host, socket_timeout=0.1)
+            self._redis_master = sentinel.master_for("redis", socket_timeout=0.1)
+            self._redis_connection = sentinel.slave_for("redis", socket_timeout=0.1)
         else:
             self._redis_connection = redis.StrictRedis(
                 host=host,
