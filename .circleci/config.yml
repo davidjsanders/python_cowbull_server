@@ -46,6 +46,7 @@ jobs:
       - deploy:
           name: Push docker image
           command: |
+            docker tag $doclog/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM $doclog/$IMAGE_NAME:latest
             docker push $doclog/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM
             docker push $doclog/$IMAGE_NAME:latest
 
