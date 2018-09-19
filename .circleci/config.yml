@@ -25,7 +25,7 @@ jobs:
       - run:
           name: Docker up and build
           command: |
-            docker-compose -f vendor/docker/compose-nodiscovery.yml up -d --build
+            docker-compose -f vendor/docker/docker-compose-cicd.yml up -d --build
 
       - run:
           name: Unit tests with Redis
