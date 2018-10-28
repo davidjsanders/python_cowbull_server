@@ -1,6 +1,9 @@
 version: 2
 jobs:
   build:
+    branches:
+      only:
+      - master
     docker:
       - image: circleci/python:2.7
 
