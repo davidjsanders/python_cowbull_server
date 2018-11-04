@@ -29,13 +29,15 @@ jobs:
           name: Docker up and build
           command: |
             docker-compose -f vendor/docker/docker-compose-cicd.yml up -d --build
+            srvapp=$(docker ps -a --format '{{.Names}}' | grep "docker_cowbull_svc_1")
+            echo "export srvapp=$srvapp" >> $BASH_ENV
 
       - run:
           name: Unit tests with Redis
           command: |
-            docker exec -it docker_cowbull_svc_1 \
+            docker exec -it $srvapp \
               bash -c "python -m unittest -v tests 2> >(tee -a /tmp/dockertest-report.log >&2)"
-            docker cp docker_cowbull_svc_1:/tmp/dockertest-report.log /tmp/dockertest-report.log
+            docker cp $srvapp:/tmp/dockertest-report.log /tmp/dockertest-report.log
 
       - run:
           name: Build final Docker image
