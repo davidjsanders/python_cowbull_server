@@ -13,7 +13,7 @@ services:
     depends_on:
       - redis
     environment:
-      - LOGGING_LEVEL=10
+      - LOGGING_LEVEL=30
       - PYTHONPATH="/cowbull:/cowbull/tests"
       - 'PERSISTER={"engine_name": "redis", "parameters": {"host": "redis", "port": 6379, "db": 0}}'
     networks:
