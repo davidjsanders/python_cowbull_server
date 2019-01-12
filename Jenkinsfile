@@ -9,7 +9,6 @@ pipeline {
             }
             steps {
                 checkout scm
-                docker.image('redis:3.0.7-alpine').withRun {}
                 withEnv(["HOME=${env.WORKSPACE}"]) {
                     sh """
                       pwd
