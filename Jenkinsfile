@@ -1,7 +1,7 @@
 pipeline {
     agent none
     stages {
-        stage('Build') {
+        stage('Test') {
             agent {
                 docker {
                     image 'dsanderscan/jenkins-py3-0.1' 
