@@ -1,19 +1,10 @@
 node {
-    environment {
-        docker_creds = credentials("dockerhub")
-        username = "${env.dockerhub_USR}"
-        password = "${env.dockerhub_PSW}"
-    }
-    def app
-
-    stage('Clone repository') {
+    stage('Clone') {
         /* Let's make sure we have the repository cloned to our workspace */
         checkout scm
     }
 
     stage('Test') {
-        /* Ideally, we would run a test framework against our image.
-         * For this example, we're using a Volkswagen-type approach ;-) */
         docker.image('redis:5.0.3-alpine').withRun('--name redis') { container ->
             docker.image('dsanderscan/jenkins-py3-0.1').inside('--link redis:redis') {
                 withEnv(["HOME=${env.WORKSPACE}"]) {
@@ -34,14 +25,13 @@ node {
         }
     }
 
-    stage('Build image') {
+    stage('Build') {
         sh """
             docker build -t dsanders/cowbull:jenkins-test -f vendor/docker/Dockerfile .
         """
-//        def pkg = docker.build("dsanderscan/cowbull", "-f vendor/docker/Dockerfile .")
     }
 
-    stage('Push image') {
+    stage('Push') {
         withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'dockerhub',
 usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
             sh """
@@ -50,13 +40,5 @@ usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
             docker push dsanderscan/cowbull:jenkins-test-"${env.BUILD_NUMBER}"
             """
         }
-        /* Finally, we'll push the image with two tags:
-         * First, the incremental build number from Jenkins
-         * Second, the 'latest' tag.
-         * Pushing multiple tags is cheap, as all the layers are reused. */
-//        docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
-//            pkg.push("jenkins-test-${env.BUILD_NUMBER}")
-//            // app.push("latest")
-//        }
     }
 }
