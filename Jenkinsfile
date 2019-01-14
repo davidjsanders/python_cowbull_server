@@ -1,6 +1,10 @@
 pipeline {
-    agent any
     stages {
+        agent {
+            docker {
+                image 'dsanderscan/jenkins-py3-0.1'
+            }
+        }
         stage('Test') {
             node {
                 checkout scm
