@@ -20,7 +20,7 @@ node {
                     export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
                     export PERSISTER='PERSISTER={"engine_name": "redis", "parameters": {"host": "redis", "port": 6379, "db": 0}}'
                     echo "*** PYTHONPATH=\${PYTHONPATH}"
-                    python3 -m pip install -r requirements.txt
+                    python3 -m pip install -r requirements.txt --no-cache --user
                     python3 -m unittest tests
                 """
             }
