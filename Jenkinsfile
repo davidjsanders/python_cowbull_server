@@ -46,6 +46,7 @@ node {
 usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
             sh """
             docker login -u "${USERNAME}" -p "${PASSWORD}"
+            docker tag dsanderscan/cowbull dsanderscan/cowbull:jenkins-test-"${env.BUILD_NUMBER}"
             docker push dsanderscan/cowbull:jenkins-test-"${env.BUILD_NUMBER}"
             """
         }
