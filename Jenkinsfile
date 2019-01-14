@@ -9,7 +9,7 @@ node {
     stage('Test') {
         /* Ideally, we would run a test framework against our image.
          * For this example, we're using a Volkswagen-type approach ;-) */
-        docker.image('redis:5.0.3-alpine') { c ->
+        docker.image('redis:5.0.3-alpine').withRun() { c ->
             docker.image('dsanderscan/jenkins-py3-0.1').inside('--link ${c.id}:redis') {
                 checkout scm
                 sh """
