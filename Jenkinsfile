@@ -9,7 +9,7 @@ node {
     stage('Test') {
         /* Ideally, we would run a test framework against our image.
          * For this example, we're using a Volkswagen-type approach ;-) */
-        docker.inside('dsanderscan/jenkins-py3-0.1').withRun('-p 6379:6379') { c ->
+        docker.image('dsanderscan/jenkins-py3-0.1').inside('-p 6379:6379') { c ->
             checkout scm
             sh """
                 pwd
