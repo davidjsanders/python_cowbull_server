@@ -45,7 +45,7 @@ node {
          * Second, the 'latest' tag.
          * Pushing multiple tags is cheap, as all the layers are reused. */
         docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
-            app.push("jenkins-test-${env.BUILD_NUMBER}")
+            pkg.push("jenkins-test-${env.BUILD_NUMBER}")
             // app.push("latest")
         }
     }
