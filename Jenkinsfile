@@ -9,7 +9,7 @@ node {
     stage('Test') {
         /* Ideally, we would run a test framework against our image.
          * For this example, we're using a Volkswagen-type approach ;-) */
-        docker.image('dsanderscan/python_cowbull_redis:4.0.6').withRun('--name redis redis-server') { container ->
+        docker.image('redis:4.0.6').withRun('--name redis redis-server') { container ->
             docker.image('dsanderscan/jenkins-py3-0.1').inside('--link redis:redis') {
                 withEnv(["HOME=${env.WORKSPACE}"]) {
                     checkout scm
