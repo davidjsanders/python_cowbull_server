@@ -5,11 +5,11 @@ pipeline {
     agent none
     stages {
         stage('Test') {
-            agent {
-                docker {
-                    image 'dsanderscan/jenkins-py3-0.1' 
-                }
-            }
+            // agent {
+            //     docker {
+            //         image 'dsanderscan/jenkins-py3-0.1' 
+            //     }
+            // }
             steps {
                 checkout scm
                 script {
