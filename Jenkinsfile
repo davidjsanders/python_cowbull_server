@@ -1,4 +1,9 @@
 node {
+    environment {
+        docker_creds = credentials("dockerhub")
+        username = "${env.dockerhub_USR}"
+        password = "${env.dockerhub_PSW}"
+    }
     def app
 
     stage('Clone repository') {
@@ -30,23 +35,24 @@ node {
     }
 
     stage('Build image') {
-        // sh """
-        //     docker build -t dsanders/cowbull:jenkins-test -f vendor/docker/Dockerfile .
-        // """
-        def pkg = docker.build("dsanderscan/cowbull", "-f vendor/docker/Dockerfile .")
+        sh """
+            docker build -t dsanders/cowbull:jenkins-test -f vendor/docker/Dockerfile .
+        """
+//        def pkg = docker.build("dsanderscan/cowbull", "-f vendor/docker/Dockerfile .")
     }
 
     stage('Push image') {
-        // sh """
-        //   docker login 
-        // """
+        sh """
+          docker login -u "${env.dockerhub_USR}" -p "${env.dockerhub_PSW}"
+          docker push dsanderscan/cowbull:jenkins-test\${env.BUILD_NUMBER}
+        """
         /* Finally, we'll push the image with two tags:
          * First, the incremental build number from Jenkins
          * Second, the 'latest' tag.
          * Pushing multiple tags is cheap, as all the layers are reused. */
-        docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
-            pkg.push("jenkins-test-${env.BUILD_NUMBER}")
-            // app.push("latest")
-        }
+//        docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
+//            pkg.push("jenkins-test-${env.BUILD_NUMBER}")
+//            // app.push("latest")
+//        }
     }
 }
