@@ -9,7 +9,7 @@ node {
     stage('Build image') {
         /* This builds the actual image; synonymous to
          * docker build on the command line */
-        app = docker.build("dsanderscan/cowbull")
+        app = docker.build("dsanderscan/cowbull", "-f vendor/docker/Dockerfile .")
     }
 
     stage('Test image') {
