@@ -10,7 +10,7 @@ pipeline {
             steps {
                 checkout scm
                 withEnv(["HOME=${env.WORKSPACE}"]) {
-                    docker.image('redis:5.0.3-alpine').withRun('-p 6379:6379') { c ->
+                    docker.image('redis:5.0.3-alpine').withRun('-p 6379:6379') {
                         sh """
                         pwd
                         ls -als
