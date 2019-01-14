@@ -30,15 +30,16 @@ node {
     }
 
     stage('Build image') {
-        /* This builds the actual image; synonymous to
-         * docker build on the command line */
-        sh """
-            docker build -t dsanders/cowbull:jenkins-test -f vendor/docker/Dockerfile .
-        """
-        //app = docker.build("dsanderscan/cowbull", "-f vendor/docker/Dockerfile .")
+        // sh """
+        //     docker build -t dsanders/cowbull:jenkins-test -f vendor/docker/Dockerfile .
+        // """
+        def pkg = docker.build("dsanderscan/cowbull", "-f vendor/docker/Dockerfile")
     }
 
     stage('Push image') {
+        // sh """
+        //   docker login 
+        // """
         /* Finally, we'll push the image with two tags:
          * First, the incremental build number from Jenkins
          * Second, the 'latest' tag.
