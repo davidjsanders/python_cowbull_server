@@ -33,7 +33,7 @@ node {
         // sh """
         //     docker build -t dsanders/cowbull:jenkins-test -f vendor/docker/Dockerfile .
         // """
-        def pkg = docker.build("dsanderscan/cowbull", "-f vendor/docker/Dockerfile")
+        def pkg = docker.build("dsanderscan/cowbull", "-f vendor/docker/Dockerfile .")
     }
 
     stage('Push image') {
