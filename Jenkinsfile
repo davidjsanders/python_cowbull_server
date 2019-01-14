@@ -42,10 +42,13 @@ node {
     }
 
     stage('Push image') {
-        sh """
-          docker login -u "${env.dockerhub_USR}" -p "${env.dockerhub_PSW}"
-          docker push dsanderscan/cowbull:jenkins-test\${env.BUILD_NUMBER}
-        """
+        withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'dockerhub',
+usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+            sh """
+            docker login -u "${USERNAME}" -p "${PASSWORD}"
+            docker push dsanderscan/cowbull:jenkins-test\${env.BUILD_NUMBER}
+            """
+        }
         /* Finally, we'll push the image with two tags:
          * First, the incremental build number from Jenkins
          * Second, the 'latest' tag.
