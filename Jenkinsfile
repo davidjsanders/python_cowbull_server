@@ -1,6 +1,6 @@
 pipeline {
     environment {
-        HOME="${env.WORKSPACE}""
+        HOME="${env.WORKSPACE}"
     }
     agent none
     stages {
