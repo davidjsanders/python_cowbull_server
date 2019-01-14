@@ -9,7 +9,7 @@ node {
     stage('Test') {
         /* Ideally, we would run a test framework against our image.
          * For this example, we're using a Volkswagen-type approach ;-) */
-        docker.image('redis:4.0.6').withRun('--name redis') { container ->
+        docker.image('redis:5.0.3-alpine').withRun('--name redis') { container ->
             docker.image('dsanderscan/jenkins-py3-0.1').inside('--link redis:redis') {
                 withEnv(["HOME=${env.WORKSPACE}"]) {
                     checkout scm
@@ -19,7 +19,7 @@ node {
                         python3 -m venv env
                         source ./env/bin/activate 
                         export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
-                        export PERSISTER='PERSISTER={"engine_name": "redis", "parameters": {"host": "redis", "port": 6379, "db": 0}}'
+                        export PERSISTER='{"engine_name": "redis", "parameters": {"host": "redis", "port": 6379, "db": 0}}'
                         echo "*** PYTHONPATH=\${PYTHONPATH}"
                         python3 -m pip install -r requirements.txt --no-cache --user
                         python3 -m unittest tests
