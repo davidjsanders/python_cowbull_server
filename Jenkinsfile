@@ -31,12 +31,22 @@ node {
         """
     }
 
+    stage{'System Test'} {
+        docker.image('redis:5.0.3-alpine').withRun('--name redis') { container ->
+            docker.image('"${params.imageName}":"${params.Environment}"-"${params.Version}"."${env.BUILD_NUMBER}"').inside('--link redis:redis') {
+                sh """
+                    python3 -m unittest tests
+                """
+            }
+        }
+    }
+
     stage('Push') {
         withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'dockerhub',
 usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
             sh """
             docker login -u "${USERNAME}" -p "${PASSWORD}"
-            # docker tag "${params.imageName}" "${params.imageName}":jenkins-test-"${env.BUILD_NUMBER}"
+            #docker tag "${params.imageName}" "${params.imageName}":jenkins-test-"${env.BUILD_NUMBER}"
             docker push "${params.imageName}":"${params.Environment}"-"${params.Version}"."${env.BUILD_NUMBER}"
             """
         }
