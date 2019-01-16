@@ -14,7 +14,7 @@ node {
                 withEnv(["HOME=${env.WORKSPACE}"]) {
                     checkout scm
                     sh """
-                        export PATH="\$(pwd)/.local/bin:\$PATH"
+                        #export PATH="\$(pwd)/.local/bin:\$PATH"
                         python3 -m venv env
                         source ./env/bin/activate 
                         export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
