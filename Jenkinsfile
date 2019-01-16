@@ -9,9 +9,7 @@ node {
 
     stage('Test') {
         sh """
-        echo "**"
         echo "** Validating build with Redis"
-        echo "**"
         """
         docker.image('redis:5.0.3-alpine').withRun('--name redis') { container ->
             docker.image('dsanderscan/jenkins-py3-0.1').inside('--link redis:redis') {
@@ -32,9 +30,7 @@ node {
             }
         }
         sh """
-          echo "**"
           echo "** Validating build with MongoDB"
-          echo "**"
         """
         docker.image('mongo:4.0.5').withRun('--name mongo') { container ->
             docker.image('dsanderscan/jenkins-py3-0.1').inside('--link mongo:mongo') {
