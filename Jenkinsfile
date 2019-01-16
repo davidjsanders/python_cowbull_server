@@ -9,7 +9,7 @@ node {
 
     stage('Test') {
         docker.image('redis:5.0.3-alpine').withRun('--name redis') { container ->
-            docker.image().withRun('--name mongo') {
+            docker.image().inside('--name mongo') { 
             }
             docker.image('dsanderscan/jenkins-py3-0.1').inside('--link redis:redis --link mongo:mongodb') {
                 withEnv(["HOME=${env.WORKSPACE}"]) {
