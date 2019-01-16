@@ -13,6 +13,7 @@ node {
                 withEnv(["HOME=${env.WORKSPACE}"]) {
                     checkout scm
                     sh """
+                        python3 -m venv env
                         source ./env/bin/activate 
                         export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
                         export PERSISTER='{"engine_name": "redis", "parameters": {"host": "redis", "port": 6379, "db": 0}}'
@@ -29,8 +30,6 @@ node {
                 withEnv(["HOME=${env.WORKSPACE}"]) {
                     checkout scm
                     sh """
-                        pwd
-                        ls -als
                         python3 -m venv env
                         source ./env/bin/activate 
                         export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
