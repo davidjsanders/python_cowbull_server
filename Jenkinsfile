@@ -1,4 +1,4 @@
-pipeline {
+node {
     environment {
         def temp_image_id = UUID.randomUUID().toString()
     }
