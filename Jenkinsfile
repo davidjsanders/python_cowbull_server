@@ -8,9 +8,6 @@ node {
     }
 
     stage('Test') {
-        sh """
-        echo "** Validating build with Redis"
-        """
         docker.image('redis:5.0.3-alpine').withRun('--name redis') { container ->
             docker.image('dsanderscan/jenkins-py3-0.1').inside('--link redis:redis') {
                 withEnv(["HOME=${env.WORKSPACE}"]) {
@@ -22,26 +19,11 @@ node {
                         source ./env/bin/activate 
                         export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
                         export PERSISTER='{"engine_name": "redis", "parameters": {"host": "redis", "port": 6379, "db": 0}}'
+                        printf "\n** Validating build with Redis\n\n"
                         echo "*** PYTHONPATH=\${PYTHONPATH}"
                         python3 -m pip install -r requirements.txt --no-cache --user
                         python3 -m unittest tests
-                    """
-                }
-            }
-        }
-        sh """
-          echo "** Validating build with MongoDB"
-        """
-        docker.image('mongo:4.0.5').withRun('--name mongo') { container ->
-            docker.image('dsanderscan/jenkins-py3-0.1').inside('--link mongo:mongo') {
-                withEnv(["HOME=${env.WORKSPACE}"]) {
-                    checkout scm
-                    sh """
-                        pwd
-                        ls -als
-                        python3 -m venv env
-                        source ./env/bin/activate 
-                        export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
+                        printf "\n** Validating build with MongoDB\n\n"
                         export PERSISTER='{"engine_name": "mongodb", "parameters": {"host": "mongo", "port": 27017, "db": "cowbull"}}'
                         echo "*** PYTHONPATH=\${PYTHONPATH}"
                         python3 -m pip install -r requirements.txt --no-cache --user
@@ -50,6 +32,27 @@ node {
                 }
             }
         }
+        // sh """
+        //   echo "** Validating build with MongoDB"
+        // """
+        // docker.image('mongo:4.0.5').withRun('--name mongo') { container ->
+        //     docker.image('dsanderscan/jenkins-py3-0.1').inside('--link mongo:mongo') {
+        //         withEnv(["HOME=${env.WORKSPACE}"]) {
+        //             checkout scm
+        //             sh """
+        //                 pwd
+        //                 ls -als
+        //                 python3 -m venv env
+        //                 source ./env/bin/activate 
+        //                 export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
+        //                 export PERSISTER='{"engine_name": "mongodb", "parameters": {"host": "mongo", "port": 27017, "db": "cowbull"}}'
+        //                 echo "*** PYTHONPATH=\${PYTHONPATH}"
+        //                 python3 -m pip install -r requirements.txt --no-cache --user
+        //                 python3 -m unittest tests
+        //             """
+        //         }
+        //     }
+        // }
     }
 
     stage('Build') {
