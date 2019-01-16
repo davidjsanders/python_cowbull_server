@@ -1,13 +1,13 @@
 pipeline {
+    properties([
+        parameters([
+            string(name: 'Version', defaultValue: '1.1'),
+            string(name: 'Environment', defaultValue: 'dev'),
+            string(name: 'imageName', defaultValue: 'dsanderscan/cowbull'),
+        ])
+    ])
     environment {
         def temp_image_id = UUID.randomUUID().toString()
-        properties([
-            parameters([
-                string(name: 'Version', defaultValue: '1.1'),
-                string(name: 'Environment', defaultValue: 'dev'),
-                string(name: 'imageName', defaultValue: 'dsanderscan/cowbull'),
-            ])
-        ])
     }
 
     stage('Clone') {
