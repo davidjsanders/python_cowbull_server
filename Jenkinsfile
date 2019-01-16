@@ -27,7 +27,7 @@ node {
 
     stage('Build') {
         sh """
-            docker build -t dsanderscan/cowbull:"${params.Environment}"-"${params.Version}"-"${env.BUILD_NUMBER}" -f vendor/docker/Dockerfile .
+            docker build -t "${params.imageName}":"${params.Environment}"-"${params.Version}"."${env.BUILD_NUMBER}" -f vendor/docker/Dockerfile .
         """
     }
 
@@ -36,8 +36,8 @@ node {
 usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
             sh """
             docker login -u "${USERNAME}" -p "${PASSWORD}"
-            # docker tag dsanderscan/cowbull dsanderscan/cowbull:jenkins-test-"${env.BUILD_NUMBER}"
-            docker push dsanderscan/cowbull:"${params.Environment}"-"${params.Version}"-"${env.BUILD_NUMBER}"
+            # docker tag "${params.imageName}" "${params.imageName}":jenkins-test-"${env.BUILD_NUMBER}"
+            docker push "${params.imageName}":"${params.Environment}"-"${params.Version}"."${env.BUILD_NUMBER}"
             """
         }
     }
