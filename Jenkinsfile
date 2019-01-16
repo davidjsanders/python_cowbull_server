@@ -1,5 +1,5 @@
 node {
-    options([
+    properties([
         parameters([
             string(name: 'Version', defaultValue: '1.1'),
             string(name: 'Environment', defaultValue: 'dev'),
