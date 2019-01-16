@@ -1,15 +1,15 @@
-node {
-    properties([
-        parameters([
-            string(name: 'Version', defaultValue: '1.1'),
-            string(name: 'Environment', defaultValue: 'dev'),
-            string(name: 'imageName', defaultValue: 'dsanderscan/cowbull'),
-        ])
-    ])
-
+pipeline {
     environment {
         def temp_image_id = UUID.randomUUID().toString()
+        properties([
+            parameters([
+                string(name: 'Version', defaultValue: '1.1'),
+                string(name: 'Environment', defaultValue: 'dev'),
+                string(name: 'imageName', defaultValue: 'dsanderscan/cowbull'),
+            ])
+        ])
     }
+
     stage('Clone') {
         /* Let's make sure we have the repository cloned to our workspace */
         checkout scm
