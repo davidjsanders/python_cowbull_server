@@ -34,15 +34,15 @@ node {
         """
     }
 
-    stage{'SysTest'} {
-        docker.image('redis:5.0.3-alpine').withRun('--name redis') { container ->
-            docker.image('not_sustainable_image').inside('--link redis:redis') {
-                sh """
-                    python3 -m unittest tests
-                """
-            }
-        }
-    }
+    // stage{'SysTest'} {
+    //     docker.image('redis:5.0.3-alpine').withRun('--name redis') { container ->
+    //         docker.image('not_sustainable_image').inside('--link redis:redis') {
+    //             sh """
+    //                 python3 -m unittest tests
+    //             """
+    //         }
+    //     }
+    // }
 
     stage('Push') {
         withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'dockerhub',
