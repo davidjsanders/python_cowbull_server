@@ -27,7 +27,7 @@ node {
 
     stage('Build') {
         sh """
-            docker build -t dsanders/cowbull:"${params.Environment}"-"${params.Version}"-"${env.BUILD_NUMBER}" -f vendor/docker/Dockerfile .
+            docker build -t dsanderscan/cowbull:"${params.Environment}"-"${params.Version}"-"${env.BUILD_NUMBER}" -f vendor/docker/Dockerfile .
         """
     }
 
