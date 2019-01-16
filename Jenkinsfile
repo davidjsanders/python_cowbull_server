@@ -1,4 +1,4 @@
-pipeline {
+node {
     options([
         parameters([
             string(name: 'Version', defaultValue: '1.1'),
