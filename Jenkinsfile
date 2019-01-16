@@ -48,6 +48,7 @@ node {
         docker.image('redis:5.0.3-alpine').withRun('--name redis') { c ->
             docker.image('not_sustainable_image').inside('--link redis:redis') {
                 sh """
+                    export PERSISTER='{"engine_name": "redis", "parameters": {"host": "redis", "port": 6379, "db": 0}}'
                     python3 -m unittest tests
                 """
             }
