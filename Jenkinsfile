@@ -33,7 +33,7 @@ node {
 
     stage{'System Test'} {
         docker.image('redis:5.0.3-alpine').withRun('--name redis') { container ->
-            docker.image('"${params.imageName}":"${params.Environment}"-"${params.Version}"."${env.BUILD_NUMBER}"').inside('--link redis:redis') {
+            docker.image("${params.imageName}:${params.Environment}-${params.Version}.${env.BUILD_NUMBER}").inside('--link redis:redis') {
                 sh """
                     python3 -m unittest tests
                 """
