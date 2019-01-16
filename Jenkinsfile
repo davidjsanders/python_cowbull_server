@@ -44,6 +44,16 @@ node {
     //     }
     // }
 
+    stage('Validate') {
+        docker.image('redis:5.0.3-alpine').withRun('--name redis') { c ->
+            docker.image('not_sustainable_image').inside('--link redis:redis') {
+                sh """
+                    python3 -m unittest tests
+                """
+            }
+        }
+    }
+
     stage('Push') {
         withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'dockerhub',
 usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
