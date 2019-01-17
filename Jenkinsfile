@@ -11,17 +11,19 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    docker run --name redis --detach=true --rm redis:5.0.3-alpine
-                    docker run --name redis_test --link redis:redis --detach=false --rm -i dsanderscan/jenkins-py:3-0.1 sh<<EOF
-                        python3 -m venv env
-                        source ./env/bin/activate 
-                        export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
-                        export PERSISTER='{"engine_name": "redis", "parameters": {"host": "redis", "port": 6379, "db": 0}}'
-                        printf "\n** Validating build with Redis\n\n"
-                        echo "*** PYTHONPATH=\${PYTHONPATH}"
-                        python3 -m pip install -r requirements.txt --no-cache --user
-                        python3 -m unittest tests
-                    EOF
+                    sh """
+                        docker run --name redis --detach=true --rm redis:5.0.3-alpine
+                        docker run --name redis_test --link redis:redis --detach=false --rm -i dsanderscan/jenkins-py:3-0.1 sh<<EOF
+                            python3 -m venv env
+                            source ./env/bin/activate 
+                            export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
+                            export PERSISTER='{"engine_name": "redis", "parameters": {"host": "redis", "port": 6379, "db": 0}}'
+                            printf "\n** Validating build with Redis\n\n"
+                            echo "*** PYTHONPATH=\${PYTHONPATH}"
+                            python3 -m pip install -r requirements.txt --no-cache --user
+                            python3 -m unittest tests
+                        EOF
+                    """
                     // docker.image('redis:5.0.3-alpine').withRun('--name redis') { container ->
                     //     docker.image('dsanderscan/jenkins-py3-0.1').inside('--link redis:redis') {
                     //         withEnv(["HOME=${env.WORKSPACE}"]) {
