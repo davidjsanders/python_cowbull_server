@@ -7,8 +7,7 @@ pipeline {
 
     stage('Clone') {
         /* Let's make sure we have the repository cloned to our workspace */
-        // checkout scm
-        sh 'echo "Skipping clone"'
+        checkout scm
     }
 
     stage('Test') {
