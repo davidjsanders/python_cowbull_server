@@ -7,7 +7,7 @@ pipeline {
 
     stage('Clone') {
         /* Let's make sure we have the repository cloned to our workspace */
-        checkout scm
+        #checkout scm
     }
 
     stage('Test') {
