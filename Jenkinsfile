@@ -12,8 +12,8 @@ pipeline {
             steps {
                 script {
                     sh """
-                        docker run --name redis --detach=true --rm redis:5.0.3-alpine
-                        docker run --name redis_test --link redis:redis --detach=false --rm -i dsanderscan/jenkins-py:3-0.1 sh<<EOF
+                        docker run --name redis --detach true --rm redis:5.0.3-alpine
+                        docker run --name redis_test --link redis:redis --detach false --rm -i dsanderscan/jenkins-py:3-0.1 sh<<EOF
                             python3 -m venv env
                             source ./env/bin/activate 
                             export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
