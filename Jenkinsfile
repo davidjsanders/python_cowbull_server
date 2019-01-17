@@ -13,7 +13,7 @@ pipeline {
                 script {
                     sh """
                         docker run --name redis --rm -d redis:5.0.3-alpine
-                        docker run --name redis_test --link redis:redis --rm -i -d dsanderscan/jenkins-py:3-0.1 sh<<EOF
+                        docker run --name redis_test --link redis:redis --rm -i dsanderscan/jenkins-py:3-0.1 sh<<EOF
                             python3 -m venv env
                             source ./env/bin/activate 
                             export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
@@ -23,6 +23,7 @@ pipeline {
                             python3 -m pip install -r requirements.txt --no-cache --user
                             python3 -m unittest tests
                         EOF
+                        docker stop redis
                     """
                     // docker.image('redis:5.0.3-alpine').withRun('--name redis') { container ->
                     //     docker.image('dsanderscan/jenkins-py3-0.1').inside('--link redis:redis') {
