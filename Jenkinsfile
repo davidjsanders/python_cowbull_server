@@ -5,12 +5,12 @@ pipeline {
         def temp_image_id = UUID.randomUUID().toString()
     }
 
-    stage('Clone') {
+    stage("Clone") {
         /* Let's make sure we have the repository cloned to our workspace */
         checkout scm
     }
 
-    stage('Test') {
+    stage("Test") {
         docker.image('redis:5.0.3-alpine').withRun('--name redis') { container ->
             docker.image('dsanderscan/jenkins-py3-0.1').inside('--link redis:redis') {
                 withEnv(["HOME=${env.WORKSPACE}"]) {
