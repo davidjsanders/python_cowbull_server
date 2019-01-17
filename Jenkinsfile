@@ -80,34 +80,34 @@ pipeline {
         //     }
         // }
 
-        stage('Validate') {
-            steps {
-                docker.image('redis:5.0.3-alpine').withRun('--name redis') { c ->
-                    docker.image('not_sustainable_image').inside('--link redis:redis') {
-                        sh """
-                            export PERSISTER='{"engine_name": "redis", "parameters": {"host": "redis", "port": 6379, "db": 0}}'
-                            python3 -m unittest tests
-                        """
-                    }
-                }
-            }
-        }
+        // stage('Validate') {
+        //     steps {
+        //         docker.image('redis:5.0.3-alpine').withRun('--name redis') { c ->
+        //             docker.image('not_sustainable_image').inside('--link redis:redis') {
+        //                 sh """
+        //                     export PERSISTER='{"engine_name": "redis", "parameters": {"host": "redis", "port": 6379, "db": 0}}'
+        //                     python3 -m unittest tests
+        //                 """
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('Push') {
-            steps {
-                withCredentials([
-                    [$class: 'UsernamePasswordMultiBinding', 
-                    credentialsId: 'dockerhub',
-                    usernameVariable: 'USERNAME', 
-                    passwordVariable: 'PASSWORD']
-                ]) {
-                    sh """
-                    docker login -u "${USERNAME}" -p "${PASSWORD}"
-                    docker tag not_sustainable_image "${params.imageName}":"${params.Environment}"-"${params.Version}"."${env.BUILD_NUMBER}"
-                    docker push "${params.imageName}":"${params.Environment}"-"${params.Version}"."${env.BUILD_NUMBER}"
-                    """
-                }
-            }
-        }
+        // stage('Push') {
+        //     steps {
+        //         withCredentials([
+        //             [$class: 'UsernamePasswordMultiBinding', 
+        //             credentialsId: 'dockerhub',
+        //             usernameVariable: 'USERNAME', 
+        //             passwordVariable: 'PASSWORD']
+        //         ]) {
+        //             sh """
+        //             docker login -u "${USERNAME}" -p "${PASSWORD}"
+        //             docker tag not_sustainable_image "${params.imageName}":"${params.Environment}"-"${params.Version}"."${env.BUILD_NUMBER}"
+        //             docker push "${params.imageName}":"${params.Environment}"-"${params.Version}"."${env.BUILD_NUMBER}"
+        //             """
+        //         }
+        //     }
+        // }
     }
 }
