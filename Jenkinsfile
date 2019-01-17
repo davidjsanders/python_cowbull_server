@@ -22,7 +22,7 @@ pipeline {
                             echo "*** PYTHONPATH=\${PYTHONPATH}"
                             python3 -m pip install -r requirements.txt --no-cache --user
                             python3 -m unittest tests
-                        EOF
+EOF
                         docker stop redis
                     """
                     // docker.image('redis:5.0.3-alpine').withRun('--name redis') { container ->
