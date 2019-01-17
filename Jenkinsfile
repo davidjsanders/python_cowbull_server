@@ -1,10 +1,6 @@
 pipeline {
     agent any
     
-    environment {
-        def temp_image_id = UUID.randomUUID().toString()
-    }
-
     stage("Clone") {
         /* Let's make sure we have the repository cloned to our workspace */
         checkout scm
