@@ -1,5 +1,10 @@
 pipeline {
     agent any
+    environment {
+        REDIS_PERSISTER='{"engine_name": "redis", "parameters": {"host": "redis", "port": 6379, "db": 0}}'
+        MONGO_PERSISTER='{"engine_name": "mongodb", "parameters": {"host": "mongo", "port": 27017, "db": "cowbull"}}'
+    }
+
     stages {
         stage('Clone') {
             steps {
@@ -20,7 +25,7 @@ pipeline {
                                     python3 -m venv env
                                     source ./env/bin/activate 
                                     export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
-                                    export PERSISTER='{"engine_name": "redis", "parameters": {"host": "redis", "port": 6379, "db": 0}}'
+                                    export PERSISTER='\${REDIS_PERSISTER}'
                                     printf "\n** Validating build with Redis\n\n"
                                     echo "*** PYTHONPATH=\${PYTHONPATH}"
                                     python3 -m pip install -r requirements.txt --no-cache --user
