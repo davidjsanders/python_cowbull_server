@@ -24,8 +24,8 @@ pipeline {
             steps {
                 script {
                     for (int i = 0; i < persisters.size(); i++) {
-                        docker.image('redis:5.0.3-alpine').withRun('--name redis') { container ->
-                            docker.image('dsanderscan/jenkins-py3-0.1').inside('--link redis:redis') {
+                        docker.image(engines[i]).withRun('--name persist') { container ->
+                            docker.image('dsanderscan/jenkins-py3-0.1').inside('--link persist:db') {
                                 withEnv(["HOME=${env.WORKSPACE}"]) {
                                     checkout scm
                                     sh """
@@ -33,7 +33,7 @@ pipeline {
                                         python3 -m venv env
                                         source ./env/bin/activate 
                                         export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
-                                        export PERSISTER='{"engine_name": "redis", "parameters": {"host": "redis", "port": 6379, "db": 0}}'
+                                        export PERSISTER='${persisters[i]}'
                                         printf "\n** Validating build with Redis\n\n"
                                         echo "*** PYTHONPATH=\${PYTHONPATH}"
                                         python3 -m pip install -r requirements.txt --no-cache --user
