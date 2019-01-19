@@ -47,11 +47,31 @@ pipeline {
         }
 
         stage('Build') {
+            def image_name = "${params.imageName}":test-${params.Version}.${env.BUILD_NUMBER}
             steps {
                 echo "Building temporary image"
                 sh """
-                    docker build -t "${params.imageName}":temp-${env.BUILD_NUMBER} -f vendor/docker/Dockerfile .
+                    docker build -t ${image_name} -f vendor/docker/Dockerfile .
                 """
+                    // docker build -t "${params.imageName}":test-${params.Version}.${env.BUILD_NUMBER} -f vendor/docker/Dockerfile .
+            }
+        }
+
+        stage('System Test') {
+            steps {
+                script {
+                    for (int i = 0; i < persisters.size(); i++) {
+                        echo "Validating build: ${engine_names[i]} persister"
+                        echo "---"
+                        docker.image(engines[i]).withRun('--name persist') { container ->
+                            docker.image(${image_name}).inside('--link persist:db') {
+                                sh """
+                                    python3 -m unittest tests
+                                """
+                            }
+                        }
+                    }
+                }
             }
         }
 
