@@ -16,13 +16,14 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    def PERSISTERS=[]
+                    def persisters=[]
                     def sidecars=[]
                     sidecars[0] = 'redis:5.0.3-alpine'
                     sidecars[1] = 'mongo:4.0.5'
-                    PERSISTERS[0] = '{"engine_name": "redis", "parameters": {"host": "db", "port": 6379, "db": 0}}'
-                    PERSISTERS[1] = '{"engine_name": "mongodb", "parameters": {"host": "db", "port": 27017, "db": "cowbull"}}'
-                    for (int i = 0; i < PERSISTERS.length; i++) {
+                    persisters[0] = '{"engine_name": "redis", "parameters": {"host": "db", "port": 6379, "db": 0}}'
+                    persisters[1] = '{"engine_name": "mongodb", "parameters": {"host": "db", "port": 27017, "db": "cowbull"}}'
+                    sh 'echo ${persisters[0]}'
+                    for (int i = 0; i < persisters.length; i++) {
                         docker.image('${sidecars[0]}').withRun('--name db') { container ->
                             docker.image('dsanderscan/jenkins-py3-0.1').inside('--link db:db') {
                                 withEnv(["HOME=${env.WORKSPACE}"]) {
@@ -32,7 +33,7 @@ pipeline {
                                         python3 -m venv env
                                         source ./env/bin/activate 
                                         export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
-                                        export PERSISTER='${PERSISTERS[i]}'
+                                        export PERSISTER='${persisters[i]}'
                                         printf "\n** Validation Loop ${i}\n\n"
                                         echo "*** PYTHONPATH=\${PYTHONPATH}"
                                         python3 -m pip install -r requirements.txt --no-cache --user
