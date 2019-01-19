@@ -1,3 +1,10 @@
+def persisters = [
+    '{"engine_name": "redis", "parameters": {"host": "redis", "port": 6379, "db": 0}}',
+    '{"engine_name": "mongodb", "parameters": {"host": "mongo", "port": 27017, "db": "cowbull"}}'
+]
+def engine_names = ['Redis', 'MongoDB']
+def engines = ['redis:5.0.3-alpine', 'mongo:4.0.5']
+
 pipeline {
     agent any
     environment {
@@ -25,7 +32,7 @@ pipeline {
                                     python3 -m venv env
                                     source ./env/bin/activate 
                                     export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
-                                    export PERSISTER='\${REDIS_PERSISTER}'
+                                    export PERSISTER='{"engine_name": "redis", "parameters": {"host": "redis", "port": 6379, "db": 0}}'
                                     printf "\n** Validating build with Redis\n\n"
                                     echo "*** PYTHONPATH=\${PYTHONPATH}"
                                     python3 -m pip install -r requirements.txt --no-cache --user
@@ -103,8 +110,4 @@ pipeline {
         //     }
         // }
     }
-}
-
-void testFunction(String image = 'redis:5.0.3-alpine') {
-    echo "Tested"
 }
