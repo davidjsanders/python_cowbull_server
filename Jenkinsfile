@@ -66,7 +66,7 @@ pipeline {
                         echo "Validating build: ${engine_names[i]} persister"
                         echo "---"
                         docker.image(engines[i]).withRun('--name persist') { container ->
-                            docker.image(${image_name}).inside('--link persist:db') {
+                            docker.image('${image_name}').inside('--link persist:db') {
                                 sh """
                                     python3 -m unittest tests
                                 """
