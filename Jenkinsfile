@@ -17,11 +17,14 @@ pipeline {
             steps {
                 script {
                     def PERSISTERS=[]
-                    PERSISTERS[0] = '{"engine_name": "redis", "parameters": {"host": "redis", "port": 6379, "db": 0}}'
-                    PERSISTERS[1] = '{"engine_name": "mongodb", "parameters": {"host": "mongo", "port": 27017, "db": "cowbull"}}'
+                    def sidecars=[]
+                    sidecars[0] = 'redis:5.0.3-alpine'
+                    sidecars[1] = 'mongo:4.0.5'
+                    PERSISTERS[0] = '{"engine_name": "redis", "parameters": {"host": "db", "port": 6379, "db": 0}}'
+                    PERSISTERS[1] = '{"engine_name": "mongodb", "parameters": {"host": "db", "port": 27017, "db": "cowbull"}}'
                     for (int i = 0; i < PERSISTERS.length; i++) {
-                        docker.image('redis:5.0.3-alpine').withRun('--name redis') { container ->
-                            docker.image('dsanderscan/jenkins-py3-0.1').inside('--link redis:redis') {
+                        docker.image('${sidecars[0]}').withRun('--name db') { container ->
+                            docker.image('dsanderscan/jenkins-py3-0.1').inside('--link db:db') {
                                 withEnv(["HOME=${env.WORKSPACE}"]) {
                                     checkout scm
                                     sh """
