@@ -50,7 +50,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo "Building temporary image"
-                withEnv(["image_tag=${image_name}"]) {
+                withEnv(["image_tag=${params.imageName}:test-${params.Version}.${env.BUILD_NUMBER}"]) {
                     sh """
                         docker build -t ${image_tag} -f vendor/docker/Dockerfile .
                     """
