@@ -13,72 +13,104 @@ pipeline {
             }
         }
 
-        stage('Test') {
-            steps {
-                script {
-                    def persisters=new String[2]
-                    def sidecars=new String[2]
-                    sidecars[0] = 'redis:5.0.3-alpine'
-                    sidecars[1] = 'mongo:4.0.5'
-                    persisters[0] = '{"engine_name": "redis", "parameters": {"host": "db", "port": 6379, "db": 0}}'
-                    persisters[1] = '{"engine_name": "mongodb", "parameters": {"host": "db", "port": 27017, "db": "cowbull"}}'
-                    for (int i = 0; i < persisters.size; i++) {
-                        docker.image('${sidecars[0]}').withRun('--name db') { container ->
-                            docker.image('dsanderscan/jenkins-py3-0.1').inside('--link db:db') {
-                                withEnv(["HOME=${env.WORKSPACE}"]) {
-                                    checkout scm
-                                    sh """
-                                        #export PATH="\$(pwd)/.local/bin:\$PATH"
-                                        python3 -m venv env
-                                        source ./env/bin/activate 
-                                        export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
-                                        export PERSISTER='${persisters[i]}'
-                                        printf "\n** Validation Loop ${i}\n\n"
-                                        echo "*** PYTHONPATH=\${PYTHONPATH}"
-                                        python3 -m pip install -r requirements.txt --no-cache --user
-                                        python3 -m unittest tests
-                                    """
-                                }
-                            }
+        def persisters=new String[2]
+        def sidecars=new String[2]
+        def tests = new String[2]
+        sidecars[0] = 'redis:5.0.3-alpine'
+        sidecars[1] = 'mongo:4.0.5'
+        tests[0] = 'Redis'
+        tests[1] = 'MongoDB'
+        persisters[0] = '{"engine_name": "redis", "parameters": {"host": "db", "port": 6379, "db": 0}}'
+        persisters[1] = '{"engine_name": "mongodb", "parameters": {"host": "db", "port": 27017, "db": "cowbull"}}'
+        for (int i = 0; i < persisters.size; i++) {
+            stage('Testing ${tests[i]}') {
+                docker.image('${sidecars[0]}').withRun('--name db') { container ->
+                    docker.image('dsanderscan/jenkins-py3-0.1').inside('--link db:db') {
+                        withEnv(["HOME=${env.WORKSPACE}"]) {
+                            checkout scm
+                            sh """
+                                #export PATH="\$(pwd)/.local/bin:\$PATH"
+                                python3 -m venv env
+                                source ./env/bin/activate 
+                                export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
+                                export PERSISTER='${persisters[i]}'
+                                printf "\n** Validation Loop ${i}\n\n"
+                                echo "*** PYTHONPATH=\${PYTHONPATH}"
+                                python3 -m pip install -r requirements.txt --no-cache --user
+                                python3 -m unittest tests
+                            """
                         }
                     }
-                    // docker.image('redis:5.0.3-alpine').withRun('--name redis') { container ->
-                    //     docker.image('dsanderscan/jenkins-py3-0.1').inside('--link redis:redis') {
-                    //         withEnv(["HOME=${env.WORKSPACE}"]) {
-                    //             checkout scm
-                    //             sh """
-                    //                 #export PATH="\$(pwd)/.local/bin:\$PATH"
-                    //                 python3 -m venv env
-                    //                 source ./env/bin/activate 
-                    //                 export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
-                    //                 export PERSISTER='\${REDIS_PERSISTER}'
-                    //                 printf "\n** Validating build with Redis\n\n"
-                    //                 echo "*** PYTHONPATH=\${PYTHONPATH}"
-                    //                 python3 -m pip install -r requirements.txt --no-cache --user
-                    //                 python3 -m unittest tests
-                    //             """
-                    //         }
-                    //     }
-                    // }
-                    // docker.image('mongo:4.0.5').withRun('--name mongo') { container ->
-                    //     docker.image('dsanderscan/jenkins-py3-0.1').inside('--link mongo:mongo') {
-                    //         withEnv(["HOME=${env.WORKSPACE}"]) {
-                    //             checkout scm
-                    //             sh """
-                    //                 python3 -m venv env
-                    //                 source ./env/bin/activate 
-                    //                 export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
-                    //                 export PERSISTER='{"engine_name": "mongodb", "parameters": {"host": "mongo", "port": 27017, "db": "cowbull"}}'
-                    //                 echo "*** PYTHONPATH=\${PYTHONPATH}"
-                    //                 python3 -m pip install -r requirements.txt --no-cache --user
-                    //                 python3 -m unittest tests
-                    //             """
-                    //         }
-                    //     }
-                    // }
                 }
             }
         }
+
+        // stage('Test') {
+        //     steps {
+        //         script {
+        //             def persisters=new String[2]
+        //             def sidecars=new String[2]
+        //             sidecars[0] = 'redis:5.0.3-alpine'
+        //             sidecars[1] = 'mongo:4.0.5'
+        //             persisters[0] = '{"engine_name": "redis", "parameters": {"host": "db", "port": 6379, "db": 0}}'
+        //             persisters[1] = '{"engine_name": "mongodb", "parameters": {"host": "db", "port": 27017, "db": "cowbull"}}'
+        //             for (int i = 0; i < persisters.size; i++) {
+        //                 docker.image('${sidecars[0]}').withRun('--name db') { container ->
+        //                     docker.image('dsanderscan/jenkins-py3-0.1').inside('--link db:db') {
+        //                         withEnv(["HOME=${env.WORKSPACE}"]) {
+        //                             checkout scm
+        //                             sh """
+        //                                 #export PATH="\$(pwd)/.local/bin:\$PATH"
+        //                                 python3 -m venv env
+        //                                 source ./env/bin/activate 
+        //                                 export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
+        //                                 export PERSISTER='${persisters[i]}'
+        //                                 printf "\n** Validation Loop ${i}\n\n"
+        //                                 echo "*** PYTHONPATH=\${PYTHONPATH}"
+        //                                 python3 -m pip install -r requirements.txt --no-cache --user
+        //                                 python3 -m unittest tests
+        //                             """
+        //                         }
+        //                     }
+        //                 }
+        //             }
+        //             // docker.image('redis:5.0.3-alpine').withRun('--name redis') { container ->
+        //             //     docker.image('dsanderscan/jenkins-py3-0.1').inside('--link redis:redis') {
+        //             //         withEnv(["HOME=${env.WORKSPACE}"]) {
+        //             //             checkout scm
+        //             //             sh """
+        //             //                 #export PATH="\$(pwd)/.local/bin:\$PATH"
+        //             //                 python3 -m venv env
+        //             //                 source ./env/bin/activate 
+        //             //                 export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
+        //             //                 export PERSISTER='\${REDIS_PERSISTER}'
+        //             //                 printf "\n** Validating build with Redis\n\n"
+        //             //                 echo "*** PYTHONPATH=\${PYTHONPATH}"
+        //             //                 python3 -m pip install -r requirements.txt --no-cache --user
+        //             //                 python3 -m unittest tests
+        //             //             """
+        //             //         }
+        //             //     }
+        //             // }
+        //             // docker.image('mongo:4.0.5').withRun('--name mongo') { container ->
+        //             //     docker.image('dsanderscan/jenkins-py3-0.1').inside('--link mongo:mongo') {
+        //             //         withEnv(["HOME=${env.WORKSPACE}"]) {
+        //             //             checkout scm
+        //             //             sh """
+        //             //                 python3 -m venv env
+        //             //                 source ./env/bin/activate 
+        //             //                 export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
+        //             //                 export PERSISTER='{"engine_name": "mongodb", "parameters": {"host": "mongo", "port": 27017, "db": "cowbull"}}'
+        //             //                 echo "*** PYTHONPATH=\${PYTHONPATH}"
+        //             //                 python3 -m pip install -r requirements.txt --no-cache --user
+        //             //                 python3 -m unittest tests
+        //             //             """
+        //             //         }
+        //             //     }
+        //             // }
+        //         }
+        //     }
+        // }
 
         stage('Build') {
             steps {
