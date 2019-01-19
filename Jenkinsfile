@@ -35,9 +35,7 @@ pipeline {
                                         source ./env/bin/activate 
                                         export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
                                         export PERSISTER='${persisters[i]}'
-                                        printf "\n** Validating build with Redis\n\n"
-                                        echo "*** PYTHONPATH=\${PYTHONPATH}"
-                                        python3 -m pip install -r requirements.txt --no-cache --user
+                                        python3 -m pip install --quiet -r requirements.txt --no-cache --user
                                         python3 -m unittest tests
                                     """
                                 }
