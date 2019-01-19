@@ -16,6 +16,7 @@ pipeline {
         stage('Test') {
             steps {
                 script {
+                    def PERSISTERS=[]
                     docker.image('redis:5.0.3-alpine').withRun('--name redis') { container ->
                         docker.image('dsanderscan/jenkins-py3-0.1').inside('--link redis:redis') {
                             withEnv(["HOME=${env.WORKSPACE}"]) {
