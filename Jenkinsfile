@@ -4,6 +4,7 @@ def persisters = [
 ]
 def engine_names = ['Redis', 'MongoDB']
 def engines = ['redis:5.0.3-alpine', 'mongo:4.0.5']
+def image_name = '${params.imageName}:test-${params.Version}.${env.BUILD_NUMBER}'
 
 pipeline {
     agent any
@@ -47,7 +48,6 @@ pipeline {
         }
 
         stage('Build') {
-            def image_name = '${params.imageName}:test-${params.Version}.${env.BUILD_NUMBER}'
             steps {
                 echo "Building temporary image"
                 sh """
