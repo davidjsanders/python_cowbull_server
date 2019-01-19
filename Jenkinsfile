@@ -24,12 +24,12 @@ pipeline {
             steps {
                 script {
                     for (int i = 0; i < persisters.size(); i++) {
+                        echo "Validating build: ${engine_names[i]} persister"
+                        echo "---"
                         docker.image(engines[i]).withRun('--name persist') { container ->
                             docker.image('dsanderscan/jenkins-py3-0.1').inside('--link persist:db') {
                                 withEnv(["HOME=${env.WORKSPACE}"]) {
                                     checkout scm
-                                    echo "Validating build with ${engine_names[i]} persister"
-                                    echo "---"
                                     sh """
                                         python3 -m venv env
                                         source ./env/bin/activate 
@@ -50,9 +50,9 @@ pipeline {
 
         stage('Build') {
             steps {
+                echo "Building temporary image"
                 sh """
-                    echo "Testing"
-#                    docker build -t not_sustainable_image -f vendor/docker/Dockerfile .
+                    docker build -t "${params.imageName}":temp-${env.BUILD_NUMBER} -f vendor/docker/Dockerfile .
                 """
             }
         }
