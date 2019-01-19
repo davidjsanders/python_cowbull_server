@@ -47,7 +47,7 @@ pipeline {
         }
 
         stage('Build') {
-            def image_name = "${params.imageName}":test-${params.Version}.${env.BUILD_NUMBER}
+            def image_name = '${params.imageName}:test-${params.Version}.${env.BUILD_NUMBER}'
             steps {
                 echo "Building temporary image"
                 sh """
