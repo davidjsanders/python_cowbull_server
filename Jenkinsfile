@@ -51,7 +51,7 @@ pipeline {
             steps {
                 echo "Building temporary image"
                 sh """
-                    docker build -t ${image_name} -f vendor/docker/Dockerfile .
+                    docker build -t "${image_name}" -f vendor/docker/Dockerfile .
                 """
                     // docker build -t "${params.imageName}":test-${params.Version}.${env.BUILD_NUMBER} -f vendor/docker/Dockerfile .
             }
