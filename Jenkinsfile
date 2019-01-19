@@ -1,9 +1,9 @@
-persisters = [
+def persisters = [
     '{"engine_name": "redis", "parameters": {"host": "redis", "port": 6379, "db": 0}}',
     '{"engine_name": "mongodb", "parameters": {"host": "mongo", "port": 27017, "db": "cowbull"}}'
 ]
-engine_names = ['Redis', 'MongoDB']
-engines = ['redis:5.0.3-alpine', 'mongo:4.0.5']
+def engine_names = ['Redis', 'MongoDB']
+def engines = ['redis:5.0.3-alpine', 'mongo:4.0.5']
 
 pipeline {
     agent any
