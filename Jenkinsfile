@@ -16,8 +16,8 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    def persisters=[]
-                    def sidecars=[]
+                    def persisters=new String[2]
+                    def sidecars=new String[2]
                     sidecars[0] = 'redis:5.0.3-alpine'
                     sidecars[1] = 'mongo:4.0.5'
                     persisters[0] = '{"engine_name": "redis", "parameters": {"host": "db", "port": 6379, "db": 0}}'
