@@ -60,25 +60,25 @@ pipeline {
             }
         }
 
-        stage('System Test') {
-            steps {
-                script {
-                    for (int i = 0; i < persisters.size(); i++) {
-                        echo "Validating Docker image with the ${engine_names[i]} persister"
-                        echo "---"
-                        docker.image(engines[i]).withRun('--name persist') { container ->
-                            withEnv(["image_tag='${params.imageName}:test-${params.Version}.${env.BUILD_NUMBER}'"]) {
-                                docker.image('${image_tag}').inside('--link persist:db') {
-                                    sh """
-                                        python3 -m unittest tests
-                                    """
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        // stage('System Test') {
+        //     steps {
+        //         script {
+        //             for (int i = 0; i < persisters.size(); i++) {
+        //                 echo "Validating Docker image with the ${engine_names[i]} persister"
+        //                 echo "---"
+        //                 docker.image(engines[i]).withRun('--name persist') { container ->
+        //                     withEnv(["image_tag='${params.imageName}:test-${params.Version}.${env.BUILD_NUMBER}'"]) {
+        //                         docker.image('${image_tag}').inside('--link persist:db') {
+        //                             sh """
+        //                                 python3 -m unittest tests
+        //                             """
+        //                         }
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
         // stage{'SysTest'} {
         //     docker.image('redis:5.0.3-alpine').withRun('--name redis') { container ->
