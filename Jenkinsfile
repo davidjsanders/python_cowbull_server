@@ -57,7 +57,7 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    withEnv(["image_tag=${image_name}") {
+                    withEnv(["image_tag=${image_name}"]) {
                         sh """
                             docker build -t ${image_tag} -f vendor/docker/Dockerfile .
                         """
