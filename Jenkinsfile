@@ -2,9 +2,14 @@ def persisters = [
     '{"engine_name": "redis", "parameters": {"host": "db", "port": 6379, "db": 0}}',
     '{"engine_name": "mongodb", "parameters": {"host": "db", "port": 27017, "db": "cowbull"}}'
 ]
+
+def test_engines = [
+    readJSON text: '{"persister":"redis", "image":"redis:5.0.3-alpine"}',
+    readJSON text: '{"persister":"mongodb", "image":"mongo:4.0.5"}'
+]
+
 def engine_names = ['Redis', 'MongoDB']
 def engines = ['redis:5.0.3-alpine', 'mongo:4.0.5']
-def test_variable = readJSON text: '{"persister":"redis", "foo":"bar"}'
 def image_name = '${params.imageName}:test-${params.Version}.${env.BUILD_NUMBER}'
 
 pipeline {
