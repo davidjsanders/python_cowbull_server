@@ -10,6 +10,8 @@ def test_engines = [
     engine2
 ]
 
+def python_engine='dsanderscan/jenkins-py:3-0.1'
+
 def image_name = '${params.imageName}:test-${params.Version}.${env.BUILD_NUMBER}'
 
 pipeline {
@@ -32,7 +34,7 @@ pipeline {
                 script {
                     for (int i = 0; i < persisters.size(); i++) {
                         docker.image(test_engines[i]['image']).withRun("--name ${test_engines[i]['name']}") { container ->
-                            docker.image('dsanderscan/jenkins-py3-0.1').inside("--link ${test_engines[i]['name']}:db") {
+                            docker.image(python_engine).inside("--link ${test_engines[i]['name']}:db") {
                                 withEnv(["HOME=${env.WORKSPACE}"]) {
                                     // checkout scm
                                     sh """
@@ -54,11 +56,12 @@ pipeline {
         stage('Build') {
             steps {
                 echo "Building temporary image"
-                withEnv(["image_tag='${params.imageName}:test-${params.Version}.${env.BUILD_NUMBER}'"]) {
-                    sh """
-                        docker build -t ${image_tag} -f vendor/docker/Dockerfile .
-                    """
-                }
+                def customImage = docker.build(image_name)
+                // withEnv(["image_tag='${params.imageName}:test-${params.Version}.${env.BUILD_NUMBER}'"]) {
+                //     sh """
+                //         docker build -t ${image_tag} -f vendor/docker/Dockerfile .
+                //     """
+                // }
                     // docker build -t "${params.imageName}":test-${params.Version}.${env.BUILD_NUMBER} -f vendor/docker/Dockerfile .
             }
         }
