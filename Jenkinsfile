@@ -35,8 +35,9 @@ pipeline {
                         echo "Engine Image -> ${test_engines[i]['image']}"
                         echo "Name command -> --name ${test_engines[i]['name']}"
                         def with_run_command = "--name ${test_engines[i]['name']}"
-                        docker.image(test_engines[i]['image']).withRun('--name '${test_engines[i]['name']}) { container ->
-                            docker.image('dsanderscan/jenkins-py3-0.1').inside('--name '${test_engines[i]['name']}':db') {
+                        // def with_run_inner = 
+                        docker.image(test_engines[i]['image']).withRun(with_run_command) { container ->
+                            docker.image('dsanderscan/jenkins-py3-0.1').inside("--link ${test_engines[i]['name']}:db") {
                                 withEnv(["HOME=${env.WORKSPACE}"]) {
                                     checkout scm
                                     sh """
