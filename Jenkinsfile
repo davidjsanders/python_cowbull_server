@@ -12,7 +12,7 @@ def test_engines = [
 
 def python_engine='dsanderscan/jenkins-py:3-0.1'
 
-def image_name = '${params.imageName}:test-${params.Version}.${env.BUILD_NUMBER}'
+def image_name = ''
 
 pipeline {
     agent any
@@ -26,6 +26,7 @@ pipeline {
             steps {
                 /* Let's make sure we have the repository cloned to our workspace */
                 checkout scm
+                image_name = "${params.imageName}:test-${params.Version}.${env.BUILD_NUMBER}"
             }
         }
 
@@ -56,19 +57,19 @@ pipeline {
         stage('Build') {
             steps {
                 script {
+                    withEnv(["image_tag=${image_name}") {
+                        sh """
+                            docker build -t ${image_tag} -f vendor/docker/Dockerfile .
+                        """
+                    }
                     // "--name ${test_engines[i]['name']}"
-                    echo "Image Name: ${params.imageName}"
-                    echo "Version:    ${params.Version}"
-                    echo "Build:      ${env.BUILD_NUMBER}"
-                    def image_tag = "${params.imageName}:test-${params.Version}.${env.BUILD_NUMBER}"
-                    echo "Building temporary image ${image_tag}"
-                    def customImage = docker.build(image_tag, "-f ./vendor/docker/Dockerfile .")
+                    // echo "Image Name: ${params.imageName}"
+                    // echo "Version:    ${params.Version}"
+                    // echo "Build:      ${env.BUILD_NUMBER}"
+                    // def image_tag = "${params.imageName}:test-${params.Version}.${env.BUILD_NUMBER}"
+                    // echo "Building temporary image ${image_tag}"
+                    // def customImage = docker.build(image_tag, "-f ./vendor/docker/Dockerfile .")
                 }
-                // withEnv(["image_tag='${params.imageName}:test-${params.Version}.${env.BUILD_NUMBER}'"]) {
-                //     sh """
-                //         docker build -t ${image_tag} -f vendor/docker/Dockerfile .
-                //     """
-                // }
                     // docker build -t "${params.imageName}":test-${params.Version}.${env.BUILD_NUMBER} -f vendor/docker/Dockerfile .
             }
         }
