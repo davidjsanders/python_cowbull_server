@@ -3,15 +3,13 @@ def persisters = [
     '{"engine_name": "mongodb", "parameters": {"host": "db", "port": 27017, "db": "cowbull"}}'
 ]
 
-def xengine1 = readJSON text: '{"persister":"redis", "image":"redis:5.0.3-alpine"}'
-def engine2 = readJSON text: '{"persister":"mongodb", "image":"mongo:4.0.5"}'
+def engine1 = readJSON text: '{"persister":"redis", "image":"redis:5.0.3-alpine", "name":"redis"}'
+def engine2 = readJSON text: '{"persister":"mongodb", "image":"mongo:4.0.5", "name":"mongo"}'
 def test_engines = [
-    def engine1 = readJSON text: '{"persister":"redis", "image":"redis:5.0.3-alpine"}',
+    engine1,
     engine2
 ]
 
-def engine_names = ['Redis', 'MongoDB']
-def engines = ['redis:5.0.3-alpine', 'mongo:4.0.5']
 def image_name = '${params.imageName}:test-${params.Version}.${env.BUILD_NUMBER}'
 
 pipeline {
@@ -35,10 +33,8 @@ pipeline {
                     for (int i = 0; i < persisters.size(); i++) {
                         echo "Engine       -> ${test_engines[i]['persister']}"
                         echo "Engine Image -> ${test_engines[i]['image']}"
-                        echo "Conducting unit tests with ${engine_names[i]} persister"
-                        echo "---"
-                        docker.image(engines[i]).withRun('--name persist') { container ->
-                            docker.image('dsanderscan/jenkins-py3-0.1').inside('--link persist:db') {
+                        docker.image(test_engines[i]['image']).withRun('--name ${test_engines[i]["name"]}') { container ->
+                            docker.image('dsanderscan/jenkins-py3-0.1').inside('--link ${test_engines[i]["name"]:db') {
                                 withEnv(["HOME=${env.WORKSPACE}"]) {
                                     checkout scm
                                     sh """
