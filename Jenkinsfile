@@ -4,7 +4,7 @@ def persisters = [
 ]
 def engine_names = ['Redis', 'MongoDB']
 def engines = ['redis:5.0.3-alpine', 'mongo:4.0.5']
-def test_variable = readJson text: '{"persister":"redis", "foo":"bar"}'
+def test_variable = readJSON text: '{"persister":"redis", "foo":"bar"}'
 def image_name = '${params.imageName}:test-${params.Version}.${env.BUILD_NUMBER}'
 
 pipeline {
