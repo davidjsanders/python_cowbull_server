@@ -25,7 +25,7 @@ pipeline {
             steps {
                 script {
                     for (int i = 0; i < persisters.size(); i++) {
-                        echo "Validating build: ${engine_names[i]} persister"
+                        echo "Conducting unit tests with ${engine_names[i]} persister"
                         echo "---"
                         docker.image(engines[i]).withRun('--name persist') { container ->
                             docker.image('dsanderscan/jenkins-py3-0.1').inside('--link persist:db') {
@@ -63,7 +63,7 @@ pipeline {
             steps {
                 script {
                     for (int i = 0; i < persisters.size(); i++) {
-                        echo "Validating build: ${engine_names[i]} persister"
+                        echo "Validating Docker image with the ${engine_names[i]} persister"
                         echo "---"
                         docker.image(engines[i]).withRun('--name persist') { container ->
                             withEnv(["image_tag='${params.imageName}:test-${params.Version}.${env.BUILD_NUMBER}'"]) {
