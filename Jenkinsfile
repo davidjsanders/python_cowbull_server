@@ -33,6 +33,8 @@ pipeline {
             steps {
                 script {
                     for (int i = 0; i < persisters.size(); i++) {
+                        echo "Engine       -> ${test_engines[i]['persister']}"
+                        echo "Engine Image -> ${test_engines[i]['image']}"
                         echo "Conducting unit tests with ${engine_names[i]} persister"
                         echo "---"
                         docker.image(engines[i]).withRun('--name persist') { container ->
