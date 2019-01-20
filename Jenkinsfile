@@ -22,10 +22,10 @@ pipeline {
     }
 
     stages {
-        stage('Clone') {
+        stage('Setup') {
             steps {
-                /* Let's make sure we have the repository cloned to our workspace */
-                checkout scm
+                // /* Let's make sure we have the repository cloned to our workspace */
+                // checkout scm
                 script {
                     image_name = "${params.imageName}:test-${params.Version}.${env.BUILD_NUMBER}"
                 }
