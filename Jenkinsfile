@@ -26,7 +26,9 @@ pipeline {
             steps {
                 /* Let's make sure we have the repository cloned to our workspace */
                 checkout scm
-                image_name = "${params.imageName}:test-${params.Version}.${env.BUILD_NUMBER}"
+                script {
+                    image_name = "${params.imageName}:test-${params.Version}.${env.BUILD_NUMBER}"
+                }
             }
         }
 
