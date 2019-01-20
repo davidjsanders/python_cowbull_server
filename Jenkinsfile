@@ -3,10 +3,10 @@ def persisters = [
     '{"engine_name": "mongodb", "parameters": {"host": "db", "port": 27017, "db": "cowbull"}}'
 ]
 
-def engine1 = readJSON text: '{"persister":"redis", "image":"redis:5.0.3-alpine"}'
+def xengine1 = readJSON text: '{"persister":"redis", "image":"redis:5.0.3-alpine"}'
 def engine2 = readJSON text: '{"persister":"mongodb", "image":"mongo:4.0.5"}'
 def test_engines = [
-    engine1,
+    def engine1 = readJSON text: '{"persister":"redis", "image":"redis:5.0.3-alpine"}',
     engine2
 ]
 
