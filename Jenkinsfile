@@ -64,15 +64,27 @@ pipeline {
                             docker build -t ${image_tag} -f vendor/docker/Dockerfile .
                         """
                     }
-                    // "--name ${test_engines[i]['name']}"
-                    // echo "Image Name: ${params.imageName}"
-                    // echo "Version:    ${params.Version}"
-                    // echo "Build:      ${env.BUILD_NUMBER}"
-                    // def image_tag = "${params.imageName}:test-${params.Version}.${env.BUILD_NUMBER}"
-                    // echo "Building temporary image ${image_tag}"
-                    // def customImage = docker.build(image_tag, "-f ./vendor/docker/Dockerfile .")
                 }
-                    // docker build -t "${params.imageName}":test-${params.Version}.${env.BUILD_NUMBER} -f vendor/docker/Dockerfile .
+            }
+        }
+
+        stage('System Test') {
+            steps {
+                script {
+                    for (int i = 0; i < persisters.size(); i++) {
+                        docker.image(test_engines[i]['image']).withRun("--name ${test_engines[i]['name']}") { container ->
+                            docker.image(image_name).inside("--link ${test_engines[i]['name']}:db") {
+                                withEnv(["HOME=${env.WORKSPACE}"]) {
+                                    // checkout scm
+                                    sh """
+                                        export PERSISTER='${persisters[i]}'
+                                        python3 -m unittest tests
+                                    """
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
