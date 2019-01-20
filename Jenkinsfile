@@ -55,9 +55,9 @@ pipeline {
 
         stage('Build') {
             steps {
-                echo "Building temporary image"
+                echo "Building temporary image ${image_name}"
                 script {
-                    def customImage = docker.build(image_name)
+                    def customImage = docker.build('${image_name}')
                 }
                 // withEnv(["image_tag='${params.imageName}:test-${params.Version}.${env.BUILD_NUMBER}'"]) {
                 //     sh """
