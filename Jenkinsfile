@@ -79,6 +79,11 @@ pipeline {
                 script {
                     withEnv(["PERSISTER=${systest_persister.toString()}"]) {
                         echo "Persister is ${PERSISTER}"
+                        docker.image(image_name).inside() {
+                            sh """
+                                python3 -m unittest tests
+                            """
+                        }
                     }
                     // for (int i = 0; i < persisters.size(); i++) {
                     //     docker.image(test_engines[i]['image']).withRun("--name ${test_engines[i]['name']}") { container ->
