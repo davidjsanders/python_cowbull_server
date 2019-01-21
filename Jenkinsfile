@@ -1,3 +1,4 @@
+import groovy.json.JsonOutput
 def persisters = [
     '{"engine_name": "redis", "parameters": {"host": "db", "port": 6379, "db": 0}}',
     '{"engine_name": "mongodb", "parameters": {"host": "db", "port": 27017, "db": "cowbull"}}'
@@ -77,19 +78,22 @@ pipeline {
         stage('System Test') {
             steps {
                 script {
-                    for (int i = 0; i < persisters.size(); i++) {
-                        docker.image(test_engines[i]['image']).withRun("--name ${test_engines[i]['name']}") { container ->
-                            docker.image(image_name).inside("--link ${test_engines[i]['name']}:db") {
-                                withEnv(["HOME=${env.WORKSPACE}"]) {
-                                    // checkout scm
-                                    sh """
-                                        export PERSISTER='${persisters[i]}'
-                                        python3 -m unittest tests
-                                    """
-                                }
-                            }
-                        }
+                    withEnv(["PERSISTER=${systest_persister.toString()}"]) {
+                        echo "Persister is ${PERSISTER}"
                     }
+                    // for (int i = 0; i < persisters.size(); i++) {
+                    //     docker.image(test_engines[i]['image']).withRun("--name ${test_engines[i]['name']}") { container ->
+                    //         docker.image(image_name).inside("--link ${test_engines[i]['name']}:db") {
+                    //             withEnv(["HOME=${env.WORKSPACE}"]) {
+                    //                 // checkout scm
+                    //                 sh """
+                    //                     export PERSISTER='${persisters[i]}'
+                    //                     python3 -m unittest tests
+                    //                 """
+                    //             }
+                    //         }
+                    //     }
+                    // }
                 }
             }
         }
