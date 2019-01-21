@@ -27,7 +27,7 @@ pipeline {
                 script {
                     systest_persister['parameters']['host'] = params.RedisHost.toString()
                     systest_persister.parameters.port = params.RedisPort.toString()
-                    image_name = "${params.imageName}:build-${major}.${minor}"
+                    image_name = "${params.imageName}:build-${major}.${minor}.{env.BUILD_NUMBER}"
                     logging_level = params.LoggingLevel
                     echo "Pulling required sidecars"
                     for (int i = 0; i < persisters.size(); i++) {
