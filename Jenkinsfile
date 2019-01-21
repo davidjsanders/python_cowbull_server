@@ -109,7 +109,7 @@ pipeline {
                 ]) {
                     sh """
                     docker login -u "${USERNAME}" -p "${PASSWORD}"
-                    docker tag "${image_name}" "${params.imageName}":"${params.Version}"."${env.BUILD_NUMBER}"
+                    docker tag "${image_name}" "${params.imageName}":"${major}"."${minor}"."${env.BUILD_NUMBER}"
                     docker push "${params.imageName}":"${params.Version}"."${env.BUILD_NUMBER}"
                     docker rmi "${image_name}"
                     """
