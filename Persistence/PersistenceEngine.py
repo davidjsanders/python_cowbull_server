@@ -40,7 +40,7 @@ class PersistenceEngine(object):
 
         # Step 2 - get the persisters and choose the right one
         self.handler.log(message="Building persisters and validators")
-        persisters = [filefound[:-3] for filefound in listdir(extension_path) if filefound.endswith(".py")]
+        persisters = [filefound[:-3].lower() for filefound in listdir(extension_path) if filefound.endswith(".py")]
         validators = [filefound.lower() for filefound in persisters]
         self.handler.log(message="Persisters: {}".format(persisters))
         self.handler.log(message="Validators: {}".format(validators))
