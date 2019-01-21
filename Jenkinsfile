@@ -25,8 +25,14 @@ pipeline {
                 script {
                     systest_persister['parameters']['host'] = params.RedisHost.toString()
                     systest_persister.parameters.port = params.RedisPort.toString()
-                    image_name = "${params.imageName}:test-${params.Version}.${env.BUILD_NUMBER}"
+                    image_name = "${params.imageName}:build-${params.Version}.${env.BUILD_NUMBER}"
                     logging_level = params.LoggingLevel
+                    for (int i = 0; i < persisters.size(); i++) {
+                        echo "Pulling test engine ${test_engines[i]['name']}: ${test_engines[i]['image']}"
+                        sh """
+                            docker pull ${test_engines[i]['image']}
+                        """
+                    }
                 }
             }
         }
