@@ -27,8 +27,9 @@ pipeline {
                     systest_persister.parameters.port = params.RedisPort.toString()
                     image_name = "${params.imageName}:build-${params.Version}.${env.BUILD_NUMBER}"
                     logging_level = params.LoggingLevel
+                    echo "Pulling required sidecars"
                     for (int i = 0; i < persisters.size(); i++) {
-                        echo "Pulling test engine ${test_engines[i]['name']}: ${test_engines[i]['image']}"
+                        echo "Pulling test sidecar ${test_engines[i]['name']}: ${test_engines[i]['image']}"
                         sh """
                             docker pull ${test_engines[i]['image']}
                         """
