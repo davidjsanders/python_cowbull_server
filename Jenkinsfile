@@ -13,6 +13,7 @@ def test_engines = [
 def python_engine='dsanderscan/jenkins-py:3-0.1'
 
 def image_name = ''
+def systest_persister = ''
 
 pipeline {
     agent any
@@ -27,7 +28,10 @@ pipeline {
                 // /* Let's make sure we have the repository cloned to our workspace */
                 // checkout scm
                 script {
+                    systest_persister = '{"engine_name": "SecureRedis", "parameters": {"host": ${params.RedisHost}, "port": ${params.RedisPort}, "db": 0}}'
                     image_name = "${params.imageName}:test-${params.Version}.${env.BUILD_NUMBER}"
+                    echo "Set image_name        -> ${image_name}"
+                    echo "Set systest_persister -> ${systest_persister}"
                 }
             }
         }
@@ -36,6 +40,7 @@ pipeline {
             steps {
                 script {
                     for (int i = 0; i < persisters.size(); i++) {
+                        echo "Testing ${test_engines[i]['image']}"
                         docker.image(test_engines[i]['image']).withRun("--name ${test_engines[i]['name']}") { container ->
                             docker.image(python_engine).inside("--link ${test_engines[i]['name']}:db") {
                                 withEnv(["HOME=${env.WORKSPACE}"]) {
@@ -88,51 +93,15 @@ pipeline {
             }
         }
 
-        // stage('System Test') {
-        //     steps {
-        //         script {
-        //             for (int i = 0; i < persisters.size(); i++) {
-        //                 echo "Validating Docker image with the ${engine_names[i]} persister"
-        //                 echo "---"
-        //                 docker.image(engines[i]).withRun('--name persist') { container ->
-        //                     withEnv(["image_tag='${params.imageName}:test-${params.Version}.${env.BUILD_NUMBER}'"]) {
-        //                         docker.image('${image_tag}').inside('--link persist:db') {
-        //                             sh """
-        //                                 python3 -m unittest tests
-        //                             """
-        //                         }
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Security Scan') {
+            steps {
+                echo "Starting security scan"
+            }
+        }
 
-        // stage{'SysTest'} {
-        //     docker.image('redis:5.0.3-alpine').withRun('--name redis') { container ->
-        //         docker.image('not_sustainable_image').inside('--link redis:redis') {
-        //             sh """
-        //                 python3 -m unittest tests
-        //             """
-        //         }
-        //     }
-        // }
-
-        // stage('Validate') {
-        //     steps {
-        //         docker.image('redis:5.0.3-alpine').withRun('--name redis') { c ->
-        //             docker.image('not_sustainable_image').inside('--link redis:redis') {
-        //                 sh """
-        //                     export PERSISTER='{"engine_name": "redis", "parameters": {"host": "redis", "port": 6379, "db": 0}}'
-        //                     python3 -m unittest tests
-        //                 """
-        //             }
-        //         }
-        //     }
-        // }
-
-        // stage('Push') {
-        //     steps {
+        stage('Push') {
+            steps {
+                echo "Pushing ${image_name}"
         //         withCredentials([
         //             [$class: 'UsernamePasswordMultiBinding', 
         //             credentialsId: 'dockerhub',
@@ -145,7 +114,7 @@ pipeline {
         //             docker push "${params.imageName}":"${params.Environment}"-"${params.Version}"."${env.BUILD_NUMBER}"
         //             """
         //         }
-        //     }
-        // }
+            }
+        }
     }
 }
