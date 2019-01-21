@@ -1,4 +1,3 @@
-import groovy.json.JsonOutput
 def persisters = [
     '{"engine_name": "redis", "parameters": {"host": "db", "port": 6379, "db": 0}}',
     '{"engine_name": "mongodb", "parameters": {"host": "db", "port": 27017, "db": "cowbull"}}'
