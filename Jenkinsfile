@@ -15,6 +15,8 @@ def python_engine='dsanderscan/jenkins-py:3-0.1'
 
 def image_name = ''
 def logging_level = ''
+def major = '1'
+def minor = '2'
 
 pipeline {
     agent any
@@ -25,7 +27,7 @@ pipeline {
                 script {
                     systest_persister['parameters']['host'] = params.RedisHost.toString()
                     systest_persister.parameters.port = params.RedisPort.toString()
-                    image_name = "${params.imageName}:build-${params.Version}.${env.BUILD_NUMBER}"
+                    image_name = "${params.imageName}:build-${major}.${minor}"
                     logging_level = params.LoggingLevel
                     echo "Pulling required sidecars"
                     for (int i = 0; i < persisters.size(); i++) {
