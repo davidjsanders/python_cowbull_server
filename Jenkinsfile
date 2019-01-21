@@ -14,6 +14,7 @@ def test_engines = [
 def python_engine='dsanderscan/jenkins-py:3-0.1'
 
 def image_name = ''
+def logging_level = ''
 
 pipeline {
     agent any
@@ -31,6 +32,7 @@ pipeline {
                     systest_persister['parameters']['host'] = params.RedisHost.toString()
                     systest_persister.parameters.port = params.RedisPort.toString()
                     image_name = "${params.imageName}:test-${params.Version}.${env.BUILD_NUMBER}"
+                    logging_level = params.LoggingLevel
                     echo "Set image_name        -> ${image_name}"
                     echo "Set systest_persister -> ${systest_persister}"
                 }
@@ -44,7 +46,7 @@ pipeline {
                         echo "Testing ${test_engines[i]['image']}"
                         docker.image(test_engines[i]['image']).withRun("--name ${test_engines[i]['name']}") { container ->
                             docker.image(python_engine).inside("--link ${test_engines[i]['name']}:db") {
-                                withEnv(["HOME=${env.WORKSPACE}"]) {
+                                withEnv(["HOME=${env.WORKSPACE}","LOGGING_LEVEL=${logging_level}"]) {
                                     // checkout scm
                                     sh """
                                         python3 -m venv env
@@ -77,11 +79,10 @@ pipeline {
         stage('System Test') {
             steps {
                 script {
-                    withEnv(["PERSISTER=${systest_persister.toString()}"]) {
+                    withEnv(["PERSISTER=${systest_persister.toString()}","LOGGING_LEVEL=${logging_level}"]]) {
                         echo "Persister is ${PERSISTER}"
                         docker.image(image_name).inside() {
                             sh """
-                                export LOGGING_LEVEL=10
                                 python3 -m unittest tests
                             """
                         }
