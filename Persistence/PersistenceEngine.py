@@ -40,14 +40,14 @@ class PersistenceEngine(object):
 
         # Step 2 - get the persisters and choose the right one
         self.handler.log(message="Building persisters and validators")
-        persisters = [filefound[:-3].lower() for filefound in listdir(extension_path) if filefound.endswith(".py")]
+        persisters = [filefound[:-3] for filefound in listdir(extension_path) if filefound.endswith(".py")]
         validators = [filefound.lower() for filefound in persisters]
         self.handler.log(message="Persisters: {}".format(persisters))
         self.handler.log(message="Validators: {}".format(validators))
 
         try:
             self.handler.log(message="Set persister")
-            self._engine_name = persisters[validators.index(self._engine_name)]
+            self._engine_name = persisters[validators.index(self._engine_name.lower())]
 
             self.handler.log(message="Importing Persister from {}".format(self._engine_name))
             self._persister = importlib.import_module(self._engine_name)
