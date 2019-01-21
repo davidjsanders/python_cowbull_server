@@ -18,23 +18,15 @@ def logging_level = ''
 
 pipeline {
     agent any
-    environment {
-        REDIS_PERSISTER='{"engine_name": "redis", "parameters": {"host": "redis", "port": 6379, "db": 0}}'
-        MONGO_PERSISTER='{"engine_name": "mongodb", "parameters": {"host": "mongo", "port": 27017, "db": "cowbull"}}'
-    }
 
     stages {
         stage('Setup') {
             steps {
-                // /* Let's make sure we have the repository cloned to our workspace */
-                // checkout scm
                 script {
                     systest_persister['parameters']['host'] = params.RedisHost.toString()
                     systest_persister.parameters.port = params.RedisPort.toString()
                     image_name = "${params.imageName}:test-${params.Version}.${env.BUILD_NUMBER}"
                     logging_level = params.LoggingLevel
-                    echo "Set image_name        -> ${image_name}"
-                    echo "Set systest_persister -> ${systest_persister}"
                 }
             }
         }
@@ -43,7 +35,7 @@ pipeline {
             steps {
                 script {
                     for (int i = 0; i < persisters.size(); i++) {
-                        echo "Testing ${test_engines[i]['image']}"
+                        echo "Testing with image: ${test_engines[i]['name']}"
                         docker.image(test_engines[i]['image']).withRun("--name ${test_engines[i]['name']}") { container ->
                             docker.image(python_engine).inside("--link ${test_engines[i]['name']}:db") {
                                 withEnv(["HOME=${env.WORKSPACE}","LOGGING_LEVEL=${logging_level}"]) {
@@ -67,6 +59,7 @@ pipeline {
         stage('Build') {
             steps {
                 script {
+                    echo "Building image ${image_name}"
                     withEnv(["image_tag=${image_name}"]) {
                         sh """
                             docker build -t ${image_tag} -f vendor/docker/Dockerfile .
@@ -80,26 +73,12 @@ pipeline {
             steps {
                 script {
                     withEnv(["PERSISTER=${systest_persister.toString()}","LOGGING_LEVEL=${logging_level}"]) {
-                        echo "Persister is ${PERSISTER}"
                         docker.image(image_name).inside() {
                             sh """
                                 python3 -m unittest tests
                             """
                         }
                     }
-                    // for (int i = 0; i < persisters.size(); i++) {
-                    //     docker.image(test_engines[i]['image']).withRun("--name ${test_engines[i]['name']}") { container ->
-                    //         docker.image(image_name).inside("--link ${test_engines[i]['name']}:db") {
-                    //             withEnv(["HOME=${env.WORKSPACE}"]) {
-                    //                 // checkout scm
-                    //                 sh """
-                    //                     export PERSISTER='${persisters[i]}'
-                    //                     python3 -m unittest tests
-                    //                 """
-                    //             }
-                    //         }
-                    //     }
-                    // }
                 }
             }
         }
@@ -113,18 +92,18 @@ pipeline {
         stage('Push') {
             steps {
                 echo "Pushing ${image_name}"
-        //         withCredentials([
-        //             [$class: 'UsernamePasswordMultiBinding', 
-        //             credentialsId: 'dockerhub',
-        //             usernameVariable: 'USERNAME', 
-        //             passwordVariable: 'PASSWORD']
-        //         ]) {
-        //             sh """
-        //             docker login -u "${USERNAME}" -p "${PASSWORD}"
-        //             docker tag not_sustainable_image "${params.imageName}":"${params.Environment}"-"${params.Version}"."${env.BUILD_NUMBER}"
-        //             docker push "${params.imageName}":"${params.Environment}"-"${params.Version}"."${env.BUILD_NUMBER}"
-        //             """
-        //         }
+                withCredentials([
+                    [$class: 'UsernamePasswordMultiBinding', 
+                    credentialsId: 'dockerhub',
+                    usernameVariable: 'USERNAME', 
+                    passwordVariable: 'PASSWORD']
+                ]) {
+                    sh """
+                    docker login -u "${USERNAME}" -p "${PASSWORD}"
+                    docker tag "${image_name}" "${params.imageName}":"${params.Environment}"-"${params.Version}"."${env.BUILD_NUMBER}"
+                    docker push "${params.imageName}":"${params.Environment}"-"${params.Version}"."${env.BUILD_NUMBER}"
+                    """
+                }
             }
         }
     }
