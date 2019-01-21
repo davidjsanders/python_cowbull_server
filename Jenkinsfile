@@ -28,11 +28,11 @@ pipeline {
                 // /* Let's make sure we have the repository cloned to our workspace */
                 // checkout scm
                 script {
-                    systest_persister.parameters.host = "${params.RedisHost}"
-                    systest_persister.parameters.port = "${params.RedisPort}"
+                    systest_persister.parameters.host = "${params.RedisHost.toString()}"
+                    systest_persister.parameters.port = "${params.RedisPort.toString()}"
                     image_name = "${params.imageName}:test-${params.Version}.${env.BUILD_NUMBER}"
                     echo "Set image_name        -> ${image_name}"
-                    echo "Set systest_persister -> ${systest_persister.toString()}"
+                    echo "Set systest_persister -> ${systest_persister}"
                 }
             }
         }
