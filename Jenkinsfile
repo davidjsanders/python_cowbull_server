@@ -3,6 +3,7 @@ def persisters = [
     '{"engine_name": "mongodb", "parameters": {"host": "db", "port": 27017, "db": "cowbull"}}'
 ]
 
+def systest_persister = readJSON text: '{"engine_name": "SecureRedis", "parameters": {"host": "db", "port": 6379, "db": 0, "password": "fCFlVIE7nUD2unwYYn8agYYWXzAz1GvK"}}'
 def engine1 = readJSON text: '{"persister":"redis", "image":"redis:5.0.3-alpine", "name":"redis"}'
 def engine2 = readJSON text: '{"persister":"mongodb", "image":"mongo:4.0.5", "name":"mongo"}'
 def test_engines = [
@@ -13,7 +14,6 @@ def test_engines = [
 def python_engine='dsanderscan/jenkins-py:3-0.1'
 
 def image_name = ''
-def systest_persister = ''
 
 pipeline {
     agent any
@@ -28,7 +28,8 @@ pipeline {
                 // /* Let's make sure we have the repository cloned to our workspace */
                 // checkout scm
                 script {
-                    systest_persister = '{"engine_name": "SecureRedis", "parameters": {"host": ${params.RedisHost}, "port": ${params.RedisPort}, "db": 0}}'
+                    systest_persister['host'] = '${params.RedisHost}'
+                    systest_persister['port'] = '${params.RedisPort}'
                     image_name = "${params.imageName}:test-${params.Version}.${env.BUILD_NUMBER}"
                     echo "Set image_name        -> ${image_name}"
                     echo "Set systest_persister -> ${systest_persister}"
