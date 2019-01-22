@@ -98,6 +98,12 @@ pipeline {
             }
         }
 
+        stage('Code Analysis') {
+            steps {
+                echo "Code analysis"
+            }
+        }
+
         stage('Push') {
             steps {
                 echo "Pushing ${image_name}"
