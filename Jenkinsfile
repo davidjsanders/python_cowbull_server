@@ -66,11 +66,11 @@ pipeline {
         }
 
         stage('Code Analysis') {
-            agent {
-                docker {
-                    image python_engine
-                }
-            }
+            // agent {
+            //     docker {
+            //         image python_engine
+            //     }
+            // }
             steps {
                 echo "Code analysis"
                 script {
