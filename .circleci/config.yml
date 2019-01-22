@@ -1,0 +1,81 @@
+version: 2
+jobs:
+  build:
+    branches:
+      only:
+      - master
+    docker:
+      - image: circleci/python:2.7
+
+    working_directory: ~/python_cowbull_server
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+          - v2-dependencies-{{ checksum "requirements.txt" }}
+          # fallback to using the latest cache if no exact match is found
+          - v2-dependencies-
+
+      - setup_remote_docker
+
+      - run:
+          name: Docker login
+          command: |
+            docker login --username=$doclog --password=$docpass
+
+      - run:
+          name: Docker up and build
+          command: |
+            docker-compose -f vendor/docker/docker-compose-cicd.yml up -d --build
+            srvapp=$(docker ps -a --format '{{.Names}}' | grep "docker_cowbull_svc_1")
+            echo "export srvapp=$srvapp" >> $BASH_ENV
+
+      - run:
+          name: Unit tests with Redis
+          command: |
+            docker exec -it $srvapp \
+              bash -c "python -m unittest -v tests 2> >(tee -a /tmp/dockertest-report.log >&2)"
+            docker cp $srvapp:/tmp/dockertest-report.log /tmp/dockertest-report.log
+
+      - run:
+          name: Build final Docker image
+          command: |
+            docker build -f vendor/docker/Dockerfile -t $doclog/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM .
+
+      - deploy:
+          name: Push docker image
+          command: |
+            docker tag $doclog/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM $doclog/$IMAGE_NAME:latest
+            docker push $doclog/$IMAGE_NAME:$MAJOR_VERSION"."$MINOR_VERSION"."$CIRCLE_BUILD_NUM
+            docker push $doclog/$IMAGE_NAME:latest
+
+      # - run:
+      #     name: install Google Cloud dependencies
+      #     command: |
+      #       # Fix the repo to Jessie - needs to be updated later
+      #       export CLOUDSDK_CORE_DISABLE_PROMPTS=1
+      #       export CLOUD_SDK_REPO="cloud-sdk-jessie"
+      #       echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+      #       curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+      #       sudo apt-get update && sudo apt-get install google-cloud-sdk --yes
+      #       echo $circlecibuilder | base64 --decode --ignore-garbage > auth.json
+      #       gcloud auth activate-service-account $circleciuser --key-file auth.json --project=$gproject
+
+      # - run:
+      #     name: Build GAE project and deploy
+      #     command: |
+      #       export CLOUDSDK_CORE_DISABLE_PROMPTS=1
+      #       mkdir -p vendor/gae
+      #       pip2 install -t vendor/gae/lib -r requirements.txt
+      #       gcloud app deploy --version="cigen-"$MAJOR_VERSION"-"$MINOR_VERSION"-"$CIRCLE_BUILD_NUM --quiet
+
+      - save_cache:
+          key: v2-dependencies-{{ checksum "requirements.txt" }}
+          paths:
+            - ~/.m2
+
+      - store_artifacts:
+          path: /tmp/dockertest-report.log
+          destination: dockertest-report

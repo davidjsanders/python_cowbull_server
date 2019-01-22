@@ -1,0 +1,16 @@
+runtime: python27
+api_version: 1
+threadsafe: true
+service: default
+
+handlers:
+- url: /.*
+  script: app.app
+libraries:
+- name: ssl
+  version: latest
+
+env_variables:
+  LOGGING_LEVEL: "10"
+  LOGGING_FORMAT: "%(asctime)s %(levelname)s: %(message)s"
+  PERSISTER: '{"engine_name": "gcpstorage", "parameters": {"bucket": "dasander-python-cowbull-save-games"}}'

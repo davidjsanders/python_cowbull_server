@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+#rg="clusterResourceGroup"
+#clusterName="k8Cluster"
+#masters="1"
+#agents="1"
+#location="eastus"
+#machineType="Standard_A2"
+#dnsPrefix="dasanderk8"
+echo ""
+echo "1. Create the resource group "$rg" in "$location
+az group create --name $rg --location $location
+echo ""
+echo "2. Create the cluster. --resource-group "$rg" --clusterName "$clusterName" --master-count "$masters" --agent-count "$agents
+az acs create \
+  --orchestrator-type kubernetes \
+  --resource-group $rg \
+  --name $clusterName \
+  --master-count $masters \
+  --agent-count $agents \
+  --generate-ssh-keys \
+  --dns-prefix $dnsPrefix \
+  --agent-vm-size $machineType
+echo ""
