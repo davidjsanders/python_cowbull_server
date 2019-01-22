@@ -68,8 +68,8 @@ pipeline {
         stage('Code Analysis') {
             steps {
                 echo "Code analysis"
-                withSonarQubeEnv('sonarQube') {
-                    // Optionally use a Maven environment you've configured already
+                def scannerHome = tool 'SonarQube Scanner 2.8';
+                withSonarQubeEnv('sonarqube') {
                     sh "${scannerHome}/bin/sonar-scanner"
                 }
             }
