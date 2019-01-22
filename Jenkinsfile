@@ -45,21 +45,21 @@ pipeline {
                 script {
                     for (int i = 0; i < persisters.size(); i++) {
                         echo "Testing with image: ${test_engines[i]['name']}"
-                        docker.image(test_engines[i]['image']).withRun("--name ${test_engines[i]['name']}") { container ->
-                            docker.image(python_engine).inside("--link ${test_engines[i]['name']}:db") {
-                                withEnv(["HOME=${env.WORKSPACE}","LOGGING_LEVEL=${logging_level}"]) {
-                                    // checkout scm
-                                    sh """
-                                        python3 -m venv env
-                                        source ./env/bin/activate 
-                                        export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
-                                        export PERSISTER='${persisters[i]}'
-                                        python3 -m pip install --quiet -r requirements.txt --no-cache --user
-                                        python3 -m unittest tests
-                                    """
-                                }
-                            }
-                        }
+                        // docker.image(test_engines[i]['image']).withRun("--name ${test_engines[i]['name']}") { container ->
+                        //     docker.image(python_engine).inside("--link ${test_engines[i]['name']}:db") {
+                        //         withEnv(["HOME=${env.WORKSPACE}","LOGGING_LEVEL=${logging_level}"]) {
+                        //             // checkout scm
+                        //             sh """
+                        //                 python3 -m venv env
+                        //                 source ./env/bin/activate 
+                        //                 export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
+                        //                 export PERSISTER='${persisters[i]}'
+                        //                 python3 -m pip install --quiet -r requirements.txt --no-cache --user
+                        //                 python3 -m unittest tests
+                        //             """
+                        //         }
+                        //     }
+                        // }
                     }
                 }
             }
