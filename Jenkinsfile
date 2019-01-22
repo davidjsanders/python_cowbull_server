@@ -76,7 +76,10 @@ pipeline {
                 script {
                     def scannerHome = tool 'SonarQube Scanner 2.8';
                     withSonarQubeEnv('sonarqube') {
-                        sh "${scannerHome}/bin/sonar-scanner -Dproject.settings=./sonar-project.properties"
+                        sh """
+                            rm -rf *.pyc
+                            ${scannerHome}/bin/sonar-scanner -Dproject.settings=./sonar-project.properties
+                        """
                     }
                 }
             }
@@ -84,7 +87,7 @@ pipeline {
 
         stage('Quality Gate') {
             steps {
-                timeout(time: 1, unit: 'HOURS') {
+                timeout(time: 30, unit: 'MINUTES') {
                     // Parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
                     // true = set pipeline to UNSTABLE, false = don't
                     // Requires SonarQube Scanner for Jenkins 2.7+
