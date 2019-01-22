@@ -68,9 +68,11 @@ pipeline {
         stage('Code Analysis') {
             steps {
                 echo "Code analysis"
-                def scannerHome = tool 'SonarQube Scanner 2.8';
-                withSonarQubeEnv('sonarqube') {
-                    sh "${scannerHome}/bin/sonar-scanner"
+                script {
+                    def scannerHome = tool 'SonarQube Scanner 2.8';
+                    withSonarQubeEnv('sonarqube') {
+                        sh "${scannerHome}/bin/sonar-scanner"
+                    }
                 }
             }
         }
