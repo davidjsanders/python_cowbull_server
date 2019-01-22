@@ -65,6 +65,27 @@ pipeline {
             }
         }
 
+        stage('Code Analysis') {
+            steps {
+                echo "Code analysis"
+                withSonarQubeEnv('sonarQube') {
+                    // Optionally use a Maven environment you've configured already
+                    sh "${scannerHome}/bin/sonar-scanner"
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 1, unit: 'HOURS') {
+                    // Parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
+                    // true = set pipeline to UNSTABLE, false = don't
+                    // Requires SonarQube Scanner for Jenkins 2.7+
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
         stage('Build') {
             steps {
                 script {
@@ -95,27 +116,6 @@ pipeline {
         stage('Security Scan') {
             steps {
                 echo "Starting security scan"
-            }
-        }
-
-        stage('Code Analysis') {
-            steps {
-                echo "Code analysis"
-                withSonarQubeEnv('My SonarQube Server') {
-                    // Optionally use a Maven environment you've configured already
-                    sh "${scannerHome}/bin/sonar-scanner"
-                }
-            }
-        }
-
-        stage('Quality Gate') {
-            steps {
-                timeout(time: 1, unit: 'HOURS') {
-                    // Parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
-                    // true = set pipeline to UNSTABLE, false = don't
-                    // Requires SonarQube Scanner for Jenkins 2.7+
-                    waitForQualityGate abortPipeline: true
-                }
             }
         }
 
