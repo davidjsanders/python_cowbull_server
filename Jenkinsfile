@@ -165,6 +165,11 @@ pipeline {
                     docker tag "${image_name}" dsanderscan/cowbull:"${major}"."${minor}"."${env.BUILD_NUMBER}"
                     docker push dsanderscan/cowbull:"${major}"."${minor}"."${env.BUILD_NUMBER}"
                     docker rmi "${image_name}"
+                    #
+                    # TODO
+                    #
+                    # 1. ADD docker rmi of build and prod image
+                    # 2. Clear up /var/jenkins_home/.docker/config.json
                     """
                 }
             }
