@@ -54,8 +54,8 @@ pipeline {
                                         source /tmp/env/bin/activate 
                                         export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
                                         export PERSISTER='${persisters[i]}'
-                                        python3 -m pip install --quiet -r requirements.txt --no-cache --user
-                                        python3 -m unittest tests
+                                        python -m pip install --quiet -r requirements.txt
+                                        python -m unittest tests
                                     """
                                 }
                             }
