@@ -215,7 +215,7 @@ class GameController(object):
 
         self.handler.log(message="Validating (any) JSON provided")
         if game_json is None:
-            _game_object = _new_game(mode=mode)
+            _game_object = self._new_game(mode=mode)
         else:
             self.handler.log(message="JSON provided")
             if not isinstance(game_json, self.STRINGY):
