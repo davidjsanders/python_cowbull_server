@@ -26,8 +26,8 @@ pipeline {
         stage('Setup') {
             steps {
                 script {
-                    withCredentials(secretText(credentialsId: 'systest_persister', secret: 'Secret')) {
-                        systest_persister = readJSON text: secret
+                    withCredentials([string(credentialsId: 'systest_persister', variable: 'SECRET')]) {
+                        systest_persister = readJSON text: SECRET
                     }
                     systest_persister['parameters']['host'] = params.RedisHost.toString()
                     systest_persister.parameters.port = params.RedisPort.toString()
