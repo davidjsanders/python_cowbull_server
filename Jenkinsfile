@@ -165,6 +165,8 @@ pipeline {
                     docker tag "${image_name}" dsanderscan/cowbull:"${major}"."${minor}"."${env.BUILD_NUMBER}"
                     docker push dsanderscan/cowbull:"${major}"."${minor}"."${env.BUILD_NUMBER}"
                     docker rmi "${image_name}"
+                    docker rmi dsanderscan/cowbull:"${major}"."${minor}"."${env.BUILD_NUMBER}"
+                    rm -f /var/jenkins_home/.docker/config.json
                     #
                     # TODO
                     #
