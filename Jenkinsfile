@@ -78,6 +78,8 @@ pipeline {
                     withSonarQubeEnv('sonarqube') {
                         sh """
                             rm -rf *.pyc
+                            rm -f /var/jenkins_home/workspace/cowbull-server/.scannerwork/report-task.txt
+                            rm -f /var/jenkins_home/workspace/cowbull-server/.sonar/report-task.txt
                             ${scannerHome}/bin/sonar-scanner -Dproject.settings=./sonar-project.properties
                         """
                     }
