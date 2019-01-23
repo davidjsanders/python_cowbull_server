@@ -343,7 +343,6 @@ class GameController(object):
                     _mode = GameMode(**mode)
                 else:
                     _mode = mode
-#                    raise TypeError("Expected list to contain only GameMode objects")
                 self.handler.log(
                     message="Appending mode: {}".format(mode)
                 )

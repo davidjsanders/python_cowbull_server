@@ -10,8 +10,8 @@ class Persister(AbstractPersister):
     def __init__(self, host="localhost", port=6379, master_port=26379, db=0, password=""):
         super(Persister, self).__init__()
 
-        self.handler.module="Redis Persister"
-        self.handler.log(message="Preparing redis connection")
+        self.handler.module="Secure Redis Persister"
+        self.handler.log(message="Preparing secure redis connection")
 
         master_node = None
         sentinel = None

@@ -47,7 +47,7 @@ class PersistenceEngine(object):
 
         try:
             self.handler.log(message="Set persister")
-            self._engine_name = persisters[validators.index(self._engine_name)]
+            self._engine_name = persisters[validators.index(self._engine_name.lower())]
 
             self.handler.log(message="Importing Persister from {}".format(self._engine_name))
             self._persister = importlib.import_module(self._engine_name)
