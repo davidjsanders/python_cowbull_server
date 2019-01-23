@@ -339,7 +339,7 @@ class GameController(object):
     #
     # 'private' methods
     #
-    def _new_game(mode):
+    def _new_game(self, mode):
         self.handler.log(message="No JSON, so start new game.")
         self.handler.log(message="Validating (any) mode provided")
         if mode is not None:
