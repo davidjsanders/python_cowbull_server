@@ -119,7 +119,7 @@ pipeline {
                         echo "Testing with image: ${test_engines[i]['name']}"
                         docker.image(test_engines[i]['image']).withRun("--name ${test_engines[i]['name']}") { container ->
                             docker.image(image_name).inside("--link ${test_engines[i]['name']}:db") {
-                                withEnv(["PERSISTER=${systest_persister.toString()}","LOGGING_LEVEL=${logging_level}"]) {
+                                withEnv(["PERSISTER=${persisters[i]}","LOGGING_LEVEL=${logging_level}"]) {
                                     sh """
                                         python -m unittest tests
                                     """
