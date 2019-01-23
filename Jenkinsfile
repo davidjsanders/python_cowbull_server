@@ -27,7 +27,7 @@ pipeline {
                 script {
                     systest_persister['parameters']['host'] = params.RedisHost.toString()
                     systest_persister.parameters.port = params.RedisPort.toString()
-                    image_name = "${params.imageName}:build-${major}.${minor}.${env.BUILD_NUMBER}"
+                    image_name = "dsanderscan/cowbull:build-${major}.${minor}.${env.BUILD_NUMBER}"
                     logging_level = params.LoggingLevel
                     echo "Pulling required sidecars"
                     for (int i = 0; i < persisters.size(); i++) {
@@ -140,8 +140,8 @@ pipeline {
                 ]) {
                     sh """
                     docker login -u "${USERNAME}" -p "${PASSWORD}"
-                    docker tag "${image_name}" "${params.imageName}":"${major}"."${minor}"."${env.BUILD_NUMBER}"
-                    docker push "${params.imageName}":"${major}"."${minor}"."${env.BUILD_NUMBER}"
+                    docker tag "${image_name}" dsanderscan/cowbull:"${major}"."${minor}"."${env.BUILD_NUMBER}"
+                    docker push dsanderscan/cowbull:"${major}"."${minor}"."${env.BUILD_NUMBER}"
                     docker rmi "${image_name}"
                     """
                 }
