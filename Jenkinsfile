@@ -40,24 +40,21 @@ pipeline {
             }
         }
 
-        stage('Test') {
+        stage('Unit Test') {
             steps {
                 script {
-                    for (int i = 0; i < persisters.size(); i++) {
-                        echo "Testing with image: ${test_engines[i]['name']}"
-                        docker.image(test_engines[i]['image']).withRun("--name ${test_engines[i]['name']}") { container ->
-                            docker.image(python_engine).inside("--link ${test_engines[i]['name']}:db") {
-                                withEnv(["HOME=${env.WORKSPACE}","LOGGING_LEVEL=${logging_level}"]) {
-                                    // checkout scm
-                                    sh """
-                                        python3 -m venv /tmp/env
-                                        source /tmp/env/bin/activate 
-                                        export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
-                                        export PERSISTER='${persisters[i]}'
-                                        python -m pip install --quiet -r requirements.txt
-                                        python -m unittest tests
-                                    """
-                                }
+                    echo "Testing with image: ${test_engines[0]['name']}"
+                    docker.image(test_engines[0]['image']).withRun("--name ${test_engines[0]['name']}") { container ->
+                        docker.image(python_engine).inside("--link ${test_engines[0]['name']}:db") {
+                            withEnv(["PERSISTER=${persisters[0]}","HOME=${env.WORKSPACE}","LOGGING_LEVEL=${logging_level}"]) {
+                                // checkout scm
+                                sh """
+                                    python3 -m venv /tmp/env
+                                    source /tmp/env/bin/activate 
+                                    export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
+                                    python -m pip install --quiet -r requirements.txt
+                                    python -m unittest tests
+                                """
                             }
                         }
                     }
@@ -107,6 +104,25 @@ pipeline {
                         sh """
                             docker build -t ${image_tag} -f vendor/docker/Dockerfile .
                         """
+                    }
+                }
+            }
+        }
+
+        stage('Image Test') {
+            steps {
+                script {
+                    for (int i = 0; i < persisters.size(); i++) {
+                        echo "Testing with image: ${test_engines[i]['name']}"
+                        docker.image(test_engines[i]['image']).withRun("--name ${test_engines[i]['name']}") { container ->
+                            docker.image(image_name).inside("--link ${test_engines[i]['name']}:db") {
+                                withEnv(["PERSISTER=${systest_persister.toString()}","LOGGING_LEVEL=${logging_level}"]) {
+                                    sh """
+                                        python -m unittest tests
+                                    """
+                                }
+                            }
+                        }
                     }
                 }
             }
