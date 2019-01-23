@@ -1,0 +1,6 @@
+projectKey=pytest2
+serverUrl=http://sonarqube
+serverVersion=7.5.0.20543
+dashboardUrl=http://sonarqube/dashboard?id=pytest2
+ceTaskId=AWh3sjeO7Qk5oxyXQUmw
+ceTaskUrl=http://sonarqube/api/ce/task?id=AWh3sjeO7Qk5oxyXQUmw

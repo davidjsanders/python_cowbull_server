@@ -15,8 +15,8 @@ def python_engine='dsanderscan/jenkins-py:3-0.1'
 
 def image_name = ''
 def logging_level = ''
-def major = '1'
-def minor = '2'
+def major = '2'
+def minor = '0'
 
 pipeline {
     agent any
