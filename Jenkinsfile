@@ -86,6 +86,9 @@ pipeline {
         }
 
         stage('Quality Gate') {
+            environment {
+                scannerHome = tool 'SonarQube Scanner 2.8'
+            }
             steps {
                 echo "In Quality Gate"
                 timeout(time: 10, unit: 'MINUTES') {
