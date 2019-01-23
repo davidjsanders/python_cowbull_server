@@ -83,12 +83,6 @@ pipeline {
                             ${scannerHome}/bin/sonar-scanner -Dproject.settings=./sonar-project.properties
                         """
                     }
-                    timeout(time: 10, unit: 'MINUTES') {
-                        // Parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
-                        // true = set pipeline to UNSTABLE, false = don't
-                        // Requires SonarQube Scanner for Jenkins 2.7+
-                        waitForQualityGate abortPipeline: true
-                    }
                 }
             }
         }
@@ -98,13 +92,10 @@ pipeline {
                 scannerHome = tool 'SonarQube Scanner 2.8'
             }
             steps {
-                echo "In Quality Gate"
-                // timeout(time: 10, unit: 'MINUTES') {
-                //     // Parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
-                //     // true = set pipeline to UNSTABLE, false = don't
-                //     // Requires SonarQube Scanner for Jenkins 2.7+
-                //     waitForQualityGate abortPipeline: true
-                // }
+                echo "Quality validation"
+                timeout(time: 10, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
             }
         }
 
