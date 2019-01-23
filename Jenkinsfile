@@ -3,7 +3,7 @@ def persisters = [
     '{"engine_name": "mongodb", "parameters": {"host": "db", "port": 27017, "db": "cowbull"}}'
 ]
 
-def systest_persister = '{"engine_name": "SecureRedis", "parameters": {"host": "db", "port": 6379, "db": 0, "password": ""}}'
+def systest_persister = readJSON text: '{"engine_name": "SecureRedis", "parameters": {"host": "db", "port": 6379, "db": 0, "password": ""}}'
 def engine1 = readJSON text: '{"persister":"redis", "image":"redis:5.0.3-alpine", "name":"redis"}'
 def engine2 = readJSON text: '{"persister":"mongodb", "image":"mongo:4.0.5", "name":"mongo"}'
 def test_engines = [
