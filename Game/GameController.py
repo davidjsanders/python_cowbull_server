@@ -214,24 +214,8 @@ class GameController(object):
         _mode = mode or 'Normal' # Default mode to normal if not provided
 
         self.handler.log(message="Validating (any) JSON provided")
-        if game_json is None:    # New game_json
-            self.handler.log(message="No JSON, so start new game.")
-            self.handler.log(message="Validating (any) mode provided")
-            if mode is not None:
-                self.handler.log(message="mode provided, checking if string or GameMode")
-                if isinstance(mode, self.STRINGY):
-                    self.handler.log(message="Mode is a string; matching name {}".format(mode))
-                    _game_object = GameObject(mode=self._match_mode(mode=mode))
-                elif isinstance(mode, GameMode):
-                    self.handler.log(message="Mode is a GameMode object")
-                    _game_object = GameObject(mode=mode)
-                else:
-                    self.handler.log(message="Mode is invalid")
-                    raise TypeError("Game mode must be a GameMode or string")
-            else:
-                self.handler.log(message="Game mode is None, so default mode used.")
-                _game_object = GameObject(mode=self._game_modes[0])
-            _game_object.status = self.GAME_PLAYING
+        if game_json is None:
+            _game_object = _new_game(mode=mode)
         else:
             self.handler.log(message="JSON provided")
             if not isinstance(game_json, self.STRINGY):
@@ -355,6 +339,26 @@ class GameController(object):
     #
     # 'private' methods
     #
+    def _new_game(mode):
+        self.handler.log(message="No JSON, so start new game.")
+        self.handler.log(message="Validating (any) mode provided")
+        if mode is not None:
+            self.handler.log(message="mode provided, checking if string or GameMode")
+            if isinstance(mode, self.STRINGY):
+                self.handler.log(message="Mode is a string; matching name {}".format(mode))
+                _game_object = GameObject(mode=self._match_mode(mode=mode))
+            elif isinstance(mode, GameMode):
+                self.handler.log(message="Mode is a GameMode object")
+                _game_object = GameObject(mode=mode)
+            else:
+                self.handler.log(message="Mode is invalid")
+                raise TypeError("Game mode must be a GameMode or string")
+        else:
+            self.handler.log(message="Game mode is None, so default mode used.")
+            _game_object = GameObject(mode=self._game_modes[0])
+        _game_object.status = self.GAME_PLAYING
+        return _game_object
+
     def _match_mode(self, mode):
         self.handler.method = "_match_mode"
         self.handler.log(message="Attempting to match mode: {}".format(mode))
