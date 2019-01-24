@@ -1,0 +1,36 @@
+version: '2'
+
+services:
+  redis:
+    image: 'arm32v7/redis'
+    networks:
+      - cowbull_network
+    restart: always
+  cowbull_svc:
+    image: 'dsanderscan/cowbull:latest-arm32'
+    depends_on:
+      - redis
+#    ports:
+#      - 5000:8080
+    environment:
+      - LOGGING_LEVEL=10
+      - 'PERSISTER={"engine_name": "redis", "parameters": {"host": "redis", "port": 6379, "db": 0}}'
+#    volumes:
+#      - /home/devdsanders/Documents/dev/cowbull/python_cowbull_server/vendor/docker/:/cowbull/config
+    networks:
+      - cowbull_network
+    restart: always
+  cowbull_webapp:
+    image: 'dsanderscan/cowbull_webapp:latest-arm32'
+    depends_on:
+      - cowbull_svc
+    ports:
+      - 8080:8080
+    environment:
+      - COWBULL_SERVER=cowbull_svc
+      - COWBULL_PORT=8080
+      - COWBULL_VERSION=v1
+    networks:
+      - cowbull_network
+networks:
+  cowbull_network:

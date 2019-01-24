@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-master
+  labels:
+    app: redis
+    role: master
+    tier: backend
+spec:
+  selector:
+    app: redis
+    role: master
+    tier: backend
+  ports:
+    - protocol: TCP
+      port: 6379
+      targetPort: 6379
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: redis-master
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: redis
+        role: master
+        tier: backend
+    spec:
+      containers:
+      - name: redis-master
+        image: redis:latest
+        args: ["/redis-master/redis.conf"]
+        env:
+        - name: "MASTER"
+          value: "true"
+        resources:
+          requests:
+            cpu: "0.1"
+            memory: 100Mi
+        volumeMounts:
+        - mountPath: /redis-master
+          name: config
+        ports:
+        - containerPort: 6379
+      volumes:
+        - name: config
+          configMap:
+            name: cowbull-redis-config
+            items:
+            - key: redis-config.yml
+              path: redis.conf
