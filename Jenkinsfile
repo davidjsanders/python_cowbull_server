@@ -55,7 +55,7 @@ pipeline {
                                     python3 -m venv /tmp/env
                                     source /tmp/env/bin/activate 
                                     export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
-                                    python -m pip install --quiet -r requirements.txt
+                                    python -m pip install -r requirements.txt
                                     python -m unittest tests
                                 """
                             }
