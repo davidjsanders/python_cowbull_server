@@ -55,8 +55,12 @@ pipeline {
                                     python3 -m venv /tmp/env
                                     source /tmp/env/bin/activate 
                                     export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
-                                    python -m pip install --quiet -r requirements.txt
+                                    python -m pip install -r requirements.txt
                                     python -m unittest tests
+                                    echo "Run code coverage"
+                                    coverage run -m unittest tests
+                                    echo "Generate code coverage XML"
+                                    coverage xml -i
                                 """
                             }
                         }
@@ -80,7 +84,8 @@ pipeline {
                             rm -rf *.pyc
                             rm -f /var/jenkins_home/workspace/cowbull-server/.scannerwork/report-task.txt
                             rm -f /var/jenkins_home/workspace/cowbull-server/.sonar/report-task.txt
-                            ${scannerHome}/bin/sonar-scanner -Dproject.settings=./sonar-project.properties
+                            echo "Run sonar scanner"
+                            ${scannerHome}/bin/sonar-scanner -Dproject.settings=./sonar-project.properties -Dsonar.python.coverage.reportPath=./coverage.xml
                         """
                     }
                 }
@@ -165,6 +170,8 @@ pipeline {
                     docker tag "${image_name}" dsanderscan/cowbull:"${major}"."${minor}"."${env.BUILD_NUMBER}"
                     docker push dsanderscan/cowbull:"${major}"."${minor}"."${env.BUILD_NUMBER}"
                     docker rmi "${image_name}"
+                    docker rmi dsanderscan/cowbull:"${major}"."${minor}"."${env.BUILD_NUMBER}"
+                    rm -f /var/jenkins_home/.docker/config.json
                     #
                     # TODO
                     #

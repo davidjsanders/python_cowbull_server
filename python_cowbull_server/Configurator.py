@@ -18,54 +18,8 @@ class Configurator(object):
         self.app = None
         self.configuration = {}
         self.error_handler = None
-        self.env_vars = [
-            {
-                "name": "PERSISTER",
-                "description": "The persistence engine object",
-                "required": False,
-                "default": '{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0}}',
-                "caster": PersistenceEngine
-            },
-            {
-                "name": "FLASK_HOST",
-                "description": "For debug purposes, defines the Flask host. Default is 0.0.0.0",
-                "required": False,
-                "default": "0.0.0.0"
-            },
-            {
-                "name": "FLASK_PORT",
-                "description": "For debug purposes, the port Flask should serve on. Default is 5000",
-                "required": False,
-                "default": 5000,
-                "caster": int
-            },
-            {
-                "name": "FLASK_DEBUG",
-                "description": "For debug purposes, set Flask into debug mode.",
-                "required": False,
-                "default": True,
-                "caster": bool
-            },
-            {
-                "name": "COWBULL_DRY_RUN",
-                "description": "Do not run the server, simply report the configuration that would "
-                               "be used to run it.",
-                "required": False,
-                "default": False,
-                "caster": bool
-            },
-            {
-                "name": "COWBULL_CUSTOM_MODES",
-                "description": "A file which defines additional "
-                               "modes to be defined in addition to the default modes. The "
-                               "file must be a list of JSON objects containing mode "
-                               "definitions. Each object must contain (at a minimum): mode, digits, and "
-                               "priority",
-                "required": False,
-                "default": None,
-                "caster": self._load_from_json
-            }
-        ]
+        default_config_file = "./python_cowbull_server/defaults.json"
+        self.env_vars = self._load_defaults(default_config_file)
 
     def execute_load(self, app):
         if app is None:
@@ -190,6 +144,88 @@ class Configurator(object):
                 self.load_variables(source=item)
             else:
                 raise TypeError("Unexpected item in configuration: {}, type: {}".format(item, type(item)))
+
+    def _load_defaults(
+            self,
+            source
+    ):
+        if not source:
+            raise ValueError("Source for _load_defaults is None!")
+
+        f = None
+        try:
+            f = open(source, 'r')
+            _defaults = json.load(f)
+        except IOError:
+            raise IOError("The source file for _load_defaults was not found!")
+        finally:
+            if f:
+                f.close()
+
+        _persister_default = {
+            "engine_name" : "redis",
+            "parameters": {
+                "host": "{0}".format(_defaults["redis_host"]),
+                "port": _defaults["redis_port"],
+                "db": 0
+            }
+        }
+        _persister = {
+            "name": "PERSISTER",
+            "description": "The persistence engine object",
+            "required": False,
+            "default": json.dumps(_persister_default),
+            "caster": PersistenceEngine
+        }
+        _flask_host = {
+            "name": "FLASK_HOST",
+            "description": "For debug purposes, defines the Flask host. Default is 0.0.0.0",
+            "required": False,
+            "default": "{0}".format(_defaults["flask_host"])
+        }
+        _flask_port = {
+            "name": "FLASK_PORT",
+            "description": "For debug purposes, the port Flask should serve on. Default is 5000",
+            "required": False,
+            "default": _defaults["flask_port"],
+            "caster": int
+        }
+        _flask_debug = {
+            "name": "FLASK_DEBUG",
+            "description": "For debug purposes, set Flask into debug mode.",
+            "required": False,
+            "default": _defaults["flask_debug"],
+            "caster": bool
+        }
+        _cowbull_dry_run = {
+            "name": "COWBULL_DRY_RUN",
+            "description": "Do not run the server, simply report the configuration that would "
+                            "be used to run it.",
+            "required": False,
+            "default": False,
+            "caster": bool
+        }
+        _cowbull_custom_modes = {
+            "name": "COWBULL_CUSTOM_MODES",
+            "description": "A file which defines additional "
+                            "modes to be defined in addition to the default modes. The "
+                            "file must be a list of JSON objects containing mode "
+                            "definitions. Each object must contain (at a minimum): mode, digits, and "
+                            "priority",
+            "required": False,
+            "default": None,
+            "caster": self._load_from_json
+        }
+
+        return [
+            _persister,
+            _flask_host,
+            _flask_port,
+            _flask_debug,
+            _cowbull_dry_run,
+            _cowbull_custom_modes
+        ]
+
 
     def _set_config(
             self,
