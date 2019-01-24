@@ -18,7 +18,7 @@ class Configurator(object):
         self.app = None
         self.configuration = {}
         self.error_handler = None
-        default_config_file = "./python_cowbull_server/defaults.json"
+        default_config_file = "./python_cowbull_server/defaults.config"
         self.env_vars = self._load_defaults(default_config_file)
 
     def execute_load(self, app):
