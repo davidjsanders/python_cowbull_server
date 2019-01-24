@@ -80,7 +80,12 @@ pipeline {
                             rm -rf *.pyc
                             rm -f /var/jenkins_home/workspace/cowbull-server/.scannerwork/report-task.txt
                             rm -f /var/jenkins_home/workspace/cowbull-server/.sonar/report-task.txt
-                            ${scannerHome}/bin/sonar-scanner -Dproject.settings=./sonar-project.properties
+                            echo "Run code coverage"
+                            coverage run -m unittest tests
+                            echo "Generate code coverage XML"
+                            coverage xml -i
+                            echo "Run sonar scanner"
+                            ${scannerHome}/bin/sonar-scanner -Dproject.settings=./sonar-project.properties -Dsonar.python.coverage.reportPath=./coverage.xml
                         """
                     }
                 }
