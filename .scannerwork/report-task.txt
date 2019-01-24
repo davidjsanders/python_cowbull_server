@@ -1,6 +1,0 @@
-projectKey=testCowbullServer
-serverUrl=http://sonarqube:9000
-serverVersion=7.5.0.20543
-dashboardUrl=http://sonarqube:9000/dashboard?id=testCowbullServer
-ceTaskId=AWh9Owhd7Qk5oxyXQUnw
-ceTaskUrl=http://sonarqube:9000/api/ce/task?id=AWh9Owhd7Qk5oxyXQUnw
