@@ -179,7 +179,7 @@ class Configurator(object):
         }
         _flask_host = {
             "name": "FLASK_HOST",
-            "description": "For debug purposes, defines the Flask host. Default is 0.0.0.0",
+            "description": "For debug purposes, defines the Flask host. Default is all traffic *not* localhost",
             "required": False,
             "default": "{0}".format(_defaults["flask_host"])
         }
