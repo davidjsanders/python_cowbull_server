@@ -24,7 +24,7 @@ error_handler.log(
         method="__init__",
         module="python_cowbull_server",
         message="c.execute_load has been run",
-        logger=logging.warning
+        logger=logging.debug
     )
 
 # print the variables defined to stdout.
