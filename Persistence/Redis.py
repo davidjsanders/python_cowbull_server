@@ -17,6 +17,8 @@ class Persister(AbstractPersister):
         sentinel = None
         slave_nodes = [(host, port)]
 
+        self.handler.log(message="Host: {0}, Port: {1}".format(host, port))
+
         try:
             self.handler.log(message="Checking if redis instance passed is a cluster")
             sentinel = Sentinel([(host, master_port)], socket_timeout=0.1)
