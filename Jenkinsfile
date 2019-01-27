@@ -57,6 +57,7 @@ pipeline {
                                     python3 -m venv /tmp/env
                                     source /tmp/env/bin/activate 
                                     echo "Persister: ${PERSISTER}"
+                                    echo "Persister as defined: ${persisters[0]}"
                                     export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
                                     python -m pip install -q -r requirements.txt
                                     python -m unittest tests
