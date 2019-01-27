@@ -250,7 +250,7 @@ class Configurator(object):
                     caster,
                     choices
                 ),
-            logger=logging.info
+            logger=logging.debug
         )
         value = source(
             name.lower(),
@@ -296,7 +296,7 @@ class Configurator(object):
                     name,
                     value
                 ),
-            logger=logging.info
+            logger=logging.debug
         )
         return value
 

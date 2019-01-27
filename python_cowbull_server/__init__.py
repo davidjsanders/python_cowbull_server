@@ -23,7 +23,7 @@ error_handler = c.error_handler
 error_handler.log(
         method="__init__",
         module="python_cowbull_server",
-        message="c.execute_load has been run",
+        message="c.execute_load has been run; logging enabled.",
         logger=logging.debug
     )
 
