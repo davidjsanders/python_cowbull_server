@@ -290,6 +290,14 @@ class Configurator(object):
                 )
 
         self.app.config[name] = value
+        self.error_handler.log(
+            message="In _set_config Set app.config[{}] = {}"
+                .format(
+                    name,
+                    value
+                ),
+            logger=logging.info
+        )
         return value
 
     def _load_from_json(self, json_file_name):
