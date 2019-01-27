@@ -58,7 +58,6 @@ pipeline {
                                     source /tmp/env/bin/activate 
                                     echo "Persister: ${PERSISTER}"
                                     echo "Persister as defined: ${persisters[0]}"
-                                    ping -c 3 db
                                     export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
                                     python -m pip install -q -r requirements.txt
                                     python -m unittest tests
