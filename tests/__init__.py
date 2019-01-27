@@ -4,3 +4,4 @@ from tests.TestGameController import TestGameController
 from tests.TestGameObject import TestGameObject
 from tests.TestGameMode import TestGameMode
 from tests.TestErrorHandler import TestErrorHandler
+from tests.TestConfigurator import TestConfigurator

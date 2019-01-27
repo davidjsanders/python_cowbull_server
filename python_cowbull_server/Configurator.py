@@ -25,7 +25,7 @@ class Configurator(object):
         if app is None:
             raise ValueError("The Flask app must be passed to the Configurator")
         if not isinstance(app, Flask):
-            raise TypeError("Expected a Flask object")
+            raise TypeError("Expected a Flask object, received {0}".format(type(app)))
 
         self.app = app
         self.app.config["PYTHON_VERSION_MAJOR"] = sys.version_info[0]
