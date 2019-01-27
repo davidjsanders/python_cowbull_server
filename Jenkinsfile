@@ -60,7 +60,7 @@ pipeline {
                                     echo "Persister as defined: ${persisters[0]}"
                                     export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
                                     python -m pip install -q -r requirements.txt
-                                    python -m unittest tests
+                                    python -m unittest -v tests
                                     echo "Run code coverage"
                                     coverage run -m unittest tests
                                     echo "Generate code coverage XML"
