@@ -1,3 +1,5 @@
+
+def unique_id = UUID.randomUUID().toString()
 def persisters = [
     '{"engine_name": "redis", "parameters": {"host": "db", "port": 6379, "db": 0}}',
     '{"engine_name": "mongodb", "parameters": {"host": "db", "port": 27017, "db": "cowbull"}}'
@@ -47,7 +49,7 @@ pipeline {
             steps {
                 script {
                     echo "Testing with image: ${test_engines[0]['name']}"
-                    docker.image(test_engines[0]['image']).withRun("--name ${test_engines[0]['name']}") { container ->
+                    docker.image(test_engines[0]['image']).withRun("--name ${unique_id}-${test_engines[0]['name']}") { container ->
                         docker.image(python_engine).inside("--link ${test_engines[0]['name']}:db") {
                             withEnv(["PERSISTER=${persisters[0]}","HOME=${env.WORKSPACE}","LOGGING_LEVEL=${logging_level}"]) {
                                 // checkout scm
