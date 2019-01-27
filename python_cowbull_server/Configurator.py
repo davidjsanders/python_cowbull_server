@@ -239,9 +239,7 @@ class Configurator(object):
             choices=None
     ):
         self.error_handler.log(
-            message="In _set_config -- source: {}, name: {}, " +
-                    "description: {}, required: {}, default: {}, " +
-                    "errmsg: {}, caster: {}, choices: {}"
+            message="In _set_config -- source: {0}, name: {1}, description: {}, required: {}, default: {}, errmsg: {}, caster: {}, choices: {}"
                 .format(
                     source,
                     name,
