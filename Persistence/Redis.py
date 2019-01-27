@@ -15,7 +15,8 @@ class Persister(AbstractPersister):
 
         master_node = None
         sentinel = None
-        slave_nodes = [(host, port)]
+        # Removed as per http://sonarqube:9000/project/issues?id=cowbull_server&issues=AWiRMKBbaAhZ-jY-ujHo&open=AWiRMKBbaAhZ-jY-ujHo
+        # slave_nodes = [(host, port)]
 
         self.handler.log(message="Host: {0}, Port: {1}".format(host, port))
 
@@ -58,8 +59,8 @@ class Persister(AbstractPersister):
         self.handler.log(message="Fetching key: {}".format(key))
         return_result = self._redis_connection.get(key)
 
-        if return_result is not None:
-            if isinstance(return_result, bytes):
+        # http://sonarqube:9000/project/issues?id=cowbull_server&issues=AWiRMKBcaAhZ-jY-ujHp&open=AWiRMKBcaAhZ-jY-ujHp
+        if return_result is not None and isinstance(return_result, bytes):
                 return_result = str(return_result.decode('utf-8'))
 
         self.handler.log(message="Key {} returned: {}".format(key, return_result))
