@@ -15,15 +15,11 @@ class GameMode(object):
     * help_text <str>           A free form string offering help text for the mode
 
     """
+
+    # Simplify method as per http://sonarqube:9000/project/issues?id=cowbull_server&issues=AWiRMJ-OaAhZ-jY-ujHk&open=AWiRMJ-OaAhZ-jY-ujHk
     def __init__(
             self,
-            mode=None,
-            priority=None,
-            digits=None,
-            digit_type=None,
-            guesses_allowed=None,
-            instruction_text=None,
-            help_text=None
+            **kwargs
     ):
         """
         Constructor to create a new mode.
@@ -37,6 +33,33 @@ class GameMode(object):
         :param help_text: <str> Help text (dependent upon caller to show)
 
         """
+
+        # Valid parameters list
+        param_list=[
+            "mode", 
+            "priority", 
+            "digits", 
+            "digit_type",
+            "guesses_allowed",
+            "instruction_text",
+            "help_text"
+        ]
+
+        # Validate no extra parameters
+        for kw in kwargs:
+            if not kw in param_list:
+                raise TypeError(
+                    "Parameter {} is not a valid parameter for game mode"
+                    .format(kw)
+                )
+
+        mode=kwargs.get("mode", None)
+        priority=kwargs.get("priority", None)
+        digits=kwargs.get("digits", None)
+        digit_type=kwargs.get("digit_type", None)
+        guesses_allowed=kwargs.get("guesses_allowed", None)
+        instruction_text=kwargs.get("instruction_text", None)
+        help_text=kwargs.get("help_text", None)
 
         # execute_load error handler
 #        self.handler = ErrorHandler(module="GameMode", method="__init__")
