@@ -58,10 +58,7 @@ pipeline {
                                     source /tmp/env/bin/activate 
                                     export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
                                     python -m pip install -q -r requirements.txt
-                                    python -m unittest -v tests
-                                    echo "Run code coverage"
                                     coverage run -m unittest tests
-                                    echo "Generate code coverage XML"
                                     coverage xml -i
                                 """
                             }
