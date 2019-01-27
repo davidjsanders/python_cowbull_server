@@ -3,6 +3,7 @@ import json
 import logging
 
 from python_cowbull_server import app
+from python_cowbull_server.Configurator import Configurator
 from Game.GameController import GameController
 from Routes.V1 import V1
 from unittest import TestCase
@@ -51,6 +52,7 @@ class TestV1Routes(TestCase):
         )
         self.app = app.test_client()
         self.c = Configurator()
+        self.c.execute_load(self.app)
         
         if app.config["PYTHON_VERSION_MAJOR"] < 3:
             self.logging_type = io.BytesIO
