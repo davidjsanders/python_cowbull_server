@@ -32,7 +32,7 @@ pipeline {
                     }
                     systest_persister['parameters']['host'] = params.RedisHost.toString()
                     systest_persister.parameters.port = params.RedisPort.toString()
-                    image_name = "dsanderscan/cowbull:build-${major}.${minor}.${env.BUILD_NUMBER}"
+                    image_name = "dsanderscan/cowbull:${unique_id}"
                     logging_level = params.LoggingLevel
                     echo "Pulling required sidecars"
                     for (int i = 0; i < persisters.size(); i++) {
@@ -126,8 +126,8 @@ pipeline {
                 script {
                     for (int i = 0; i < persisters.size(); i++) {
                         echo "Testing with image: ${test_engines[i]['name']}"
-                        docker.image(test_engines[i]['image']).withRun("--name ${test_engines[i]['name']}") { container ->
-                            docker.image(image_name).inside("--link ${test_engines[i]['name']}:db") {
+                        docker.image(test_engines[i]['image']).withRun("--name ${unique_id}-${test_engines[i]['name']}") { container ->
+                            docker.image(image_name).inside("--link ${unique_id}-${test_engines[i]['name']}:db") {
                                 withEnv(["PERSISTER=${persisters[i]}","LOGGING_LEVEL=${logging_level}"]) {
                                     sh """
                                         python -m unittest tests
