@@ -15,7 +15,7 @@ class TestConfigurator(TestCase):
         else:
             self.json_raises = json.JSONDecodeError
 
-    def tearDownClass(self):
+    def tearDown(self):
         self.c = Configurator()
         self.c.execute_load(self.app.application)
 
