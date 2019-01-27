@@ -118,8 +118,7 @@ class Persister(AbstractPersister):
             ))
 
             self.handler.log(message="Converting bytes result to unicode (if reqd)")
-            if return_result is not None:
-                if isinstance(return_result, bytes):
+            if return_result is not None and isinstance(return_result, bytes):
                     return_result = str(return_result.decode('utf-8'))
 
             self.handler.log(message="Returning result: {}".format(return_result))
