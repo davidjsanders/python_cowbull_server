@@ -3,7 +3,6 @@ import json
 import logging
 
 from python_cowbull_server import app
-from python_cowbull_server.Configurator import Configurator
 from Game.GameController import GameController
 from Routes.V1 import V1
 from unittest import TestCase
