@@ -7,7 +7,14 @@ import redis
 class Persister(AbstractPersister):
     _redis_connection = None
 
-    def __init__(self, host="localhost", port=6379, master_port=26379, db=0):
+    def __init__(
+        self, 
+        host="localhost", 
+        password="",
+        port=6379, 
+        master_port=26379, 
+        db=0
+    ):
         super(Persister, self).__init__()
 
         self.handler.module="Redis Persister"
@@ -40,6 +47,7 @@ class Persister(AbstractPersister):
             self._redis_connection = redis.StrictRedis(
                 host=host,
                 port=port,
+                password=password,
                 db=db
             )
             self.handler.log(message="Pointing redis master to connection")
