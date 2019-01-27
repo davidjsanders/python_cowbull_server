@@ -20,6 +20,13 @@ c.execute_load(app)
 # Grab the error handler from the configuration object
 error_handler = c.error_handler
 
+error_handler.log(
+        method="__init__",
+        module="python_cowbull_server",
+        message="c.execute_load has been run",
+        logger=logging.warning
+    )
+
 # print the variables defined to stdout.
 c.print_variables()
 
