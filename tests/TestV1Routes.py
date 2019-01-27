@@ -51,8 +51,6 @@ class TestV1Routes(TestCase):
             method="setUp"
         )
         self.app = app.test_client()
-        self.c = Configurator()
-        self.c.execute_load(self.app.application)
         
         if app.config["PYTHON_VERSION_MAJOR"] < 3:
             self.logging_type = io.BytesIO

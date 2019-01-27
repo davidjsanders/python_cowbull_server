@@ -15,6 +15,10 @@ class TestConfigurator(TestCase):
         else:
             self.json_raises = json.JSONDecodeError
 
+    def tearDownClass(self):
+        self.c = Configurator()
+        self.c.execute_load(self.app.application)
+
     def test_co_init(self):
         c = Configurator()
         self.assertIsInstance(c, Configurator)
