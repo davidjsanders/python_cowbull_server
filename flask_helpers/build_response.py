@@ -15,6 +15,7 @@ def build_response(
 
     return Response(
         response=json.dumps(_response_data),
-        mimetype="application/json",
+        mimetype=_response_mimetype,
         status=_html_status
     )
+#        mimetype="application/json",
