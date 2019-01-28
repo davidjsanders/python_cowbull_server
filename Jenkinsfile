@@ -125,7 +125,7 @@ pipeline {
                             docker.image(image_name).inside("--link ${unique_id}-${test_engines[i]['name']}:db") {
                                 withEnv(["PERSISTER=${persisters[i]}","LOGGING_LEVEL=${logging_level}"]) {
                                     sh """
-                                        python -m unittest tests
+                                        python -m unittest discover
                                     """
                                 }
                             }
@@ -141,7 +141,7 @@ pipeline {
                     withEnv(["PERSISTER=${systest_persister.toString()}","LOGGING_LEVEL=${logging_level}"]) {
                         docker.image(image_name).inside() {
                             sh """
-                                python3 -m unittest tests
+                                python3 -m unittest discover
                             """
                         }
                     }
