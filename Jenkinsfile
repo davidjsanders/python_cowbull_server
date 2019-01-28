@@ -13,7 +13,7 @@ def test_engines = [
     engine2
 ]
 
-def python_engine='dsanderscan/jenkins-py:3-0.1'
+def python_engine='dsanderscan/jenkins-py:3-0.2'
 
 def image_name = ''
 def logging_level = ''
