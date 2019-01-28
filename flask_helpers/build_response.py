@@ -18,4 +18,3 @@ def build_response(
         mimetype=_response_mimetype,
         status=_html_status
     )
-#        mimetype="application/json",
