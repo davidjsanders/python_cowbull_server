@@ -91,7 +91,7 @@ class GameServerController(MethodView):
         #
         self.handler.log(message='Fetching arguments (if any) passed to get')
         game_mode = request.args.get('mode', default=None, type=None)
-        self.handler.log("game_mode value from request.args.get: {}, type: {}".format(game_mode, type(game_mode)))
+        self.handler.log(message="game_mode value from request.args.get: {}, type: {}".format(game_mode, type(game_mode)))
 
         try:
             self.handler.log(message="Creating game with mode {} ({})".format(game_mode, type(game_mode)))

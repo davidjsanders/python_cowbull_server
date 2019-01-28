@@ -60,7 +60,7 @@ class V1(object):
         hv2 = controller.as_view('Health2')
         self.app.add_url_rule(
             '/_ah/health',
-            view_func=health_view,
+            view_func=hv2,
             methods=["GET"]
         )
 

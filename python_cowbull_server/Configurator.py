@@ -4,6 +4,7 @@ import os
 import sys
 
 from flask_helpers.ErrorHandler import ErrorHandler
+from flask_helpers.check_kwargs import check_kwargs
 from flask import Flask
 from Persistence.PersistenceEngine import PersistenceEngine
 
@@ -227,17 +228,25 @@ class Configurator(object):
         ]
 
 
+    # http://sonarqube:9000/project/issues?id=cowbull_server&issues=AWiRMKAZaAhZ-jY-ujHl&open=AWiRMKAZaAhZ-jY-ujHl
     def _set_config(
             self,
-            source=None,
-            name=None,
-            description=None,
-            required=None,
-            default=None,
-            errmsg=None,
-            caster=None,
-            choices=None
+            **kwargs
     ):
+        check_kwargs(
+            parameter_list = ["source", "name", "description", "required", "default", "errmsg", "caster", "choices"],
+            caller="Configurator-_set_config",
+            **kwargs
+        )
+        source=kwargs.get("source", None)
+        name=kwargs.get("name", None)
+        description=kwargs.get("description", None)
+        required=kwargs.get("required", None)
+        default=kwargs.get("default", None)
+        errmsg=kwargs.get("errmsg", None)
+        caster=kwargs.get("caster", None)
+        choices=kwargs.get("choices", None)
+
         self.error_handler.log(
             message="In _set_config -- source: {}, name: {}, description: {}, required: {}, default: {}, errmsg: {}, caster: {}, choices: {}"
                 .format(
@@ -278,11 +287,10 @@ class Configurator(object):
             else:
                 value = caster(value)
 
-        if choices:
-            if value not in choices:
+        if choices and value not in choices:
                 raise ValueError(
                     errmsg or
-                    "The configuration value for {}({}) is not in the list of choices: ()".format(
+                        "The configuration value for {}({}) is not in the list of choices: {}".format(
                         name,
                         value,
                         choices

@@ -2,6 +2,7 @@ import json
 import logging
 import os
 from flask import Response
+from flask_helpers.check_kwargs import check_kwargs
 
 
 class ErrorHandler(object):
@@ -9,7 +10,7 @@ class ErrorHandler(object):
         self.defaults = {}
         self.defaults["module"] = kwargs.get("module", None)
         self.defaults["method"] = kwargs.get("method", None)
-        self.basicConfig = logging.basicConfig
+        self.basic_config = logging.basicConfig
 
         str_level = None
         try:
@@ -20,7 +21,7 @@ class ErrorHandler(object):
                 print("*** INVALID LOGGING_LEVEL: --> {}; is LOGGING_LEVEL set to a number?".format(exmsg))
             level = logging.WARNING
 
-        self.basicConfig(
+        self.basic_config(
             level=level,
             format=kwargs.get("format", "%(asctime)s %(levelname)s: %(message)s")
         )
@@ -55,7 +56,22 @@ class ErrorHandler(object):
     #
     # 'public' methods
     #
-    def error(self, module=None, method=None, status=None, exception=None, message=None):
+    def error(
+        self, 
+        **kwargs
+    ):
+        check_kwargs(
+            parameter_list = ["module", "method", "exception", "status", "message", "logger", "verbose"],
+            caller="ErrorHandler-log",
+            **kwargs
+        )
+
+        module=kwargs.get("module", None)
+        method=kwargs.get("method", None)
+        status=kwargs.get("status", None)
+        exception=kwargs.get("exception", None)
+        message=kwargs.get("message", None)
+
         response_dict = {
             "status": status or "NA",
             "module": module or self.defaults["module"],
@@ -82,14 +98,22 @@ class ErrorHandler(object):
 
     def log(
             self,
-            module=None,
-            method=None,
-            exception=None,
-            status=None,
-            message=None,
-            logger=None,
-            verbose=None
+            **kwargs
     ):
+        check_kwargs(
+            parameter_list = ["module", "method", "exception", "status", "message", "logger", "verbose"],
+            caller="ErrorHandler-log",
+            **kwargs
+        )
+
+        module=kwargs.get("module", None)
+        method=kwargs.get("method", None)
+        exception=kwargs.get("exception", None)
+        status=kwargs.get("status", None)
+        message=kwargs.get("message", None)
+        logger=kwargs.get("logger", None)
+        verbose=kwargs.get("verbose", None)
+
         if logger is None:
             logger = logging.debug
         if verbose is None:

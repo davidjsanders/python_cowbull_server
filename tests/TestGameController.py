@@ -19,7 +19,7 @@ class TestGameController(TestCase):
 
     def test_gc_new_badmode(self):
         with self.assertRaises(ValueError):
-            g = GameController(mode="foobar")
+            GameController(mode="foobar")
 
     def test_gc_new_game_modes(self):
         mode_list = [
@@ -130,7 +130,7 @@ class TestGameController(TestCase):
     def test_gc_load_bad_json(self):
         json_string = ''
         with self.assertRaises(self.json_raises):
-            g = GameController(game_json=json_string)
+            GameController(game_json=json_string)
 
     def test_gc_load_bad_data(self):
         json_string = '{' \
@@ -150,7 +150,7 @@ class TestGameController(TestCase):
                         '"status": "playing"' \
                       '}'
         with self.assertRaises(ValueError):
-            g = GameController(game_json=json_string)
+            GameController(game_json=json_string)
 
     def tearDown(self):
         pass
