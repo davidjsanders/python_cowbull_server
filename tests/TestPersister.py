@@ -6,10 +6,6 @@ from unittest import TestCase
 from Persistence.PersistenceEngine import PersistenceEngine
 
 class TestPersister(TestCase):
-    class bad_class:
-        def __init__(self):
-            pass
-
     def test_bad_engine(self):
         with self.assertRaises(TypeError):
             PersistenceEngine(

@@ -10,7 +10,7 @@ class Persister(AbstractPersister):
         host="localhost", 
         port=27017, 
         db="cowbull",
-        serverSelectionTimeoutMS=30000
+        server_selection_timeout_ms=30000
     ):
         super(Persister, self).__init__()
 
@@ -19,7 +19,7 @@ class Persister(AbstractPersister):
         self.connection = pymongo.MongoClient(
             host=host, 
             port=port,
-            serverSelectionTimeoutMS=serverSelectionTimeoutMS
+            serverSelectionTimeoutMS=server_selection_timeout_ms
             )
 
         self.handler.log(message="Establishing connection.")

@@ -11,7 +11,7 @@ class TestPersisterMongo(TestCase):
             host="foobar", 
             port=27017, 
             db="cowbull",
-            serverSelectionTimeoutMS=1000
+            server_selection_timeout_ms=1000
         )
 
     def test_bad_save(self):
