@@ -56,7 +56,7 @@ pipeline {
                                 sh """
                                     python3 -m venv /tmp/env
                                     source /tmp/env/bin/activate 
-                                    export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
+                                    #export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
                                     python -m pip install -q -r requirements.txt
                                     coverage run -m unittest discover
                                     coverage xml -i
