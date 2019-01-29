@@ -25,7 +25,7 @@ class TestHelpers(TestCase):
         self.assertIsInstance(r.headers, Headers)
         self.assertIs(r.status_code, 200)
         self.assertEqual(mimetype, "application/json".encode("utf-8"))
-        self.assertEquals(return_data, '{"result": "String response"}')
+        self.assertEqual(return_data.decode("utf-8"), '{"result": "String response"}')
 
     def test_he_br_jsondata(self):
         r = build_response(
