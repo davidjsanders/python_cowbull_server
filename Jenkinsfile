@@ -126,7 +126,7 @@ pipeline {
                                 withEnv(["PERSISTER=${persisters[i]}","LOGGING_LEVEL=${logging_level}"]) {
                                     sh """
                                         export PYTHONPATH="\$(pwd)/:\$(pwd)/systests"
-                                        python -m unittest discover
+                                        python -m unittest discover -p systest.py
                                     """
                                 }
                             }
