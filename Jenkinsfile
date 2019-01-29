@@ -141,7 +141,7 @@ pipeline {
                     withEnv(["PERSISTER=${systest_persister.toString()}","LOGGING_LEVEL=${logging_level}"]) {
                         docker.image(image_name).inside() {
                             sh """
-                                python3 -m unittest discover
+                                python3 -m unittest discover -p systest.py
                             """
                         }
                     }
