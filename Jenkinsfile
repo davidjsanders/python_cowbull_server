@@ -125,6 +125,7 @@ pipeline {
                             docker.image(image_name).inside("--link ${unique_id}-${test_engines[i]['name']}:db") {
                                 withEnv(["PERSISTER=${persisters[i]}","LOGGING_LEVEL=${logging_level}"]) {
                                     sh """
+                                        export PYTHONPATH="\$(pwd)/:\$(pwd)/systests"
                                         python -m unittest discover
                                     """
                                 }
