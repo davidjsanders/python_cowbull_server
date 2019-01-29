@@ -8,8 +8,8 @@ from flask_helpers.check_kwargs import check_kwargs
 class ErrorHandler(object):
     def __init__(self, **kwargs):
         self.defaults = {}
-        self.defaults["module"] = kwargs.get("module", None)
-        self.defaults["method"] = kwargs.get("method", None)
+        self.module = kwargs.get("module", "None")
+        self.method = kwargs.get("method", "None")
         self.basic_config = logging.basicConfig
 
         str_level = None
