@@ -56,7 +56,7 @@ pipeline {
                                 sh """
                                     python3 -m venv /tmp/env
                                     source /tmp/env/bin/activate 
-                                    #export PYTHONPATH="\$(pwd)/:\$(pwd)/tests"
+                                    export PYTHONPATH="\$(pwd)/:\$(pwd)/unittests"
                                     python -m pip install -q -r requirements.txt
                                     coverage run -m unittest discover
                                     coverage xml -i
@@ -141,6 +141,7 @@ pipeline {
                     withEnv(["PERSISTER=${systest_persister.toString()}","LOGGING_LEVEL=${logging_level}"]) {
                         docker.image(image_name).inside() {
                             sh """
+                                export PYTHONPATH="\$(pwd)/:\$(pwd)/systests"
                                 python3 -m unittest discover -p systest.py
                             """
                         }
