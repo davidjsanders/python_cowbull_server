@@ -1,3 +1,4 @@
 from TestGameObject import TestGameObject
 from TestHelpers import TestHelpers
 from TestPersister import TestPersister
+from TestFlaskControllers import TestFlaskControllers
