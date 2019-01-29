@@ -57,7 +57,7 @@ class PersistenceEngine(object):
             if self._engine_name.lower() == 'redis':
                 self.handler.log(message="Redis selected")
             else:
-                self.handler.log(message="Persister {} not found, defaulting to Redis".format(self._engine_name))
+                raise TypeError("Persister {} not available.".format(self._engine_name))
 
             self._engine_name = "RedisPersist"
 

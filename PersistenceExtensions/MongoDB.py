@@ -5,12 +5,22 @@ import pymongo
 
 
 class Persister(AbstractPersister):
-    def __init__(self, host="localhost", port=27017, db="cowbull"):
+    def __init__(
+        self, 
+        host="localhost", 
+        port=27017, 
+        db="cowbull",
+        serverSelectionTimeoutMS=30000
+    ):
         super(Persister, self).__init__()
 
         self.handler.module="MongoDB Persister"
         self.handler.log(message="Persistence engine MongoDB establishing client to database: {} {}.".format(host, port))
-        self.connection = pymongo.MongoClient(host=host, port=port)
+        self.connection = pymongo.MongoClient(
+            host=host, 
+            port=port,
+            serverSelectionTimeoutMS=serverSelectionTimeoutMS
+            )
 
         self.handler.log(message="Establishing connection.")
         self.mdb = self.connection[db]
