@@ -14,10 +14,10 @@ class TestPersisterMongo(TestCase):
             server_selection_timeout_ms=1000
         )
 
-    def test_bad_save(self):
+    def test_mp_bad_save(self):
         with self.assertRaises(ServerSelectionTimeoutError):
             self.p.save(key="foo",jsonstr="bar")
 
-    def test_bad_load(self):
+    def test_mp_bad_load(self):
         with self.assertRaises(ServerSelectionTimeoutError):
             self.p.load(key="foo")
