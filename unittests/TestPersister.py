@@ -6,7 +6,7 @@ from unittest import TestCase
 from Persistence.PersistenceEngine import PersistenceEngine
 
 class TestPersister(TestCase):
-    def test_bad_engine(self):
+    def test_rp_bad_engine(self):
         with self.assertRaises(TypeError):
             PersistenceEngine(
                 engine_name="foobar",
@@ -17,14 +17,14 @@ class TestPersister(TestCase):
                 }
             )
 
-    def test_bad_parameters(self):
+    def test_rp_bad_parameters(self):
         with self.assertRaises(TypeError):
             PersistenceEngine(
-                engine_name="foobar",
+                engine_name="redis",
                 parameters=["foobar", 27017, "cowbull"]
             )
 
-    def test_bad_engine_name(self):
+    def test_rp_bad_engine_name(self):
         with self.assertRaises(ValueError):
             PersistenceEngine(
                 engine_name=None,

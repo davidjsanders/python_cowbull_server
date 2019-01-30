@@ -53,6 +53,10 @@ class Persister(AbstractPersister):
             self.handler.log(message="Pointing redis master to connection")
             self._redis_master = self._redis_connection
 
+    @property
+    def redis_connection(self):
+        return self._redis_connection or None
+
     def save(self, key=None, jsonstr=None):
         super(Persister, self).save(key=key, jsonstr=jsonstr)
         try:
