@@ -21,7 +21,7 @@ COPY        python_cowbull_server /cowbull/python_cowbull_server/
 COPY        Routes /cowbull/Routes
 COPY        unittests /cowbull/unittests
 COPY        systests /cowbull/systests
-COPY        app.py  /cowbull/
+COPY        *.py  /cowbull/
 COPY        LICENSE /cowbull/
 CMD         ["gunicorn", "-b", "0.0.0.0:8080", "-w", "4", "app:app"]
 EXPOSE      8080

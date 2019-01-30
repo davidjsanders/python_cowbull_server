@@ -126,7 +126,7 @@ pipeline {
                                 withEnv(["PERSISTER=${persisters[i]}","LOGGING_LEVEL=${logging_level}"]) {
                                     sh """
                                         export PYTHONPATH="\$(pwd)/:\$(pwd)/systests"
-                                        python -m unittest discover -p systest.py
+                                        python2 -m unittest systests
                                     """
                                 }
                             }
@@ -143,7 +143,7 @@ pipeline {
                         docker.image(image_name).inside() {
                             sh """
                                 export PYTHONPATH="\$(pwd)/:\$(pwd)/systests"
-                                python3 -m unittest discover -p systest.py
+                                python3 -m unittest systests
                             """
                         }
                     }
