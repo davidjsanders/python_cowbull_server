@@ -9,6 +9,7 @@ RUN         apt-get update \
                 libgcrypt20=1.6.3-2+deb8u5 \
                 openssl=1.0.1t-1+deb8u10 \
                 procps=2:3.3.9-9+deb8u1 \
+                sensible-utils=0.0.9+deb8u1 \
                 systemd=215-17+deb8u9
 WORKDIR     /cowbull
 COPY        requirements.txt /cowbull
