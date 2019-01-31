@@ -1,10 +1,15 @@
 FROM        python:3.5.3-slim
 MAINTAINER  David Sanders
 RUN         apt-get update && \
-            groupadd -r cowbull_g && \
-            mkdir /cowbull && \
-            useradd -r -G cowbull_g -d /cowbull cowbull && \
-            chown cowbull /cowbull
+            && groupadd -r cowbull_g \
+            && mkdir /cowbull \
+            && useradd -r -G cowbull_g -d /cowbull cowbull \
+            && chown cowbull /cowbull \
+            && apt-get install --yes \
+                libgcrypt20=1.6.3-2+deb8u5 \
+                openssl=1.0.1t-1+deb8u10 \
+                procps=2:3.3.9-9+deb8u1 \
+                systemd=215-17+deb8u8
 WORKDIR     /cowbull
 COPY        requirements.txt /cowbull
 RUN         pip install -q setuptools
