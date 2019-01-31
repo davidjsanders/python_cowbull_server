@@ -1,6 +1,6 @@
 FROM        python:3.5.3-slim
 MAINTAINER  David Sanders
-RUN         apt-get update && \
+RUN         apt-get update \
             && groupadd -r cowbull_g \
             && mkdir /cowbull \
             && useradd -r -G cowbull_g -d /cowbull cowbull \
