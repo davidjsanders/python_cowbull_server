@@ -116,6 +116,13 @@ pipeline {
             }
         }
 
+        stage('Security Scan') {
+            steps {
+                echo "Starting security scan"
+                aquaMicroscanner imageName: '${image_name}', notCompliesCmd: '', onDisallowed: 'fail', outputFormat: 'html'
+            }
+        }
+
         stage('Image Test') {
             steps {
                 script {
@@ -148,13 +155,6 @@ pipeline {
                         }
                     }
                 }
-            }
-        }
-
-        stage('Security Scan') {
-            steps {
-                echo "Starting security scan"
-                aquaMicroscanner imageName: '${image_name}', notCompliesCmd: '', onDisallowed: 'fail', outputFormat: 'html'
             }
         }
 
