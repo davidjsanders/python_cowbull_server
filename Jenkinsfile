@@ -119,7 +119,7 @@ pipeline {
         stage('Security Scan') {
             steps {
                 echo "Starting security scan"
-                aquaMicroscanner imageName: '${image_name}', notCompliesCmd: '', onDisallowed: 'fail', outputFormat: 'html'
+                aquaMicroscanner imageName: image_name, notCompliesCmd: '', onDisallowed: 'fail', outputFormat: 'html'
             }
         }
 
