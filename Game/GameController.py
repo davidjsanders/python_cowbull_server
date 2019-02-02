@@ -120,7 +120,7 @@ class GameController(object):
         #     response_object["status"] = \
         #         self._start_again_message("You've made too many guesses")
         # else:
-        if self._game_on:
+        if self._game_on(response_object):
             self.handler.log(message="Game is valid and in play")
 
             guess_made = DigitWord(*args, wordtype=self.game.mode.digit_type)
@@ -341,9 +341,10 @@ class GameController(object):
     # 'private' methods
     #
     def _game_on(
-        self
+        self,
+        response_object
     ):
-        if not self.responder:
+        if not response_object:
             raise ValueError("Responder must be set before calling _game_on")
         if not self.game:
             raise ValueError("Game must be passed to _game_on")
