@@ -157,6 +157,10 @@ class TestGameController(TestCase):
         modes = g.game_mode_names
         self.assertIsInstance(modes,list)
 
+    def test_gc_guess(self):
+        g = GameController()
+        for i in range(11):
+            g.guess(0,0,0,0)
 
     def tearDown(self):
         pass
