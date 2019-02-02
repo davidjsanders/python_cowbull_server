@@ -107,19 +107,20 @@ class GameController(object):
         }
 
         self.handler.log(message="Checking game status")
-        if self.game.status == self.GAME_WON:
-            self.handler.log(message="Game already won")
-            response_object["status"] = \
-                self._start_again_message("You already won!")
-        elif self.game.status == self.GAME_LOST:
-            self.handler.log(message="Game already lost")
-            response_object["status"] = \
-                self._start_again_message("You already lost!")
-        elif self.game.guesses_remaining < 1:
-            self.handler.log(message="Game lost, too many guesses")
-            response_object["status"] = \
-                self._start_again_message("You've made too many guesses")
-        else:
+        # if self.game.status == self.GAME_WON:
+        #     self.handler.log(message="Game already won")
+        #     response_object["status"] = \
+        #         self._start_again_message("You already won!")
+        # elif self.game.status == self.GAME_LOST:
+        #     self.handler.log(message="Game already lost")
+        #     response_object["status"] = \
+        #         self._start_again_message("You already lost!")
+        # elif self.game.guesses_remaining < 1:
+        #     self.handler.log(message="Game lost, too many guesses")
+        #     response_object["status"] = \
+        #         self._start_again_message("You've made too many guesses")
+        # else:
+        if self._game_on:
             self.handler.log(message="Game is valid and in play")
 
             guess_made = DigitWord(*args, wordtype=self.game.mode.digit_type)
@@ -339,6 +340,32 @@ class GameController(object):
     #
     # 'private' methods
     #
+    def _game_on(
+        self
+    ):
+        if not self.responder:
+            raise ValueError("Responder must be set before calling _game_on")
+        if not self.game:
+            raise ValueError("Game must be passed to _game_on")
+
+        if self.game.status == self.GAME_WON:
+            self.handler.log(message="Game already won")
+            response_object["status"] = \
+                self._start_again_message("You already won!")
+            return False
+        elif self.game.status == self.GAME_LOST:
+            self.handler.log(message="Game already lost")
+            response_object["status"] = \
+                self._start_again_message("You already lost!")
+            return False
+        elif self.game.guesses_remaining < 1:
+            self.handler.log(message="Game lost, too many guesses")
+            response_object["status"] = \
+                self._start_again_message("You've made too many guesses")
+            return False
+        else:
+            return True
+
     def _new_game(self, mode):
         self.handler.log(message="No JSON, so start new game.")
         self.handler.log(message="Validating (any) mode provided")
