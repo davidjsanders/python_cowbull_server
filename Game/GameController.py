@@ -26,7 +26,7 @@ class GameController(object):
     GAME_LOST = "lost"          # The game is over and has been lost.
 
     version_helper = VersionHelpers()
-    STRINGY = version_helper.STRINGTYPE
+    STRINGY = version_helper.stringtype
 
     def __init__(self, game_json=None, game_modes=None, mode=None):
         """
@@ -150,7 +150,7 @@ class GameController(object):
 
         self.handler.log(message="Validating (any) JSON provided")
         if game_json is None:
-            _game_object = self._new_game(mode=mode)
+            _game_object = self._new_game(mode=_mode)
         else:
             _game_object = self._load_game(game_json)
 

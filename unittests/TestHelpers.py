@@ -132,7 +132,7 @@ class TestHelpers(TestCase):
 
     def test_he_vh_init(self):
         vh = VersionHelpers()
-#        isinstance(vh.STRINGTYPE, basestring)
+#        isinstance(vh.stringtype, basestring)
         self.assertTrue(
-            vh.STRINGTYPE, basestring if sys.version_info[0] < 3 else str
+            vh.stringtype, basestring if sys.version_info[0] < 3 else str
         )

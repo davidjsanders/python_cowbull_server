@@ -13,17 +13,17 @@ class VersionHelpers(object):
             self._stringtype = str
 
     @property
-    def STRINGTYPE(self):
+    def stringtype(self):
         return self._stringtype
 
     @property
-    def VERSION(self):
+    def version(self):
         return "{}.{}".format(self._major, self._minor)
 
     @property
-    def MAJOR(self):
+    def major(self):
         return self._major
 
     @property
-    def MINOR(self):
+    def minor(self):
         return self._minor

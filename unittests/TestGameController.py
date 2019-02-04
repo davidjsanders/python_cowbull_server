@@ -9,7 +9,7 @@ from flask_helpers.VersionHelpers import VersionHelpers
 class TestGameController(TestCase):
     def setUp(self):
         self.info = VersionHelpers()
-        if self.info.MAJOR < 3:
+        if self.info.major < 3:
             self.json_raises = ValueError
         else:
             self.json_raises = json.JSONDecodeError
@@ -160,8 +160,39 @@ class TestGameController(TestCase):
 
     def test_gc_guess(self):
         g = GameController()
-        for i in range(11):
+        for _ in range(11):
             g.guess(0,0,0,0)
+
+    def test_gc_check_game_bad_response(self):
+        g = GameController()
+        with self.assertRaises(ValueError):
+            g._check_game_on(response_object=None)
+
+    def test_gc_check_game_bad_game(self):
+        g = GameController()
+        with self.assertRaises(ValueError):
+            response_object = {
+                "bulls": None,
+                "cows": None,
+                "analysis": None,
+                "status": None
+            }
+            g.game = None
+            g._check_game_on(response_object=response_object)
+
+    def test_gc_win_game(self):
+        g = GameController()
+        ans = g.game.answer.word
+        r = g.guess(*ans)
+        self.assertEqual(r["bulls"], 4)
+
+    def test_gc_already_won_game(self):
+        g = GameController()
+        ans = g.game.answer.word
+        r = g.guess(*ans)
+        self.assertEqual(r["bulls"], 4)
+        r = g.guess(*ans)
+        self.assertEqual(r["bulls"], None)
 
     def tearDown(self):
         pass
