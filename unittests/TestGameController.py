@@ -4,11 +4,12 @@ from unittest import TestCase
 from Game.GameController import GameController
 from Game.GameMode import GameMode
 from python_cowbull_server import app
+from flask_helpers.VersionHelpers import VersionHelpers
 
 class TestGameController(TestCase):
     def setUp(self):
-        self.app = app.test_client()
-        if app.config["PYTHON_VERSION_MAJOR"] < 3:
+        self.info = VersionHelpers()
+        if self.info.MAJOR < 3:
             self.json_raises = ValueError
         else:
             self.json_raises = json.JSONDecodeError

@@ -95,6 +95,7 @@ class GameController(object):
 
         self.handler.method="guess"
         self.handler.log(message="Validating game is defined")
+
         if self.game is None:
             raise ValueError("The Game is unexpectedly undefined!")
 
@@ -107,75 +108,8 @@ class GameController(object):
         }
 
         self.handler.log(message="Checking game status")
-        # if self.game.status == self.GAME_WON:
-        #     self.handler.log(message="Game already won")
-        #     response_object["status"] = \
-        #         self._start_again_message("You already won!")
-        # elif self.game.status == self.GAME_LOST:
-        #     self.handler.log(message="Game already lost")
-        #     response_object["status"] = \
-        #         self._start_again_message("You already lost!")
-        # elif self.game.guesses_remaining < 1:
-        #     self.handler.log(message="Game lost, too many guesses")
-        #     response_object["status"] = \
-        #         self._start_again_message("You've made too many guesses")
-        # else:
-        if self._game_on(response_object):
-            self.handler.log(message="Game is valid and in play")
-
-            guess_made = DigitWord(*args, wordtype=self.game.mode.digit_type)
-            self.handler.log(
-                message="Created DigitWord using digits provided: Value {} Type {}"
-                    .format(guess_made.word, type(guess_made))
-            )
-
-            self.handler.log(message="Comparing guess and answer")
-            comparison = self.game.answer.compare(guess_made)
-
-            self.handler.log(message="Increment number of guesses made")
-            self.game.guesses_made += 1
-            response_object["bulls"] = 0
-            response_object["cows"] = 0
-            response_object["analysis"] = []
-
-            self.handler.log(message="Process comparison analysis")
-            for comparison_object in comparison:
-                self.handler.log(message="Processing index {} value {}".format(
-                    comparison_object.index,
-                    comparison_object.digit
-                ))
-                if comparison_object.match:
-                    response_object["bulls"] += 1
-                elif comparison_object.in_word:
-                    response_object["cows"] += 1
-                response_object["analysis"].append(comparison_object.get_object())
-
-            if response_object["bulls"] == self.game.mode.digits:
-                self.game.status = self.GAME_WON
-                self.game.guesses_made = self.game.mode.guesses_allowed
-                response_object["status"] = self._start_again_message(
-                    "Congratulations, you win!"
-                )
-                self.handler.log(
-                    message="The game has been won with the answers: {}"
-                        .format(guess_made.word)
-                )
-            elif self.game.guesses_remaining < 1:
-                self.game.status = self.GAME_LOST
-                response_object["status"] = self._start_again_message(
-                    "Sorry, you lost!"
-                )
-                self.handler.log(method="guess", message="Game lost.")
-            else:
-                self.game_status = self.GAME_PLAYING
-                response_object["status"] = "You have {} bulls and {} cows".format(
-                    response_object["bulls"],
-                    response_object["cows"]
-                )
-                self.handler.log(
-                    message="Still in play. {} bulls, {} cows"
-                        .format(response_object["bulls"], response_object["cows"])
-                )
+        if self._check_game_on(response_object):
+            self._game_is_on(response_object, *args)
 
         return response_object
 
@@ -218,23 +152,7 @@ class GameController(object):
         if game_json is None:
             _game_object = self._new_game(mode=mode)
         else:
-            self.handler.log(message="JSON provided")
-            if not isinstance(game_json, self.STRINGY):
-                raise TypeError("Game must be passed as a serialized JSON string.")
-
-            self.handler.log(message="Attempting to execute_load")
-            game_dict = json.loads(game_json)
-
-            self.handler.log(message="Validating mode exists in JSON")
-            if not 'mode' in game_dict:
-                raise ValueError("Mode is not provided in JSON; game_json cannot be loaded!")
-
-            _mode = GameMode(**game_dict["mode"])
-
-            if len(game_dict["answer"]) != game_dict["mode"]["digits"]:
-                raise ValueError("JSON provided answer does not match the JSON game mode")
-
-            _game_object = GameObject(mode=_mode, source_game=game_dict)
+            _game_object = self._load_game(game_json)
 
         self.handler.log(message="Deep copy loaded (or new) object")
         self.game = copy.deepcopy(_game_object)
@@ -340,14 +258,14 @@ class GameController(object):
     #
     # 'private' methods
     #
-    def _game_on(
+    def _check_game_on(
         self,
         response_object
     ):
         if not response_object:
-            raise ValueError("Responder must be set before calling _game_on")
+            raise ValueError("Responder must be set before calling _check_game_on")
         if not self.game:
-            raise ValueError("Game must be passed to _game_on")
+            raise ValueError("Game must be passed to _check_game_on")
 
         if self.game.status == self.GAME_WON:
             self.handler.log(message="Game already won")
@@ -366,6 +284,87 @@ class GameController(object):
             return False
         else:
             return True
+
+    def _game_is_on(
+        self,
+        response_object,
+        *args
+    ):
+        self.handler.log(message="Game is valid and in play")
+
+        guess_made = DigitWord(*args, wordtype=self.game.mode.digit_type)
+        self.handler.log(
+            message="Created DigitWord using digits provided: Value {} Type {}"
+                .format(guess_made.word, type(guess_made))
+        )
+
+        self.handler.log(message="Comparing guess and answer")
+        comparison = self.game.answer.compare(guess_made)
+
+        self.handler.log(message="Increment number of guesses made")
+        self.game.guesses_made += 1
+        response_object["bulls"] = 0
+        response_object["cows"] = 0
+        response_object["analysis"] = []
+
+        self.handler.log(message="Process comparison analysis")
+        for comparison_object in comparison:
+            self.handler.log(message="Processing index {} value {}".format(
+                comparison_object.index,
+                comparison_object.digit
+            ))
+            if comparison_object.match:
+                response_object["bulls"] += 1
+            elif comparison_object.in_word:
+                response_object["cows"] += 1
+            response_object["analysis"].append(comparison_object.get_object())
+
+        if response_object["bulls"] == self.game.mode.digits:
+            self.game.status = self.GAME_WON
+            self.game.guesses_made = self.game.mode.guesses_allowed
+            response_object["status"] = self._start_again_message(
+                "Congratulations, you win!"
+            )
+            self.handler.log(
+                message="The game has been won with the answers: {}"
+                    .format(guess_made.word)
+            )
+        elif self.game.guesses_remaining < 1:
+            self.game.status = self.GAME_LOST
+            response_object["status"] = self._start_again_message(
+                "Sorry, you lost!"
+            )
+            self.handler.log(method="guess", message="Game lost.")
+        else:
+            self.game_status = self.GAME_PLAYING
+            response_object["status"] = "You have {} bulls and {} cows".format(
+                response_object["bulls"],
+                response_object["cows"]
+            )
+            self.handler.log(
+                message="Still in play. {} bulls, {} cows"
+                    .format(response_object["bulls"], response_object["cows"])
+            )
+
+    def _load_game(self, game_json):
+        self.handler.log(message="JSON provided")
+        if not isinstance(game_json, self.STRINGY):
+            raise TypeError("Game must be passed as a serialized JSON string.")
+
+        self.handler.log(message="Attempting to execute_load")
+        game_dict = json.loads(game_json)
+
+        self.handler.log(message="Validating mode exists in JSON")
+        if not 'mode' in game_dict:
+            raise ValueError("Mode is not provided in JSON; game_json cannot be loaded!")
+
+        _mode = GameMode(**game_dict["mode"])
+
+        if len(game_dict["answer"]) != game_dict["mode"]["digits"]:
+            raise ValueError("JSON provided answer does not match the JSON game mode")
+
+        _game_object = GameObject(mode=_mode, source_game=game_dict)
+        return _game_object
 
     def _new_game(self, mode):
         self.handler.log(message="No JSON, so start new game.")
