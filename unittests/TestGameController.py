@@ -158,10 +158,50 @@ class TestGameController(TestCase):
         modes = g.game_mode_names
         self.assertIsInstance(modes,list)
 
-    def test_gc_guess(self):
+    def test_gc_guess_once(self):
         g = GameController()
-        for _ in range(11):
+        r = g.guess(0,0,0,0)
+        bulls = r.get("bulls", None)
+        self.assertIsNot(bulls, None)
+
+    def test_gc_guess_win_game(self):
+        g = GameController()
+        ans = g.game.answer.word
+        r = g.guess(*ans)
+        self.assertEqual(r["bulls"], 4)
+
+    def test_gc_guess_lose_game(self):
+        g = GameController()
+        for i in range(10):
             g.guess(0,0,0,0)
+        r = g.guess(0,0,0,0)
+        self.assertIsNone(r.get("bulls"))
+
+    def test_gc_guess_no_game(self):
+        g = GameController()
+        g.game = None
+        with self.assertRaises(ValueError):
+            g.guess(1,2,3,4)
+
+    def test_gc_check_game_nomore_turns(self):
+        response_object = {
+            "bulls": None,
+            "cows": None,
+            "analysis": None,
+            "status": None
+        }
+        g = GameController()
+        for _ in range(10):
+            r = g.guess(0,0,0,0)
+
+        game_on = g._check_game_on(response_object)
+        self.assertEqual(game_on, False)
+        self.assertIn("You've made too many", response_object.get("status", None))
+
+        self.assertEqual(r.get("status", None), "You've made too many guesses")
+        r = g._check_game_on(response_object)
+        self.assertEqual(r, False)
+        self.assertIn("You already lost! The correct answer was", response_object["status"])
 
     def test_gc_check_game_bad_response(self):
         g = GameController()
@@ -179,12 +219,6 @@ class TestGameController(TestCase):
             }
             g.game = None
             g._check_game_on(response_object=response_object)
-
-    def test_gc_win_game(self):
-        g = GameController()
-        ans = g.game.answer.word
-        r = g.guess(*ans)
-        self.assertEqual(r["bulls"], 4)
 
     def test_gc_already_won_game(self):
         g = GameController()
