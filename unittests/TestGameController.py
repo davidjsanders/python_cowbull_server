@@ -39,6 +39,25 @@ class TestGameController(TestCase):
         self.assertTrue("test2" in modes)
         self.assertFalse("test3" in modes)
 
+    def test_gc_new_game_direct(self):
+        g = GameController()
+        g._new_game(
+            GameMode(
+                mode="test1",
+                priority=5,
+            )
+        )
+
+    def test_gc_new_game_direct_badmode(self):
+        g = GameController()
+        with self.assertRaises(TypeError):
+            g._new_game(
+                {
+                    "mode": "test1",
+                    "priority": 5,
+                }
+            )
+
     def test_gc_load_game_modes(self):
         mode_list = [
             GameMode(
@@ -71,6 +90,11 @@ class TestGameController(TestCase):
         g = GameController()
         with self.assertRaises(TypeError):
             g.load_modes(input_modes=mode_list)
+
+    def test_gc_load_game(self):
+        g = GameController()
+        with self.assertRaises(TypeError):
+            g._load_game({"gameid":123})
 
     def test_gc_new_game_json_normal(self):
         json_string = '{' \
@@ -133,6 +157,27 @@ class TestGameController(TestCase):
         with self.assertRaises(self.json_raises):
             GameController(game_json=json_string)
 
+    def test_gc_load_bad_mode(self):
+        json_string = '{' \
+                        '"key": "12345678-0123-abcd-1234-0987654321fe", ' \
+                        '"answer": [4, 0], ' \
+                        '"smode": {' \
+                            '"guesses_allowed": 2, ' \
+                            '"digit_type": 0, ' \
+                            '"priority": 5, ' \
+                            '"mode": "test1", ' \
+                            '"instruction_text": "None", ' \
+                            '"help_text": "None", ' \
+                            '"digits": 4' \
+                        '}, ' \
+                        '"guesses_made": 0, ' \
+                        '"ttl": 3600, ' \
+                        '"status": "playing"' \
+                      '}'
+        with self.assertRaises(ValueError):
+            g = GameController()
+            g._load_game(json_string)
+
     def test_gc_load_bad_data(self):
         json_string = '{' \
                         '"key": "12345678-0123-abcd-1234-0987654321fe", ' \
@@ -169,6 +214,13 @@ class TestGameController(TestCase):
         ans = g.game.answer.word
         r = g.guess(*ans)
         self.assertEqual(r["bulls"], 4)
+
+    def test_gc_guess_with_cows(self):
+        g = GameController()
+        ans = g.game.answer.word
+        ans.reverse()
+        r = g.guess(*reversed(ans))
+        self.assertTrue(r["cows"] > 0 and r["bulls"] != 4)
 
     def test_gc_guess_lose_game(self):
         g = GameController()
