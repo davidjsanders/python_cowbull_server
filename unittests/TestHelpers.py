@@ -11,7 +11,7 @@ from flask import Response
 
 class TestHelpers(TestCase):
     def setUp(self):
-        pass
+        logging.disable(logging.CRITICAL)
 
     def test_he_br_response(self):
         r = build_response(
@@ -117,6 +117,22 @@ class TestHelpers(TestCase):
         self.assertEqual(r_data["message"], message)
         self.assertEqual(r_data["exception"], exception)
 
+    def test_he_value_error(self):
+        eh = ErrorHandler(
+            module="TEST",
+            method="TEST-METHOD",
+            level="logging.INFO"
+        )
+        self.assertEqual(eh.logger.level, logging.WARNING)
+
+    def test_he_type_error(self):
+        eh = ErrorHandler(
+            module="TEST",
+            method="TEST-METHOD",
+            level={"foobar": "logging.INFO"}
+        )
+        self.assertEqual(eh.logger.level, logging.WARNING)
+
     def test_he_check_warn(self):
         eh = ErrorHandler(
             module="TEST",
@@ -136,3 +152,6 @@ class TestHelpers(TestCase):
         self.assertTrue(
             vh.stringtype, basestring if sys.version_info[0] < 3 else str
         )
+
+    def tearDown(self):
+        logging.disable(logging.NOTSET)

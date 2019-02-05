@@ -17,9 +17,17 @@ class ErrorHandler(object):
             str_level = kwargs.get("level", None)
             level = int(str_level)
         except (ValueError, TypeError) as exmsg:
-            if str_level:
-                print("*** INVALID LOGGING_LEVEL: --> {}; is LOGGING_LEVEL set to a number?".format(exmsg))
             level = logging.WARNING
+            if str_level:
+                self.log(
+                    module="ErrorHandler",
+                    method="__init++",
+                    exception=exmsg,
+                    status=400,
+                    message="*** INVALID LOGGING_LEVEL: --> {}; is LOGGING_LEVEL set to a number?".format(str_level),
+                    logger=logging.warning,
+                    verbose=True
+                )
 
         self.basic_config(
             level=level,

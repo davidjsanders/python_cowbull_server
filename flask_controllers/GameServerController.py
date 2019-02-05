@@ -52,13 +52,13 @@ class GameServerController(MethodView):
         # Persistence Engine selector, v2.0
         #
         self.persistence_engine = app.config.get("PERSISTER", None)
-        self.handler.log(message="Persistence engine set to: {}".format(self.persistence_engine.engine_name))
         if not self.persistence_engine:
             raise ValueError(
                 "No persistence engine is defined and for some unknown "
                 "reason, the default of redis did not make it through "
                 "configuration!"
             )
+        self.handler.log(message="Persistence engine set to: {}".format(self.persistence_engine.engine_name))
 
         #
         # Log the configuration to the handler.

@@ -1,3 +1,5 @@
+import logging
+from TestGameServerController import TestGameServerController
 from TestGameController import TestGameController
 from TestGameObject import TestGameObject
 from TestHelpers import TestHelpers
@@ -5,3 +7,5 @@ from TestPersister import TestPersister
 from TestPersisterMongo import TestPersisterMongo
 from TestPersisterRedis import TestPersisterRedis
 from TestFlaskControllers import TestFlaskControllers
+
+logging.disable(logging.CRITICAL)
