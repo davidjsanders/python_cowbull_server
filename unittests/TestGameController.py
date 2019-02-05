@@ -4,6 +4,7 @@ from unittest import TestCase
 from Game.GameController import GameController
 from Game.GameMode import GameMode
 from python_cowbull_server import app
+from python_digits.DigitWord import DigitWord
 from flask_helpers.VersionHelpers import VersionHelpers
 
 class TestGameController(TestCase):
@@ -47,6 +48,11 @@ class TestGameController(TestCase):
                 priority=5,
             )
         )
+
+    def test_gc_new_game_direct_default_mode(self):
+        g = GameController()
+        g._new_game(mode=None)
+        self.assertEqual(g.game.mode.mode, g.find(0).mode)
 
     def test_gc_new_game_direct_badmode(self):
         g = GameController()

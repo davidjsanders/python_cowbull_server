@@ -80,6 +80,9 @@ class GameController(object):
     # 'public' methods
     #
 
+    def find(self, mode_number):
+        return self._game_modes[mode_number]
+
     def guess(self, *args):
         """
         Make a guess, comparing the hidden object to a set of provided digits. The digits should
