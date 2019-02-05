@@ -191,14 +191,9 @@ class TestGameController(TestCase):
             "status": None
         }
         g = GameController()
-        for _ in range(10):
+        for _ in range(11):
             r = g.guess(0,0,0,0)
 
-        game_on = g._check_game_on(response_object)
-        self.assertEqual(game_on, False)
-        self.assertIn("You've made too many", response_object.get("status", None))
-
-        self.assertEqual(r.get("status", None), "You've made too many guesses")
         r = g._check_game_on(response_object)
         self.assertEqual(r, False)
         self.assertIn("You already lost! The correct answer was", response_object["status"])
