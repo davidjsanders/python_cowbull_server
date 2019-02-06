@@ -24,9 +24,9 @@ class TestFlaskControllers(TestCase):
             gm = GameModes()
             gm.get()
 
-    def test_fc_gm_init(self):
-        v1 = V1(error_handler=self.eh, app=self.app.application)
-        v1.modes(controller=GameModes)
-        gm = GameModes()
-        with self.application.test_request_context('/game'):
-            gm.get()
+    # def test_fc_gm_init(self):
+    #     v1 = V1(error_handler=self.eh, app=app.application)
+    #     v1.modes(controller=GameModes)
+    #     gm = GameModes()
+    #     with self.application.test_request_context('/game'):
+    #         gm.get()

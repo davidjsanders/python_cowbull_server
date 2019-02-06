@@ -9,7 +9,7 @@ import socket
 from redis.exceptions import ConnectionError
 
 # Import flask packages
-from flask import request
+from flask import request, Response
 from flask.views import MethodView
 from flask_helpers.build_response import build_response
 from werkzeug.exceptions import BadRequest
@@ -114,10 +114,6 @@ class GameServerController(MethodView):
             self.handler.log(message="Fetching persistence engine - {}".format(self.persistence_engine.engine_name))
             persister = self.persistence_engine.persister
             self.handler.log(message='Persister instantiated', status=0)
-        except ConnectionError as ce:
-            return self.handler.error(status=503, exception=str(ce), message="There is no redis service available!")
-        except AttributeError as ae:
-            return self.handler.error(status=503, exception=str(ae), message="An internal error occurred - attribute missing for redis - check GameServerController:__init__")
         except Exception as e:
             return self.handler.error(status=500, exception=str(e),
                                       message="An internal error occurred - {}".format(repr(e)))
@@ -172,187 +168,57 @@ class GameServerController(MethodView):
         self.handler.method = "post"
         self.handler.log(message='Processing POST request.', status=0)
 
-        #
-        # Get the JSON from the POST request. If there is no JSON then an exception
-        # is raised. IMPORTANT NOTE: When debugging ensuring the Content-type is
-        # set to application/json - for example (using cURL):
-        #
-        # curl -H "Content-type: application/json" ...
-        #
-        try:
-            self.handler.log(message='Attempting to execute_load JSON', status=0)
-            json_dict = request.get_json()
-            self.handler.log(message='Loaded JSON. Returned: {}'.format(json_dict), status=0)
-        except BadRequest as e:
-            return self.handler.error(
-                status=400,
-                exception=e.description,
-                message="Bad request. There was no JSON present. Are you sure the "
-                        "header Content-type is set to application/json?"
-            )
+        json_dict = self._fetch_json(request=request)
 
         #
         # Get a persister to enable the game to be loaded and then saved (updated).
         # See the GET method above for more information on the persister.
         #
-        try:
-            self.handler.log(message='Getting persister', status=0)
-            persister = self.persistence_engine.persister
-        except ConnectionError as ce:
-            return self.handler.error(
-                status=503,
-                exception=str(ce),
-                message="There is no redis service available!"
-            )
+        self.handler.log(message='Getting persister', status=0)
+        persister = self.persistence_engine.persister
 
-        #
-        # Get the game key from the JSON provided above. If it does not exist,
-        # return a 400 status (client) error
-        #
-        try:
-            _key = json_dict["key"]
-            self.handler.log(message='Attempting to execute_load game {}'.format(_key), status=0)
-        except TypeError as te:
-            return self.handler.error(
-                status=400,
-                exception=str(te),
-                message="Bad request. For some reason the json_dict is None! Are you "
-                        "sure the header is set to application/json?"
-            )
-        except KeyError as ke:
-            return self.handler.error(
-                status=400,
-                exception=str(ke),
-                message="Bad request. For some reason the json_dict does not contain "
-                        "a key! Are you sure the header is set to application/json and "
-                        "a key is present?"
-            )
+        _key = self._get_key(json_dict=json_dict)
+        if not isinstance(_key, str):
+            return _key
 
-        #
-        # Load the game based on the key contained in the JSON provided to
-        # the POST request. If the JSON data is invalid, return a
-        # response to the user indicating an HTML status, the exception, and an
-        # explanatory message. If the data
-        #
+        self.handler.log(message='Attempting to execute_load game {}'.format(_key), status=0)
         gen_error_msg = "The request raised an exception while trying to load the saved game. " \
                         "Please try again shortly and the issue has been logged."
-        try:
-            _persisted_response = persister.load(key=_key)
-            if not _persisted_response:
-                raise KeyError(
-                    "The game key ({}) was not found in the persistence engine!".format(_key)
-                )
-            self.handler.log(message="Persister response: {}".format(_persisted_response))
 
-            _loaded_game = json.loads(_persisted_response)
-            self.handler.log(message="Loaded game: {}".format(_loaded_game))
-        except KeyError as ke:
-            return self.handler.error(
-                status=400,
-                exception=str(ke),
-                message="The request must contain a valid game key."
-            )
-        except ValueError as ve:
-            return self.handler.error(
-                status=500,
-                exception=str(ve),
-                message=gen_error_msg
-            )
-        except Exception as e:
-            return self.handler.error(
-                status=400,
-                exception=repr(e),
-                message=gen_error_msg
-            )
+        _loaded_game = self._load_game(key=_key, persister=persister)
+        if not isinstance(_loaded_game, dict):
+            return _loaded_game
 
-        #
-        # Load the game based on the key contained in the JSON provided to
-        # the POST request. If the JSON data is invalid, return a
-        # response to the user indicating an HTML status, the exception, and an
-        # explanatory message. If the data
-        #
-        try:
-            self.handler.log(message="Loading game mode from: {}.".format(_loaded_game["mode"]))
-            _mode = _loaded_game["mode"]
-            self.handler.log(message="Loaded game mode {}.".format(str(_mode["mode"])))
+        _game = self._get_game(
+            _loaded_game,
+            app
+        )
+        if not isinstance(_game, GameController):
+            return _game
+        self.handler.log(message='Loaded game {}'.format(_key), status=0)
 
-            _game = GameController(
-                game_modes=app.config["COWBULL_CUSTOM_MODES"],
-                game_json=json.dumps(_loaded_game),
-                mode=str(_mode["mode"])
-            )
-            self.handler.log(message='Loaded game {}'.format(_key), status=0)
-        except RuntimeError as ve:
-            return self.handler.error(
-                status=500,
-                exception=str(ve),
-                message="Bad request. For some reason the json_dict was None!"
-            )
-        except KeyError as ke:
-            return self.handler.error(
-                status=400,
-                exception=str(ke),
-                message="The request must contain a valid game key."
-            )
-        except TypeError as te:
-            return self.handler.error(
-                status=400,
-                exception=str(te),
-                message="The game key provided was invalid."
-            )
-        except Exception as e:
-            return self.handler.error(
-                status=500,
-                exception=repr(e),
-                message="Exception occurred while loading game!"
-            )
 
-        #
-        # Get the digits being guessed and add them to a list
-        #
-        try:
-            self.handler.log(message='Getting digits from {}'.format(json_dict))
-            _guesses = json_dict["digits"]
-            self.handler.log(message='Guesses extracted from JSON: {}'.format(_guesses), status=0)
-        except RuntimeError as ve:
-            return self.handler.error(
-                status=500,
-                exception=str(ve),
-                message="Bad request. For some reason the json_dict was None!"
-            )
-        except ValueError as ve:
-            return self.handler.error(
-                status=400,
-                exception=str(ve),
-                message="There was a problem with the value of the digits provided!"
-            )
-        except KeyError as ke:
-            return self.handler.error(
-                status=400,
-                exception=str(ke),
-                message="The request must contain an array of digits called 'digits'"
-            )
-        except TypeError as te:
-            return self.handler.error(
-                status=400,
-                exception=str(te),
-                message="The game key provided was invalid."
-            )
+        self.handler.log(message='Getting digits from {}'.format(json_dict))
+        _guesses = self._get_digits(json_dict=json_dict)
+        if isinstance(_guesses, Response):
+            return _guesses
+        self.handler.log(message='Guesses extracted from JSON: {}'.format(_guesses), status=0)
+
+        self.handler.log(message="In guess")
+        self.handler.log(message='Making a guess with digits: {}'.format(_guesses), status=0)
 
         #
         # Make a guess
         #
         try:
-            self.handler.log(message="In guess")
-            self.handler.log(message='Making a guess with digits: {}'.format(_guesses), status=0)
             _analysis = _game.guess(*_guesses)
-            self.handler.log(message='Retrieved guess analysis', status=0)
         except ValueError as ve:
             return self.handler.error(
                 status=400,
                 exception=str(ve),
                 message="There is a problem with the digits provided!"
             )
+        self.handler.log(message='Retrieved guess analysis', status=0)
 
         #
         # Save the game
@@ -388,3 +254,115 @@ class GameServerController(MethodView):
 
         self.handler.log(message='Returning analysis and game info to caller', status=0)
         return build_response(response_data=_return_response)
+
+    # Private methods
+    def _fetch_json(self, request=None):
+        #
+        # Get the JSON from the POST request. If there is no JSON then an exception
+        # is raised. IMPORTANT NOTE: When debugging ensuring the Content-type is
+        # set to application/json - for example (using cURL):
+        #
+        # curl -H "Content-type: application/json" ...
+        #
+        try:
+            self.handler.log(message='Attempting to execute_load JSON', status=0)
+            json_dict = request.get_json()
+            self.handler.log(message='Loaded JSON. Returned: {}'.format(json_dict), status=0)
+        except BadRequest as e:
+            return self.handler.error(
+                status=400,
+                exception=e.description,
+                message="Bad request. There was no JSON present. Are you sure the "
+                        "header Content-type is set to application/json?"
+            )
+        return json_dict
+
+    def _get_key(self, json_dict=None):
+        #
+        # Get the game key from the JSON provided above. If it does not exist,
+        # return a 400 status (client) error
+        #
+        key = None
+        try:
+#            print(json_dict)
+            key = json_dict["key"]
+            if not key:
+                raise KeyError("Key is null")
+            if not isinstance(key, str):
+                raise KeyError("Key is not a string!")
+        except TypeError as te:
+            return self.handler.error(
+                status=400,
+                exception=str(te),
+                message="Bad request. For some reason the json_dict is None! Are you "
+                        "sure the header is set to application/json?"
+            )
+        except KeyError as ke:
+            return self.handler.error(
+                status=400,
+                exception=str(ke),
+                message="Bad request. For some reason the json_dict does not contain "
+                        "a key! Are you sure the header is set to application/json and "
+                        "a key is present?"
+            )
+        return key
+
+    def _load_game(self, key=None, persister=None):
+        #
+        # Load the game based on the key contained in the JSON provided to
+        # the POST request. If the JSON data is invalid, return a
+        # response to the user indicating an HTML status, the exception, and an
+        # explanatory message. If the data
+        #
+        _persisted_response = None
+        try:
+            _persisted_response = persister.load(key=key)
+            if not _persisted_response:
+                raise KeyError(
+                    "The game key ({}) was not found in the persistence engine!".format(key)
+                )
+            _loaded_game = json.loads(_persisted_response)
+        except KeyError as ke:
+            return self.handler.error(
+                status=400,
+                exception=str(ke),
+                message="The request must contain a valid game key."
+            )
+        return _loaded_game
+
+    def _get_game(
+        self,
+        loaded_game,
+        app
+    ):
+        #
+        # Load the game based on the key contained in the JSON provided to
+        # the POST request. If the JSON data is invalid, return a
+        # response to the user indicating an HTML status, the exception, and an
+        # explanatory message. If the data
+        #
+        self.handler.log(message="Loading game mode from: {}.".format(loaded_game["mode"]))
+        _mode = loaded_game["mode"]
+        self.handler.log(message="Loaded game mode {}.".format(str(_mode["mode"])))
+
+        _game = GameController(
+            game_modes=app.config["COWBULL_CUSTOM_MODES"],
+            game_json=json.dumps(loaded_game),
+            mode=str(_mode["mode"])
+        )
+        return _game
+
+    def _get_digits(self, json_dict=None):
+        #
+        # Get the digits being guessed and add them to a list
+        #
+        try:
+            _guesses = json_dict["digits"]
+        except KeyError as ke:
+            return self.handler.error(
+                status=400,
+                exception=str(ke),
+                message="The request must contain an array of digits called 'digits'"
+            )
+        return _guesses
+

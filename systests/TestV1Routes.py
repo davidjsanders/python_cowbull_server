@@ -24,6 +24,7 @@ class TestV1Routes(TestCase):
         v1.health(controller=HealthCheck)
         v1.readiness(controller=Readiness)
 
+
     @staticmethod
     def _prepare_json_string(value=None):
         if not value:
