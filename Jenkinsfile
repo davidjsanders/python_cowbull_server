@@ -2,7 +2,7 @@
 def unique_id = UUID.randomUUID().toString()
 def persisters = [
     '{"engine_name": "redis", "parameters": {"host": "db", "port": 6379, "db": 0}}',
-    '{"engine_name": "mongodb", "parameters": {"host": "db", "port": 27017, "db": "cowbull"}}',
+    '{"engine_name": "mongodb", "parameters": {"host": "db", "port": 27017, "db": "cowbull", "server_selection_timeout_ms": 1000}}',
     '{"engine_name": "file", "parameters": {}}'
 ]
 

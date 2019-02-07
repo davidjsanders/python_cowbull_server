@@ -57,7 +57,12 @@ class Persister(AbstractPersister):
         games = self.mdb.games
 
         self.handler.log(message="Finding key {}".format(key))
-        return_result = games.find_one({"_id": key})
+        try:
+            return_result = games.find_one({"_id": key})
+            if not return_result:
+                raise KeyError("Unable to load key {}".format(key))
+        except Exception as e:
+            raise KeyError("An exception occurred: {}".format(str(e)))
 
         if return_result:
             self.handler.log(message="Key {} returned {}".format(key, return_result["game"]))
