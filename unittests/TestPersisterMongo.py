@@ -19,5 +19,5 @@ class TestPersisterMongo(TestCase):
             self.p.save(key="foo",jsonstr="bar")
 
     def test_mp_bad_load(self):
-        with self.assertRaises(ServerSelectionTimeoutError):
+        with self.assertRaises(KeyError):
             self.p.load(key="foo")
