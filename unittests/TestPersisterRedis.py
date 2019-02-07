@@ -8,7 +8,7 @@ class TestPersisterRedis(TestCase):
     def setUp(self):
         self.p = Persister(
             host="foobar", 
-            port=27017, 
+            port=6379, 
             db=0
         )
 
@@ -21,5 +21,5 @@ class TestPersisterRedis(TestCase):
             self.p.save(key="foo",jsonstr="bar")
 
     def test_rp_bad_load(self):
-        with self.assertRaises(redis.exceptions.ConnectionError):
+        with self.assertRaises(KeyError):
             self.p.load(key="foo")

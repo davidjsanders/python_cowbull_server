@@ -110,31 +110,15 @@ class GameServerController(MethodView):
         # Get a persistence engine. The persister is set in configuration
         # and dynamically loaded at the start of the transaction. See
         # Persistence/PersistenceEngine.py for more info.
-        try:
-            self.handler.log(message="Fetching persistence engine - {}".format(self.persistence_engine.engine_name))
-            persister = self.persistence_engine.persister
-            self.handler.log(message='Persister instantiated', status=0)
-        except Exception as e:
-            return self.handler.error(status=500, exception=str(e),
-                                      message="An internal error occurred - {}".format(repr(e)))
+        self.handler.log(message="Fetching persistence engine - {}".format(self.persistence_engine.engine_name))
+        persister = self.persistence_engine.persister
+        self.handler.log(message='Persister instantiated', status=0)
 
         #
         # Save the newly created game to the persistence engine
         #
-        gen_error_msg = "The request raised an exception while trying to save a new game. " \
-                        "Please try again shortly and the issue has been logged."
         self.handler.log(message="Saving game to persister")
-        try:
-            persister.save(game_controller.game.key, game_controller.save())
-        except KeyError as ke:
-            return self.handler.error(
-                status=500,
-                exception=str(ke),
-                message=gen_error_msg
-            )
-        except Exception as e:
-            return self.handler.error(status=500, exception=str(e),
-                                      message="An internal error occurred - {}".format(repr(e)))
+        persister.save(game_controller.game.key, game_controller.save())
         self.handler.log(message='Game {} persisted.'.format(game_controller.game.key), status=0)
 
         #
@@ -182,9 +166,6 @@ class GameServerController(MethodView):
             return _key
 
         self.handler.log(message='Attempting to execute_load game {}'.format(_key), status=0)
-        gen_error_msg = "The request raised an exception while trying to load the saved game. " \
-                        "Please try again shortly and the issue has been logged."
-
         _loaded_game = self._load_game(key=_key, persister=persister)
         if not isinstance(_loaded_game, dict):
             return _loaded_game
@@ -193,8 +174,6 @@ class GameServerController(MethodView):
             _loaded_game,
             app
         )
-        if not isinstance(_game, GameController):
-            return _game
         self.handler.log(message='Loaded game {}'.format(_key), status=0)
 
 
@@ -223,21 +202,9 @@ class GameServerController(MethodView):
         #
         # Save the game
         #
-        gen_error_msg = "The request raised an exception while trying to save (update) the game. " \
-                        "Please try again shortly and the issue has been logged."
         self.handler.log(message="Saving game to persister")
         save_game = _game.save()
-        try:
-            persister.save(key=_key, jsonstr=save_game)
-        except KeyError as ke:
-            return self.handler.error(
-                status=500,
-                exception=str(ke),
-                message=gen_error_msg
-            )
-        except Exception as e:
-            return self.handler.error(status=500, exception=str(e),
-                                      message="An internal error occurred - {}".format(repr(e)))
+        persister.save(key=_key, jsonstr=save_game)
         self.handler.log(message='Game {} persisted.'.format(_key), status=0)
 
         #
@@ -284,7 +251,6 @@ class GameServerController(MethodView):
         #
         key = None
         try:
-#            print(json_dict)
             key = json_dict["key"]
             if not key:
                 raise KeyError("Key is null")
@@ -317,16 +283,20 @@ class GameServerController(MethodView):
         _persisted_response = None
         try:
             _persisted_response = persister.load(key=key)
-            if not _persisted_response:
-                raise KeyError(
-                    "The game key ({}) was not found in the persistence engine!".format(key)
-                )
-            _loaded_game = json.loads(_persisted_response)
         except KeyError as ke:
             return self.handler.error(
                 status=400,
                 exception=str(ke),
                 message="The request must contain a valid game key."
+            )
+
+        try:
+            _loaded_game = json.loads(_persisted_response)
+        except Exception as e:
+            return self.handler.error(
+                status=400,
+                exception=str(e),
+                message="Exception while trying to load game from game key."
             )
         return _loaded_game
 

@@ -142,6 +142,7 @@ class TestV1Routes(TestCase):
             headers=headers
         )
         self.assertTrue(result.status_code == 400)
+        self.assertIn("The request must contain a valid game key", str(result.data))
 
     def test_v1_game_post_intkey(self):
         json_string = json.dumps(

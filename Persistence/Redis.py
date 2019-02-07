@@ -69,7 +69,14 @@ class Persister(AbstractPersister):
         super(Persister, self).load(key=key)
 
         self.handler.log(message="Fetching key: {}".format(key))
-        return_result = self._redis_connection.get(key)
+        try:
+            return_result = self._redis_connection.get(key)
+            if not return_result:
+                raise KeyError("Unable to load key {}".format(key))
+        except redis.exceptions.ConnectionError as rce:
+            raise KeyError("Unable to connect to the Redis persistence engine: {}".format(str(rce)))
+        except Exception as e:
+            raise KeyError("An exception occurred: {}".format(str(e)))
 
         # http://sonarqube:9000/project/issues?id=cowbull_server&issues=AWiRMKBcaAhZ-jY-ujHp&open=AWiRMKBcaAhZ-jY-ujHp
         if return_result is not None and isinstance(return_result, bytes):
