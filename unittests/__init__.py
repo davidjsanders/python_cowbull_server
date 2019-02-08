@@ -7,6 +7,9 @@ from TestPersister import TestPersister
 from TestPersisterMongo import TestPersisterMongo
 from TestPersisterRedis import TestPersisterRedis
 from TestFlaskControllers import TestFlaskControllers
+from TestHealthCheck import TestHealthCheck
+from TestGameMode import TestGameMode
+from TestGameModes import TestGameModes
 
 from python_cowbull_server import app
 from Routes.V1 import V1

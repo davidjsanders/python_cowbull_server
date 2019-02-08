@@ -222,10 +222,13 @@ class TestGameController(TestCase):
         self.assertEqual(r["bulls"], 4)
 
     def test_gc_guess_with_cows(self):
-        g = GameController()
-        ans = g.game.answer.word
-        ans.reverse()
-        r = g.guess(*reversed(ans))
+        while True:
+            g = GameController()
+            ans = g.game.answer.word
+            rev = [*reversed(ans)]
+            if ans != rev:
+                break
+        r = g.guess(*rev)
         self.assertTrue(r["cows"] > 0 and r["bulls"] != 4)
 
     def test_gc_guess_lose_game(self):
