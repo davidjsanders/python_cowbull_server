@@ -186,5 +186,15 @@ pipeline {
                 }
             }
         }
+
+        stage("Tidy") {
+            steps {
+                script {
+                    sh """
+                        rm -rf /tmp/*.cow
+                    """
+                }
+            }
+        }
     }
 }
