@@ -1,15 +1,15 @@
 
 def unique_id = UUID.randomUUID().toString()
 def persisters = [
+    '{"engine_name": "file", "parameters": {}}',
     '{"engine_name": "redis", "parameters": {"host": "db", "port": 6379, "db": 0}}',
-    '{"engine_name": "mongodb", "parameters": {"host": "db", "port": 27017, "db": "cowbull", "server_selection_timeout_ms": 1000}}',
-    '{"engine_name": "file", "parameters": {}}'
+    '{"engine_name": "mongodb", "parameters": {"host": "db", "port": 27017, "db": "cowbull", "server_selection_timeout_ms": 1000}}'
 ]
 
 def systest_persister = readJSON text: '{"engine_name": "redis", "parameters": {"host": "db", "port": 6379, "db": 0, "password": ""}}'
-def engine1 = readJSON text: '{"persister":"redis", "image":"redis:5.0.3-alpine", "name":"redis"}'
-def engine2 = readJSON text: '{"persister":"mongodb", "image":"mongo:4.0.5", "name":"mongo"}'
-def engine3 = readJSON text: '{"persister":"file", "image":"redis:5.0.3-alpine", "name":"file"}'
+def engine1 = readJSON text: '{"persister":"file", "image":"redis:5.0.3-alpine", "name":"file"}'
+def engine2 = readJSON text: '{"persister":"redis", "image":"redis:5.0.3-alpine", "name":"redis"}'
+def engine3 = readJSON text: '{"persister":"mongodb", "image":"mongo:4.0.5", "name":"mongo"}'
 def test_engines = [
     engine1,
     engine2,
