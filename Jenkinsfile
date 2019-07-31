@@ -30,7 +30,7 @@ podTemplate(containers: [
             sh """
                 export PYTHONPATH="\$(pwd)/:\$(pwd)/systests"
                 export PERSISTER='{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0, "password": ""}}'
-                export LOGGING_LEVEL=10
+                export LOGGING_LEVEL=30
                 python -m unittest systests
             """
         }
