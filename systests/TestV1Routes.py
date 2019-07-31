@@ -215,7 +215,7 @@ class TestV1Routes(TestCase):
 
     def test_v1_get_health(self):
         results = self.app.get('/v1/health')
-        required_keys = {"health"}
+        required_keys = {"health","comment"}
         keys_returned_from_url = set(json.loads(self._prepare_json_string(results.data)))
         self.assertTrue(
             required_keys <= keys_returned_from_url

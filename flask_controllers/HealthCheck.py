@@ -30,7 +30,7 @@ class HealthCheck(MethodView):
         except Exception as e:
             _response = {
                 "health": "notok",
-                "comment": "Unable to persist {}".format(str(e))
+                "comment": "Unable to persist {}".format(str(e.message))
             }
 
         return build_response(response_data=_response, html_status=_status)
