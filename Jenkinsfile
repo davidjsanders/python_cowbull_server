@@ -4,7 +4,7 @@ def minor = '2'
 podTemplate(containers: [
     containerTemplate(name: 'redis', image: 'k8s-master:32080/redis:5.0.3-alpine', ttyEnabled: true, command: 'redis-server'),
     containerTemplate(name: 'python', image: 'k8s-master:32080/python:3.7.4-alpine3.10', ttyEnabled: true, command: 'cat'),
-    containerTemplate(name: 'jre', image: 'k8s-master:32080/openjdk:8-jre-slim', ttyEnabled: true, command: 'cat'),
+    containerTemplate(name: 'jre', image: 'k8s-master:32080/openjdk:11-jdk', ttyEnabled: true, command: 'cat'),
   ]) {
   node(POD_LABEL) {
     stage('Verify Redis is running') {
