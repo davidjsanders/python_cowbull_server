@@ -64,5 +64,13 @@ podTemplate(containers: [
             }
         }
     }
+    stage('Docker Build') {
+        container('docker') {
+            sh """
+                docker build -t cicd/scratch:${major}.${minor}.${env.BUILD_NUMBER} -f vendor/docker/Dockerfile .
+                docker image ls
+            """
+        }
+    }
   }
 }
