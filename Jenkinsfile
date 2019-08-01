@@ -50,7 +50,7 @@ podTemplate(containers: [
                     rm -f /var/jenkins_home/workspace/cowbull-server/.sonar/report-task.txt
                     echo "Run sonar scanner"
                     chmod +x ${scannerHome}/bin/sonar-scanner
-                    ${scannerHome}/bin/sonar-scanner -Dproject.settings=./sonar-project.properties -Dsonar.python.coverage.reportPath=./coverage.xml -Dsonar.projectVersion="${major}"."${minor}"."${env.BUILD_NUMBER}"
+                    ${scannerHome}/bin/sonar-scanner -X -Dproject.settings=./sonar-project.properties -Dsonar.python.coverage.reportPath=./coverage.xml -Dsonar.projectVersion="${major}"."${minor}"."${env.BUILD_NUMBER}"
                 """
             }
         }
