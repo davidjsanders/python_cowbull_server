@@ -36,7 +36,7 @@ podTemplate(containers: [
         }
     }
     stage('Sonarqube code coverage') {
-        withSonarQubeEnv('SonarQube') { // If you have configured more than one global server connection, you can specify its name
+        withSonarQubeEnv('Sonarqube') { // If you have configured more than one global server connection, you can specify its name
             sh "${scannerHome}/bin/sonar-scanner"
         }
     }
