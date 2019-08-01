@@ -110,7 +110,7 @@ spec:
   volumes:
   - emptyDir: {}
     name: "workspace-volume"
-    """
+"""
 ) {
   node(POD_LABEL) {
     stage('Verify Redis is running') {
