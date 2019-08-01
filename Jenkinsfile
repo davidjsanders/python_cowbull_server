@@ -1,11 +1,119 @@
 def major = '2'
 def minor = '2'
 
-podTemplate(containers: [
-    containerTemplate(name: 'redis', image: 'k8s-master:32080/redis:5.0.3-alpine', ttyEnabled: true, command: 'redis-server'),
-    containerTemplate(name: 'python', image: 'k8s-master:32080/python:3.7.4-alpine3.10', ttyEnabled: true, command: 'cat'),
-    containerTemplate(name: 'jre', image: 'k8s-master:32080/openjdk:11-jre', ttyEnabled: true, command: 'cat', envVars: [envVar(key: 'dns', value: '8.8.8.8')]),
-  ]) {
+podTemplate(
+    yaml: """
+---
+apiVersion: "v1"
+kind: "Pod"
+metadata:
+  annotations:
+    buildUrl: "http://jenkins-service/job/cowbull-server/38/"
+  labels:
+    jenkins: "slave"
+    jenkins/cowbull-server_38-jqxj3: "true"
+  name: "cowbull-server-38-jqxj3-rzr8s-8ckzw"
+spec:
+  containers:
+  - command:
+    - "cat"
+    env:
+    - name: "JENKINS_SECRET"
+      value: "********"
+    - name: "JENKINS_AGENT_NAME"
+      value: "cowbull-server-38-jqxj3-rzr8s-8ckzw"
+    - name: "JENKINS_NAME"
+      value: "cowbull-server-38-jqxj3-rzr8s-8ckzw"
+    - name: "JENKINS_URL"
+      value: "http://jenkins-service/"
+    image: "k8s-master:32080/python:3.7.4-alpine3.10"
+    imagePullPolicy: "IfNotPresent"
+    name: "python"
+    resources:
+      limits: {}
+      requests: {}
+    securityContext:
+      privileged: false
+    tty: true
+    volumeMounts:
+    - mountPath: "/home/jenkins"
+      name: "workspace-volume"
+      readOnly: false
+    workingDir: "/home/jenkins"
+  - command:
+    - "cat"
+    env:
+    - name: "JENKINS_SECRET"
+      value: "********"
+    - name: "JENKINS_AGENT_NAME"
+      value: "cowbull-server-38-jqxj3-rzr8s-8ckzw"
+    - name: "JENKINS_NAME"
+      value: "cowbull-server-38-jqxj3-rzr8s-8ckzw"
+    - name: "JENKINS_URL"
+      value: "http://jenkins-service/"
+    image: "k8s-master:32080/openjdk:11-jre"
+    imagePullPolicy: "IfNotPresent"
+    name: "jre"
+    resources:
+      limits: {}
+      requests: {}
+    hostNetwork: true
+    dnsPolicy: ClusterFirstWithHostNet
+    securityContext:
+      privileged: false
+    tty: true
+    volumeMounts:
+    - mountPath: "/home/jenkins"
+      name: "workspace-volume"
+      readOnly: false
+    workingDir: "/home/jenkins"
+  - command:
+    - "redis-server"
+    env:
+    - name: "JENKINS_SECRET"
+      value: "********"
+    - name: "JENKINS_AGENT_NAME"
+      value: "cowbull-server-38-jqxj3-rzr8s-8ckzw"
+    - name: "JENKINS_NAME"
+      value: "cowbull-server-38-jqxj3-rzr8s-8ckzw"
+    - name: "JENKINS_URL"
+      value: "http://jenkins-service/"
+    image: "k8s-master:32080/redis:5.0.3-alpine"
+    imagePullPolicy: "IfNotPresent"
+    name: "redis"
+    resources:
+      limits: {}
+      requests: {}
+    securityContext:
+      privileged: false
+    tty: true
+    volumeMounts:
+    - mountPath: "/home/jenkins"
+      name: "workspace-volume"
+      readOnly: false
+    workingDir: "/home/jenkins"
+  - env:
+    - name: "JENKINS_SECRET"
+      value: "********"
+    - name: "JENKINS_AGENT_NAME"
+      value: "cowbull-server-38-jqxj3-rzr8s-8ckzw"
+    - name: "JENKINS_NAME"
+      value: "cowbull-server-38-jqxj3-rzr8s-8ckzw"
+    - name: "JENKINS_URL"
+      value: "http://jenkins-service/"
+    image: "jenkins/jnlp-slave:alpine"
+    name: "jnlp"
+    volumeMounts:
+    - mountPath: "/home/jenkins"
+      name: "workspace-volume"
+      readOnly: false
+  nodeSelector: {}
+  restartPolicy: "Never"
+  volumes:
+  - emptyDir: {}
+    name: "workspace-volume"
+    """
+) {
   node(POD_LABEL) {
     stage('Verify Redis is running') {
         container('redis') {
