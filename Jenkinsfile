@@ -38,7 +38,7 @@ podTemplate(containers: [
     }
     stage('Sonarqube code coverage') {
         container('python') {
-            def scannerHome = tool 'sonarScanner';
+            def scannerHome = tool 'SonarQube Scanner';
             withSonarQubeEnv('Sonarqube') { // If you have configured more than one global server connection, you can specify its name
                 sh """
                     rm -rf *.pyc
