@@ -36,8 +36,17 @@ podTemplate(containers: [
         }
     }
     stage('Sonarqube code coverage') {
-        withSonarQubeEnv('Sonarqube') { // If you have configured more than one global server connection, you can specify its name
-            sh "${scannerHome}/bin/sonar-scanner"
+        container('python') {
+            def scannerHome = tool 'sonarScanner';
+            withSonarQubeEnv('Sonarqube') { // If you have configured more than one global server connection, you can specify its name
+                sh """
+                    rm -rf *.pyc
+                    rm -f /var/jenkins_home/workspace/cowbull-server/.scannerwork/report-task.txt
+                    rm -f /var/jenkins_home/workspace/cowbull-server/.sonar/report-task.txt
+                    echo "Run sonar scanner"
+                    ${scannerHome}/bin/sonar-scanner -Dproject.settings=./sonar-project.properties -Dsonar.python.coverage.reportPath=./coverage.xml -Dsonar.projectVersion="${major}"."${minor}"."${env.BUILD_NUMBER}"
+                """
+            }
         }
     }
     stage('Sonarqube quality gate') {
