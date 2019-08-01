@@ -4,7 +4,7 @@ def minor = '2'
 podTemplate(containers: [
     containerTemplate(name: 'redis', image: 'k8s-master:32080/redis:5.0.3-alpine', ttyEnabled: true, command: 'redis-server'),
     containerTemplate(name: 'python', image: 'k8s-master:32080/python:3.7.4-alpine3.10', ttyEnabled: true, command: 'cat'),
-    containerTemplate(name: 'jdk', image: 'k8s-master:32080/openjdk:11-jdk', ttyEnabled: true, command: 'cat'),
+    containerTemplate(name: 'jre', image: 'k8s-master:32080/openjdk:11-jre', ttyEnabled: true, command: 'cat', privileged: true),
   ]) {
   node(POD_LABEL) {
     stage('Verify Redis is running') {
@@ -41,7 +41,7 @@ podTemplate(containers: [
         }
     }
     stage('Sonarqube code coverage') {
-        container('jdk') {
+        container('jre') {
             def scannerHome = tool 'SonarQube Scanner';
             withSonarQubeEnv('Sonarqube') { // If you have configured more than one global server connection, you can specify its name
                 sh """
