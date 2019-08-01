@@ -21,7 +21,8 @@ podTemplate(containers: [
         container('python') {
             sh """
                 export PYTHONPATH="\$(pwd)/:\$(pwd)/unittests"
-                python -m unittest unittests
+                coverage run -m unittest unittests
+                coverage xml -i
             """
         }
     }
