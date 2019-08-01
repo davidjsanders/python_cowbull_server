@@ -17,7 +17,7 @@ podTemplate(containers: [
         container('python') {
             sh """
                 python --version
-                python3 -m pip install -q -r requirements.txt
+                python3 -m pip install -r requirements.txt
             """
         }
     }
