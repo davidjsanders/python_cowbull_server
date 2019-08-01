@@ -14,8 +14,6 @@ metadata:
     jenkins/cowbull-server_38-jqxj3: "true"
   name: "cowbull-server-38-jqxj3-rzr8s-8ckzw"
 spec:
-  hostNetwork: true
-  dnsPolicy: ClusterFirstWithHostNet
   containers:
   - command:
     - "cat"
