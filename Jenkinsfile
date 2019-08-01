@@ -1,5 +1,6 @@
 def major = '2'
 def minor = '2'
+def imageName = 'cowbull'
 
 podTemplate(containers: [
     containerTemplate(name: 'redis', image: 'k8s-master:32080/redis:5.0.3-alpine', ttyEnabled: true, command: 'redis-server'),
@@ -66,10 +67,19 @@ podTemplate(containers: [
     }
     stage('Docker Build') {
         container('docker') {
-            sh """
-                docker build -t cicd/scratch:${major}.${minor}.${env.BUILD_NUMBER} -f vendor/docker/Dockerfile .
-                docker image ls
-            """
+            withCredentials([
+                [$class: 'UsernamePasswordMultiBinding', 
+                credentialsId: 'dockerhub',
+                usernameVariable: 'USERNAME', 
+                passwordVariable: 'PASSWORD']
+            ]) {
+                sh """
+                    docker login -u "${USERNAME}" -p "${PASSWORD}"
+                    docker build -t dsanderscan/${imageName}:${major}.${minor}.${env.BUILD_NUMBER} -f vendor/docker/Dockerfile .
+                    docker push dsanderscan/${imageName}:"${major}"."${minor}"."${env.BUILD_NUMBER}"
+                    docker image rm dsanderscan/${imageName}:"${major}"."${minor}"."${env.BUILD_NUMBER}"
+                """
+            }
         }
     }
   }
