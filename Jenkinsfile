@@ -43,7 +43,7 @@ podTemplate(containers: [
     stage('Sonarqube code coverage') {
         container('maven') {
             def scannerHome = tool 'SonarQube Scanner';
-            withSonarQubeEnv('Sonarqube') { // If you have configured more than one global server connection, you can specify its name
+            withSonarQubeEnv('Sonarqube') {
                 sh """
                     rm -rf *.pyc
                     rm -f /var/jenkins_home/workspace/cowbull-server/.scannerwork/report-task.txt
@@ -55,10 +55,13 @@ podTemplate(containers: [
             }
         }
     }
-    stage('Sonarqube quality gate') {
-        sh """
-          echo "Still a work in progress :) "
-        """
+    stage('Quality Gate') {
+        container('maven') {
+            def scannerHome = tool 'SonarQube Scanner';
+            timeout(time: 10, unit: 'MINUTES') {
+                waitForQualityGate abortPipeline: true
+            }
+        }
     }
   }
 }
