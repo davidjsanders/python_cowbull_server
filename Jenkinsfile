@@ -57,8 +57,6 @@ spec:
     resources:
       limits: {}
       requests: {}
-    hostNetwork: true
-    dnsPolicy: ClusterFirstWithHostNet
     securityContext:
       privileged: false
     tty: true
@@ -109,6 +107,8 @@ spec:
       readOnly: false
   nodeSelector: {}
   restartPolicy: "Never"
+  hostNetwork: true
+  dnsPolicy: ClusterFirstWithHostNet
   volumes:
   - emptyDir: {}
     name: "workspace-volume"
