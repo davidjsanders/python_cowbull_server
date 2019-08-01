@@ -35,5 +35,15 @@ podTemplate(containers: [
             """
         }
     }
+    stage('Sonarqube code coverage') {
+        sh """
+          echo "Still a work in progress :) "
+        """
+    }
+    stage('Sonarqube quality gate') {
+        sh """
+          echo "Still a work in progress :) "
+        """
+    }
   }
 }
