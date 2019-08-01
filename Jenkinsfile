@@ -4,7 +4,7 @@ def minor = '2'
 podTemplate(containers: [
     containerTemplate(name: 'redis', image: 'k8s-master:32080/redis:5.0.3-alpine', ttyEnabled: true, command: 'redis-server'),
     containerTemplate(name: 'python', image: 'k8s-master:32080/python:3.7.4-alpine3.10', ttyEnabled: true, command: 'cat'),
-    containerTemplate(name: 'jre', image: 'k8s-master:32080/openjdk:11-jre', ttyEnabled: true, command: 'cat', envVars: [envVar(key: 'dns', value: '8.8.8.8')]),
+    containerTemplate(name: 'maven', image: 'k8s-master:32080/3.6.1-jdk-11', ttyEnabled: true, command: 'cat', envVars: [envVar(key: 'dns', value: '8.8.8.8')]),
   ]) {
   node(POD_LABEL) {
     stage('Verify Redis is running') {
@@ -41,7 +41,7 @@ podTemplate(containers: [
         }
     }
     stage('Sonarqube code coverage') {
-        container('jre') {
+        container('maven') {
             def scannerHome = tool 'SonarQube Scanner';
             withSonarQubeEnv('Sonarqube') { // If you have configured more than one global server connection, you can specify its name
                 sh """
@@ -50,7 +50,7 @@ podTemplate(containers: [
                     rm -f /var/jenkins_home/workspace/cowbull-server/.sonar/report-task.txt
                     echo "Run sonar scanner"
                     chmod +x ${scannerHome}/bin/sonar-scanner
-                    ${scannerHome}/bin/sonar-scanner -X -Dsun.net.spi.nameservice.nameservers=8.8.8.8 -Dsun.net.spi.nameservice.provider.1="dns,sun" -Dproject.settings=./sonar-project.properties -Dsonar.python.coverage.reportPath=./coverage.xml -Dsonar.projectVersion="${major}"."${minor}"."${env.BUILD_NUMBER}"
+                    ${scannerHome}/bin/sonar-scanner -X -Dproject.settings=./sonar-project.properties -Dsonar.python.coverage.reportPath=./coverage.xml -Dsonar.projectVersion="${major}"."${minor}"."${env.BUILD_NUMBER}"
                 """
             }
         }
