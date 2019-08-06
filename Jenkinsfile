@@ -1,3 +1,25 @@
+// -------------------------------------------------------------------
+//
+// Module:         python_cowbull_server
+// Submodule:      Jenkinsfile
+// Environments:   all
+// Purpose:        Jenkins scripted pipeline to perform the CI and CD
+//                 build of the python cowbull server image.
+//
+// Created on:     30 July 2019
+// Created by:     David Sanders
+// Creator email:  dsanderscanada@nospam-gmail.com
+//
+// -------------------------------------------------------------------
+// Modifed On   | Modified By                 | Release Notes
+// -------------------------------------------------------------------
+// 30 Jul 2019  | David Sanders               | First release.
+// -------------------------------------------------------------------
+// 06 Aug 2019  | David Sanders               | Change python3 to use
+//              |                             | default python rather
+//              |                             | than specific version.
+// -------------------------------------------------------------------
+
 def major = '2'
 def minor = '2'
 def imageName = 'cowbull'
@@ -19,7 +41,7 @@ podTemplate(containers: [
         container('python') {
             sh """
                 python --version
-                python3 -m pip install -r requirements.txt
+                python -m pip install -r requirements.txt
             """
         }
     }
