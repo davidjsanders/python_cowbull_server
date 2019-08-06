@@ -19,9 +19,15 @@
 //              |                             | default python rather
 //              |                             | than specific version.
 // -------------------------------------------------------------------
+// 06 Aug 2019  | David Sanders               | Add multi-branch
+//              |                             | support and push non-
+//              |                             | master branches as dev
+//              |                             | and promote major/minor
+//              |                             | to year month format.
+// -------------------------------------------------------------------
 
-def major = '2'
-def minor = '2'
+def major = '19'
+def minor = '08'
 def imageName = 'cowbull'
 
 podTemplate(containers: [
@@ -88,10 +94,10 @@ podTemplate(containers: [
         }
     }
     stage('Docker Build') {
-        when {
-            branch 'master'
-        }
         container('docker') {
+            when {
+                branch 'master'
+            }
             withCredentials([
                 [$class: 'UsernamePasswordMultiBinding', 
                 credentialsId: 'dockerhub',
@@ -108,10 +114,10 @@ podTemplate(containers: [
         }
     }
     stage('Docker Build') {
-        when {
-            not {branch 'master'}
-        }
         container('docker') {
+            when {
+                not {branch 'master'}
+            }
             withCredentials([
                 [$class: 'UsernamePasswordMultiBinding', 
                 credentialsId: 'dockerhub',
