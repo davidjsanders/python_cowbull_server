@@ -95,6 +95,7 @@ podTemplate(containers: [
         }
     }
     stage('Docker Build') {
+        def imageName = ""
         container('docker') {
             withCredentials([
                 [$class: 'UsernamePasswordMultiBinding', 
