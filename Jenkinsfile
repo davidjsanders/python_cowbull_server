@@ -60,8 +60,8 @@ podTemplate(containers: [
     stage('Execute Python unit tests') {
         container('python') {
             sh """
-                export PYTHONPATH="\$(pwd)/:\$(pwd)/unittests"
-                coverage run -m unittest unittests
+                export PYTHONPATH="\$(pwd)"
+                coverage run unittests/main.py
                 coverage xml -i
             """
         }
@@ -69,10 +69,10 @@ podTemplate(containers: [
     stage('Execute Python system tests') {
         container('python') {
             sh """
-                export PYTHONPATH="\$(pwd)/:\$(pwd)/systests"
+                export PYTHONPATH="\$(pwd)"
                 export PERSISTER='{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0, "password": ""}}'
                 export LOGGING_LEVEL=30
-                python -m unittest systests
+                python systests/main.py
             """
         }
     }
