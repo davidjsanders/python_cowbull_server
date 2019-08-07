@@ -44,7 +44,8 @@ podTemplate(containers: [
         } else {
             imageName = "dsanderscan/cowbull:${env.BRANCH_NAME}"
         }
-        git 'https://github.com/dsandersAzure/python_cowbull_server'
+        checkout scm
+        // git 'https://github.com/dsandersAzure/python_cowbull_server'
         container('python') {
             sh """
                 python --version
