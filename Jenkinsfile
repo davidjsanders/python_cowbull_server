@@ -62,6 +62,7 @@ podTemplate(containers: [
             try {
                 sh """
                     export PYTHONPATH="\$(pwd)"
+                    ls -als unittests
                     coverage run unittests/main.py
                     coverage xml -i
                 """
