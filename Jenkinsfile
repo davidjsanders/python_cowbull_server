@@ -45,7 +45,6 @@ podTemplate(containers: [
             imageName = "dsanderscan/cowbull:${env.BRANCH_NAME}.${env.BUILD_NUMBER}"
         }
         checkout scm
-        // git 'https://github.com/dsandersAzure/python_cowbull_server'
         container('python') {
             sh """
                 python --version
@@ -63,7 +62,6 @@ podTemplate(containers: [
             try {
                 sh """
                     export PYTHONPATH="\$(pwd)"
-                    ls -als unittests
                     coverage run unittests/main.py
                     coverage xml -i
                 """
