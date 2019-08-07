@@ -5,6 +5,7 @@
 // Environments:   all
 // Purpose:        Jenkins scripted pipeline to perform the CI and CD
 //                 build of the python cowbull server image.
+//                 NOTE: Scripted pipeline
 //
 // Created on:     30 July 2019
 // Created by:     David Sanders
