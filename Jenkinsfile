@@ -38,11 +38,6 @@ podTemplate(containers: [
     containerTemplate(name: 'docker', image: 'k8s-master:32080/docker:19.03.1-dind', ttyEnabled: true, privileged: true),
   ]) {
   node(POD_LABEL) {
-    stage('Verify Redis is running') {
-        container('redis') {
-            sh 'redis-cli ping'
-        }
-    }
     stage('Setup environment') {
         if ( (env.BRANCH_NAME).equals('master') ) {
             imageName = "dsanderscan/cowbull:${major}.${minor}.${env.BUILD_NUMBER}"
@@ -55,6 +50,11 @@ podTemplate(containers: [
                 python --version
                 python -m pip install -r requirements.txt
             """
+        }
+    }
+    stage('Verify Redis is running') {
+        container('redis') {
+            sh 'redis-cli ping'
         }
     }
     stage('Execute Python unit tests') {
