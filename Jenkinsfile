@@ -29,7 +29,7 @@
 
 def major = '19'
 def minor = '08'
-def imageName = 'cowbull'
+def imageName = ''
 
 podTemplate(containers: [
     containerTemplate(name: 'redis', image: 'k8s-master:32080/redis:5.0.3-alpine', ttyEnabled: true, command: 'redis-server'),
@@ -106,14 +106,14 @@ podTemplate(containers: [
                     docker login -u "${USERNAME}" -p "${PASSWORD}"
                     if [ "${env.BRANCH_NAME}" == "master" ]
                     then
-                        docker build -t dsanderscan/${imageName}:${major}.${minor}.${env.BUILD_NUMBER} -f vendor/docker/Dockerfile .
-                        docker push dsanderscan/${imageName}:"${major}"."${minor}"."${env.BUILD_NUMBER}"
-                        docker image rm dsanderscan/${imageName}:"${major}"."${minor}"."${env.BUILD_NUMBER}"
+                        imageName = "dsanderscan/cowbull:${major}.${minor}.${env.BUILD_NUMBER}"
                     else
-                        docker build -t dsanderscan/${imageName}:dev.${major}.${minor}.${env.BUILD_NUMBER} -f vendor/docker/Dockerfile .
-                        docker push dsanderscan/${imageName}:dev."${major}"."${minor}"."${env.BUILD_NUMBER}"
-                        docker image rm dsanderscan/${imageName}:dev."${major}"."${minor}"."${env.BUILD_NUMBER}"
+                        imageName = "dsanderscan/cowbull:${env.BRANCH_NAME}"
                     fi
+                    echo "Building "${imageName}
+                    docker build -t ${imageName} -f vendor/docker/Dockerfile .
+                    docker push ${imageName}
+                    docker image rm ${imageName}
                 """
             }
         }
