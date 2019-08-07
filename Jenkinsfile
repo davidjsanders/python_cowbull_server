@@ -19,9 +19,15 @@
 //              |                             | default python rather
 //              |                             | than specific version.
 // -------------------------------------------------------------------
+// 06 Aug 2019  | David Sanders               | Add multi-branch
+//              |                             | support and push non-
+//              |                             | master branches as dev
+//              |                             | and promote major/minor
+//              |                             | to year month format.
+// -------------------------------------------------------------------
 
-def major = '2'
-def minor = '2'
+def major = '19'
+def minor = '08'
 def imageName = 'cowbull'
 
 podTemplate(containers: [
@@ -97,12 +103,39 @@ podTemplate(containers: [
             ]) {
                 sh """
                     docker login -u "${USERNAME}" -p "${PASSWORD}"
-                    docker build -t dsanderscan/${imageName}:${major}.${minor}.${env.BUILD_NUMBER} -f vendor/docker/Dockerfile .
-                    docker push dsanderscan/${imageName}:"${major}"."${minor}"."${env.BUILD_NUMBER}"
-                    docker image rm dsanderscan/${imageName}:"${major}"."${minor}"."${env.BUILD_NUMBER}"
+                    if [ "${env.BRANCH_NAME}" == "master" ]
+                    then
+                        docker build -t dsanderscan/${imageName}:${major}.${minor}.${env.BUILD_NUMBER} -f vendor/docker/Dockerfile .
+                        docker push dsanderscan/${imageName}:"${major}"."${minor}"."${env.BUILD_NUMBER}"
+                        docker image rm dsanderscan/${imageName}:"${major}"."${minor}"."${env.BUILD_NUMBER}"
+                    else
+                        docker build -t dsanderscan/${imageName}:dev.${major}.${minor}.${env.BUILD_NUMBER} -f vendor/docker/Dockerfile .
+                        docker push dsanderscan/${imageName}:dev."${major}"."${minor}"."${env.BUILD_NUMBER}"
+                        docker image rm dsanderscan/${imageName}:dev."${major}"."${minor}"."${env.BUILD_NUMBER}"
+                    fi
                 """
             }
         }
     }
+    // stage('Docker Build') {
+    //     container('docker') {
+    //         when {
+    //             not {branch 'master'}
+    //         }
+    //         withCredentials([
+    //             [$class: 'UsernamePasswordMultiBinding', 
+    //             credentialsId: 'dockerhub',
+    //             usernameVariable: 'USERNAME', 
+    //             passwordVariable: 'PASSWORD']
+    //         ]) {
+    //             sh """
+    //                 docker login -u "${USERNAME}" -p "${PASSWORD}"
+    //                 docker build -t dsanderscan/${imageName}:dev.${major}.${minor}.${env.BUILD_NUMBER} -f vendor/docker/Dockerfile .
+    //                 docker push dsanderscan/${imageName}:dev."${major}"."${minor}"."${env.BUILD_NUMBER}"
+    //                 docker image rm dsanderscan/${imageName}:dev."${major}"."${minor}"."${env.BUILD_NUMBER}"
+    //             """
+    //         }
+    //     }
+    // }
   }
 }
