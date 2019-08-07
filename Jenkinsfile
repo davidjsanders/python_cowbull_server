@@ -42,7 +42,7 @@ podTemplate(containers: [
         if ( (env.BRANCH_NAME).equals('master') ) {
             imageName = "dsanderscan/cowbull:${major}.${minor}.${env.BUILD_NUMBER}"
         } else {
-            imageName = "dsanderscan/cowbull:${env.BRANCH_NAME}"
+            imageName = "dsanderscan/cowbull:${env.BRANCH_NAME}.${env.BUILD_NUMBER}"
         }
         checkout scm
         // git 'https://github.com/dsandersAzure/python_cowbull_server'
