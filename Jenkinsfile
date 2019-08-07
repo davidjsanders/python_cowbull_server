@@ -95,9 +95,6 @@ podTemplate(containers: [
     }
     stage('Docker Build') {
         container('docker') {
-            when {
-                branch 'master'
-            }
             withCredentials([
                 [$class: 'UsernamePasswordMultiBinding', 
                 credentialsId: 'dockerhub',
@@ -113,25 +110,25 @@ podTemplate(containers: [
             }
         }
     }
-    stage('Docker Build') {
-        container('docker') {
-            when {
-                not {branch 'master'}
-            }
-            withCredentials([
-                [$class: 'UsernamePasswordMultiBinding', 
-                credentialsId: 'dockerhub',
-                usernameVariable: 'USERNAME', 
-                passwordVariable: 'PASSWORD']
-            ]) {
-                sh """
-                    docker login -u "${USERNAME}" -p "${PASSWORD}"
-                    docker build -t dsanderscan/${imageName}:dev.${major}.${minor}.${env.BUILD_NUMBER} -f vendor/docker/Dockerfile .
-                    docker push dsanderscan/${imageName}:dev."${major}"."${minor}"."${env.BUILD_NUMBER}"
-                    docker image rm dsanderscan/${imageName}:dev."${major}"."${minor}"."${env.BUILD_NUMBER}"
-                """
-            }
-        }
-    }
+    // stage('Docker Build') {
+    //     container('docker') {
+    //         when {
+    //             not {branch 'master'}
+    //         }
+    //         withCredentials([
+    //             [$class: 'UsernamePasswordMultiBinding', 
+    //             credentialsId: 'dockerhub',
+    //             usernameVariable: 'USERNAME', 
+    //             passwordVariable: 'PASSWORD']
+    //         ]) {
+    //             sh """
+    //                 docker login -u "${USERNAME}" -p "${PASSWORD}"
+    //                 docker build -t dsanderscan/${imageName}:dev.${major}.${minor}.${env.BUILD_NUMBER} -f vendor/docker/Dockerfile .
+    //                 docker push dsanderscan/${imageName}:dev."${major}"."${minor}"."${env.BUILD_NUMBER}"
+    //                 docker image rm dsanderscan/${imageName}:dev."${major}"."${minor}"."${env.BUILD_NUMBER}"
+    //             """
+    //         }
+    //     }
+    // }
   }
 }
