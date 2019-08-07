@@ -94,19 +94,21 @@ podTemplate(containers: [
         }
     }
     stage('Docker Build') {
-        container('docker') {
-            withCredentials([
-                [$class: 'UsernamePasswordMultiBinding', 
-                credentialsId: 'dockerhub',
-                usernameVariable: 'USERNAME', 
-                passwordVariable: 'PASSWORD']
-            ]) {
-                sh """
-                    docker login -u "${USERNAME}" -p "${PASSWORD}"
-                    docker build -t dsanderscan/${imageName}:${major}.${minor}.${env.BUILD_NUMBER} -f vendor/docker/Dockerfile .
-                    docker push dsanderscan/${imageName}:"${major}"."${minor}"."${env.BUILD_NUMBER}"
-                    docker image rm dsanderscan/${imageName}:"${major}"."${minor}"."${env.BUILD_NUMBER}"
-                """
+        if (env.BRANCH_NAME == "master") {
+            container('docker') {
+                withCredentials([
+                    [$class: 'UsernamePasswordMultiBinding', 
+                    credentialsId: 'dockerhub',
+                    usernameVariable: 'USERNAME', 
+                    passwordVariable: 'PASSWORD']
+                ]) {
+                    sh """
+                        docker login -u "${USERNAME}" -p "${PASSWORD}"
+                        docker build -t dsanderscan/${imageName}:${major}.${minor}.${env.BUILD_NUMBER} -f vendor/docker/Dockerfile .
+                        docker push dsanderscan/${imageName}:"${major}"."${minor}"."${env.BUILD_NUMBER}"
+                        docker image rm dsanderscan/${imageName}:"${major}"."${minor}"."${env.BUILD_NUMBER}"
+                    """
+                }
             }
         }
     }
