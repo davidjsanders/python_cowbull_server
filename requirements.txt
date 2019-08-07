@@ -1,3 +1,4 @@
+coverage==4.5.2
 Flask==0.12.4
 google-api-python-client==1.6.4
 google-auth==1.2.1
@@ -11,4 +12,4 @@ pymongo==3.5.1
 python-digits==2.0
 redis==2.10.6
 Werkzeug==0.12.1
-coverage==4.5.2
+xmlrunner==1.7.7
