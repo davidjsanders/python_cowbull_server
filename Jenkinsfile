@@ -45,13 +45,11 @@ podTemplate(containers: [
     }
     stage('Setup environment') {
         steps {
-            if [ "${env.BRANCH_NAME}" == "master" ]
-            then
+            if ( (env.BRANCH_NAME).equals('master') ) {
                 imageName = "dsanderscan/cowbull:${major}.${minor}.${env.BUILD_NUMBER}"
-            else
+            } else {
                 imageName = "dsanderscan/cowbull:${env.BRANCH_NAME}"
-            fi
-
+            }
         }
         git 'https://github.com/dsandersAzure/python_cowbull_server'
         container('python') {
