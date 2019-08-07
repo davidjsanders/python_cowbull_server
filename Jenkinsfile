@@ -59,21 +59,29 @@ podTemplate(containers: [
     }
     stage('Execute Python unit tests') {
         container('python') {
-            sh """
-                export PYTHONPATH="\$(pwd)"
-                coverage run unittests/main.py
-                coverage xml -i
-            """
+            try {
+                sh """
+                    export PYTHONPATH="\$(pwd)"
+                    coverage run unittests/main.py
+                    coverage xml -i
+                """
+            } finally {
+                junit 'unittest-reports/*.xml'
+            }
         }
     }
     stage('Execute Python system tests') {
         container('python') {
-            sh """
-                export PYTHONPATH="\$(pwd)"
-                export PERSISTER='{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0, "password": ""}}'
-                export LOGGING_LEVEL=30
-                python systests/main.py
-            """
+            try {
+                sh """
+                    export PYTHONPATH="\$(pwd)"
+                    export PERSISTER='{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0, "password": ""}}'
+                    export LOGGING_LEVEL=30
+                    python systests/main.py
+                """
+            } finally {
+                junit 'systest-reports/*.xml'
+            }
         }
     }
     stage('Sonarqube code coverage') {
@@ -117,25 +125,5 @@ podTemplate(containers: [
             }
         }
     }
-    // stage('Docker Build') {
-    //     container('docker') {
-    //         when {
-    //             not {branch 'master'}
-    //         }
-    //         withCredentials([
-    //             [$class: 'UsernamePasswordMultiBinding', 
-    //             credentialsId: 'dockerhub',
-    //             usernameVariable: 'USERNAME', 
-    //             passwordVariable: 'PASSWORD']
-    //         ]) {
-    //             sh """
-    //                 docker login -u "${USERNAME}" -p "${PASSWORD}"
-    //                 docker build -t dsanderscan/${imageName}:dev.${major}.${minor}.${env.BUILD_NUMBER} -f vendor/docker/Dockerfile .
-    //                 docker push dsanderscan/${imageName}:dev."${major}"."${minor}"."${env.BUILD_NUMBER}"
-    //                 docker image rm dsanderscan/${imageName}:dev."${major}"."${minor}"."${env.BUILD_NUMBER}"
-    //             """
-    //         }
-    //     }
-    // }
   }
 }

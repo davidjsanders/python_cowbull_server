@@ -12,6 +12,7 @@ config/
 **/*.pyc
 **/*.v1
 **/*.v2
+**/*.xml
 .scannerwork
 
 # Byte-compiled / optimized / DLL files
