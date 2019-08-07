@@ -44,6 +44,15 @@ podTemplate(containers: [
         }
     }
     stage('Setup environment') {
+        steps {
+            if [ "${env.BRANCH_NAME}" == "master" ]
+            then
+                imageName = "dsanderscan/cowbull:${major}.${minor}.${env.BUILD_NUMBER}"
+            else
+                imageName = "dsanderscan/cowbull:${env.BRANCH_NAME}"
+            fi
+
+        }
         git 'https://github.com/dsandersAzure/python_cowbull_server'
         container('python') {
             sh """
@@ -95,7 +104,6 @@ podTemplate(containers: [
         }
     }
     stage('Docker Build') {
-        def imageName = ""
         container('docker') {
             withCredentials([
                 [$class: 'UsernamePasswordMultiBinding', 
@@ -105,12 +113,6 @@ podTemplate(containers: [
             ]) {
                 sh """
                     docker login -u "${USERNAME}" -p "${PASSWORD}"
-                    if [ "${env.BRANCH_NAME}" == "master" ]
-                    then
-                        imageName = "dsanderscan/cowbull:${major}.${minor}.${env.BUILD_NUMBER}"
-                    else
-                        imageName = "dsanderscan/cowbull:${env.BRANCH_NAME}"
-                    fi
                     echo "Building "${imageName}
                     docker build -t ${imageName} -f vendor/docker/Dockerfile .
                     docker push ${imageName}
