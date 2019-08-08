@@ -115,13 +115,17 @@ podTemplate(containers: [
                 usernameVariable: 'USERNAME', 
                 passwordVariable: 'PASSWORD']
             ]) {
-                sh """
-                    docker login -u "${USERNAME}" -p "${PASSWORD}"
-                    echo "Building "${imageName}
-                    docker build -t ${imageName} -f vendor/docker/Dockerfile .
-                    docker push ${imageName}
-                    docker image rm ${imageName}
-                """
+                try {
+                    sh """
+                        docker login -u "${USERNAME}" -p "${PASSWORD}"
+                        echo "Building "${imageName}
+                        docker build -t ${imageName} -f vendor/docker/Dockerfile .
+                        docker push ${imageName}
+                        docker image rm ${imageName}
+                    """
+                } finally {
+                    echo "Something happened!"
+                }
             }
         }
     }
