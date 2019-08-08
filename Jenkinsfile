@@ -35,7 +35,7 @@ podTemplate(containers: [
     containerTemplate(name: 'redis', image: 'k8s-master:32080/redis:5.0.3-alpine', ttyEnabled: true, command: 'redis-server'),
     containerTemplate(name: 'python', image: 'k8s-master:32080/python:3.7.4-alpine3.10', ttyEnabled: true, command: 'cat'),
     containerTemplate(name: 'maven', image: 'k8s-master:32080/maven:3.6.1-jdk-11-slim', ttyEnabled: true, command: 'cat'),
-    containerTemplate(name: 'docker', image: 'k8s-master:32080/docker:18.09.7-dind', ttyEnabled: true, privileged: true),
+    containerTemplate(name: 'docker', image: 'k8s-master:32080/docker:19.03.1-dind', ttyEnabled: true, privileged: true),
   ]) {
   node(POD_LABEL) {
     stage('Setup environment') {
@@ -121,10 +121,10 @@ podTemplate(containers: [
                         echo "Building "${imageName}
                         docker build -t ${imageName} -f vendor/docker/Dockerfile .
                         docker push ${imageName}
-                        docker image rm ${imageName}
+                        #docker image rm ${imageName}
                     """
                 } finally {
-                    echo "Something happened!"
+                    echo "In the finally block"
                 }
             }
         }
