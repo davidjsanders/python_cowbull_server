@@ -143,7 +143,8 @@ public class HelloWorld
     
     public static void Main(string[] args)
     {
-        Console.WriteLine ("Hello Mono World");
+        Console.WriteLine ("Hello");
+        Console.WriteLine ("This is Mono, version 6.0.0.313");
     }
 }
 EOF
