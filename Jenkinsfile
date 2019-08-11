@@ -148,7 +148,13 @@ public class HelloWorld
     }
 }
 EOF
+                echo "Mono version"
+                mono --version
+                echo
+                echo "Compile code"
                 csc hello.cs
+                echo
+                echo "Run executable"
                 mono hello.exe
             """
         }
