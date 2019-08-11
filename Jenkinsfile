@@ -134,6 +134,21 @@ podTemplate(containers: [
         container('mono') {
             sh """
                 echo "Doing some tidying up :) "
+                echo "Doing some code"
+                cat <<-EOF >hello.cs
+using System;
+ 
+public class HelloWorld
+{
+    
+    public static void Main(string[] args)
+    {
+        Console.WriteLine ("Hello Mono World");
+    }
+}
+EOF
+                csc hello.cs
+                mono hello.exe
             """
         }
     }
