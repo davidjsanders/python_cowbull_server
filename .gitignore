@@ -13,6 +13,7 @@ config/
 **/*.v1
 **/*.v2
 **/*.xml
+**/*.txt
 .scannerwork
 
 # Byte-compiled / optimized / DLL files
