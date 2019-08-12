@@ -134,28 +134,28 @@ podTemplate(containers: [
         container('mono') {
             sh """
                 echo "Doing some tidying up :) "
-                echo "Doing some code"
-                cat <<-EOF >hello.cs
-using System;
- 
-public class HelloWorld
-{
-    
-    public static void Main(string[] args)
-    {
-        Console.WriteLine ("Hello");
-        Console.WriteLine ("This is Mono, version 6.0.0.313");
-    }
-}
-EOF
-                echo "Mono version"
-                mono --version
-                echo
-                echo "Compile code"
-                csc hello.cs
-                echo
-                echo "Run executable"
-                mono hello.exe
+#                echo "Doing some code"
+#                cat <<-EOF >hello.cs
+#using System;
+# 
+#public class HelloWorld
+#{
+#    
+#    public static void Main(string[] args)
+#    {
+#        Console.WriteLine ("Hello");
+#        Console.WriteLine ("This is Mono, version 6.0.0.313");
+#    }
+#}
+#EOF
+#                echo "Mono version"
+#                mono --version
+#                echo
+#                echo "Compile code"
+#                csc hello.cs
+#                echo
+#                echo "Run executable"
+#                mono hello.exe
             """
         }
     }
