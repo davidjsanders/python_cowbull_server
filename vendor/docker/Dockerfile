@@ -26,19 +26,21 @@ COPY        systests /cowbull/systests
 COPY        healthcheck /cowbull/healthcheck/
 COPY        *.py  /cowbull/
 COPY        LICENSE /cowbull/
+COPY        entrypoint.sh /cowbull/
 
 USER        root
 RUN         chmod +x \
                 /cowbull/healthcheck/healthcheck.sh \
-                /cowbull/healthcheck/liveness.sh
+                /cowbull/healthcheck/liveness.sh \
+                /cowbull/entrypoint.sh
 USER        cowbull
 
-CMD         ["gunicorn", "-b", "0.0.0.0:8080", "-w", "4", "app:app"]
+ENTRYPOINT [ "/cowbull/entrypoint.sh" ]
 EXPOSE      8080
 HEALTHCHECK \
     --interval=10s \
     --timeout=5s \
-    --start-period=5s \
     --retries=3 \
     CMD [ "/bin/sh", "-c", "/cowbull/healthcheck/healthcheck.sh" ]
+
 LABEL       MAINTAINER="dsanderscanada@gmail.com"
