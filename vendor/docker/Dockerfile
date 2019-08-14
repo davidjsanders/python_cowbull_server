@@ -1,4 +1,4 @@
-FROM        python:3.6-alpine
+FROM        python:3.7.4
 MAINTAINER  David Sanders
 RUN         apk update \
             && addgroup -g 10000 cowbull_g \
