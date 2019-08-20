@@ -1,5 +1,5 @@
 #
-# D Sanders 05 May 2017
-    __pycache__/
-    */__pycache__/
-    */*/__pycache__/
+# D Sanders 19 Aug 2019
+**/*.xml
+**/*.pyc
+**/__pycache__
