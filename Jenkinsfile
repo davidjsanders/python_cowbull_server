@@ -26,24 +26,31 @@
 //              |                             | and promote major/minor
 //              |                             | to year month format.
 // -------------------------------------------------------------------
+// 19 Aug 2019  | David Sanders               | Combine k8s plug-in
+//              |                             | with Docker for simpler
+//              |                             | builds.
+// -------------------------------------------------------------------
 
 def major = '19'
 def minor = '08'
+def localImageName = ''
 def imageName = ''
+def dockerServer = "tcp://jenkins-service.jenkins.svc.cluster.local:2375"
 
 podTemplate(containers: [
     containerTemplate(name: 'redis', image: 'k8s-master:32080/redis:5.0.3-alpine', ttyEnabled: true, command: 'redis-server'),
     containerTemplate(name: 'python', image: 'k8s-master:32080/python:3.7.4-alpine3.10', ttyEnabled: true, command: 'cat'),
     containerTemplate(name: 'maven', image: 'k8s-master:32080/maven:3.6.1-jdk-11-slim', ttyEnabled: true, command: 'cat'),
-    containerTemplate(name: 'docker', image: 'k8s-master:32080/docker:19.03.1-dind', ttyEnabled: true, privileged: true),
-    containerTemplate(name: 'mono', image: 'k8s-master:32080/mono:6.0.0.313', ttyEnabled: true, privileged: true),
+    containerTemplate(name: 'docker', image: 'k8s-master:32080/docker:19.03.1-dind', ttyEnabled: true, command: 'cat'),
   ]) {
   node(POD_LABEL) {
     stage('Setup environment') {
         if ( (env.BRANCH_NAME).equals('master') ) {
             imageName = "dsanderscan/cowbull:${major}.${minor}.${env.BUILD_NUMBER}"
+            localImageName = "cowbull:${major}.${minor}.${env.BUILD_NUMBER}"
         } else {
             imageName = "dsanderscan/cowbull:${env.BRANCH_NAME}.${env.BUILD_NUMBER}"
+            localImageName = "cowbull:${env.BRANCH_NAME}.${env.BUILD_NUMBER}"
         }
         checkout scm
         container('python') {
@@ -110,52 +117,22 @@ podTemplate(containers: [
     }
     stage('Docker Build') {
         container('docker') {
-            withCredentials([
-                [$class: 'UsernamePasswordMultiBinding', 
-                credentialsId: 'dockerhub',
-                usernameVariable: 'USERNAME', 
-                passwordVariable: 'PASSWORD']
-            ]) {
-                try {
-                    sh """
-                        docker login -u "${USERNAME}" -p "${PASSWORD}"
-                        echo "Building "${imageName}
-                        docker build -t ${imageName} -f vendor/docker/Dockerfile .
-                        docker push ${imageName}
-                        docker image rm ${imageName}
-                    """
-                } finally {
-                    echo "In the finally block"
+            docker.withServer("$dockerServer") {
+                docker.withRegistry('http://k8s-master:32081', 'nexus-oss') {
+                    def customImage = docker.build("${localImageName}", "-f vendor/docker/Dockerfile .")
+                    customImage.push()
+                }
+                docker.withRegistry('https://registry-1.docker.io', 'dockerhub') {
+                    def customImage = docker.build("${imageName}", "-f vendor/docker/Dockerfile .")
+                    customImage.push()
                 }
             }
         }
     }
     stage('Tidy up') {
-        container('mono') {
+        container('docker') {
             sh """
                 echo "Doing some tidying up :) "
-                echo "Doing some code"
-                cat <<-EOF >hello.cs
-using System;
- 
-public class HelloWorld
-{
-    
-    public static void Main(string[] args)
-    {
-        Console.WriteLine ("Hello");
-        Console.WriteLine ("This is Mono, version 6.0.0.313");
-    }
-}
-EOF
-                echo "Mono version"
-                mono --version
-                echo
-                echo "Compile code"
-                csc hello.cs
-                echo
-                echo "Run executable"
-                mono hello.exe
             """
         }
     }
