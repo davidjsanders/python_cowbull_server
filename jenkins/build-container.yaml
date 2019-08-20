@@ -1,0 +1,23 @@
+metadata:
+  labels:
+    app: jenkins-cowbull-webapp-images
+spec:
+  containers:
+  - image: k8s-master:32080/redis:5.0.3-alpine
+    name: redis
+    tty: true
+  - image: k8s-master:32080/python:3.7.4
+    command:
+    - cat
+    name: python
+    tty: true
+  - image: k8s-master:32080/maven:3.6.1-jdk-11-slim
+    command:
+    - cat
+    name: maven
+    tty: true
+  - image: k8s-master:32080/docker:19.03.1-dind
+    command:
+    - cat
+    name: docker
+    tty: true

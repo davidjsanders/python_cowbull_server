@@ -30,27 +30,49 @@
 //              |                             | with Docker for simpler
 //              |                             | builds.
 // -------------------------------------------------------------------
+// 20 Aug 2019  | David Sanders               | Move yaml manifest for
+//              |                             | build containers to an
+//              |                             | external file and read
+//              |                             | on pipeline execution.
+//              |                             | Add comments.
+// -------------------------------------------------------------------
 
-def major = '19'
-def minor = '08'
-def localImageName = ''
-def imageName = ''
+// Define the variables used in the pipeline
+def major = '19'    // The major version of the build - Major.Minor.Build
+def minor = '08'    // The minor version of the build - Major.Minor.Build
+def imageName = ''  // Variable to hold image name; depends on branch
+def privateImage = '' // Variable for private hub image name
+def yamlString = "" // Variable used to contain yaml manifests which are
+                    // loaded from file.
+
+// DNS name and protocol for connecting to the Docker service
+// TODO: Make into a global variable
 def dockerServer = "tcp://jenkins-service.jenkins.svc.cluster.local:2375"
 
-podTemplate(containers: [
-    containerTemplate(name: 'redis', image: 'k8s-master:32080/redis:5.0.3-alpine', ttyEnabled: true, command: 'redis-server'),
-    containerTemplate(name: 'python', image: 'k8s-master:32080/python:3.7.4-alpine3.10', ttyEnabled: true, command: 'cat'),
-    containerTemplate(name: 'maven', image: 'k8s-master:32080/maven:3.6.1-jdk-11-slim', ttyEnabled: true, command: 'cat'),
-    containerTemplate(name: 'docker', image: 'k8s-master:32080/docker:19.03.1-dind', ttyEnabled: true, command: 'cat'),
-  ]) {
+// Preparation stage. Checks out the source and loads the yaml manifests
+// used during the pipeline. see ./jenkins/build-containers.yaml
+node {
+    stage('Prepare environment') {
+        checkout scm
+        yamlString = readFile "jenkins/build-containers.yaml"
+    }
+}
+
+// Define the pod templates to, run the containers and execute the
+// pipeline.
+podTemplate(yaml: "${yamlString}") {
   node(POD_LABEL) {
+
+    // Setup environment stage. Set the image name depending on the
+    // branch, use the python container and install the required pypi
+    // packages from requirements.txt
     stage('Setup environment') {
         if ( (env.BRANCH_NAME).equals('master') ) {
             imageName = "dsanderscan/cowbull:${major}.${minor}.${env.BUILD_NUMBER}"
-            localImageName = "cowbull:${major}.${minor}.${env.BUILD_NUMBER}"
+            privateImage = "cowbull:${major}.${minor}.${env.BUILD_NUMBER}"
         } else {
             imageName = "dsanderscan/cowbull:${env.BRANCH_NAME}.${env.BUILD_NUMBER}"
-            localImageName = "cowbull:${env.BRANCH_NAME}.${env.BUILD_NUMBER}"
+            privateImage = "cowbull:${env.BRANCH_NAME}.${env.BUILD_NUMBER}"
         }
         checkout scm
         container('python') {
@@ -60,11 +82,19 @@ podTemplate(containers: [
             """
         }
     }
+
+    // Simple stage to ensure that redis is reachable; redis is required
+    // for unit and system tests later in the pipeline.
     stage('Verify Redis is running') {
         container('redis') {
             sh 'redis-cli ping'
         }
     }
+
+    // Execute the unit tests; while these should have already been
+    // processed, they are re-run to ensure the source software is
+    // good. During unit test, the application uses the file system
+    // as the persister.
     stage('Execute Python unit tests') {
         container('python') {
             try {
@@ -78,6 +108,9 @@ podTemplate(containers: [
             }
         }
     }
+
+    // Execute the system tests; verify that the system as a whole is
+    // operating as expected. Redis is used as the persister.
     stage('Execute Python system tests') {
         container('python') {
             try {
@@ -92,6 +125,9 @@ podTemplate(containers: [
             }
         }
     }
+
+    // Collect the coverage reports and pass them to the sonarqube
+    // scanner for analysis.
     stage('Sonarqube code coverage') {
         container('maven') {
             def scannerHome = tool 'SonarQube Scanner';
@@ -107,6 +143,11 @@ podTemplate(containers: [
             }
         }
     }
+
+    // Check the quality of the project. In this stage, the 
+    // abortPipeline is set to true and ensures the pipeline aborts
+    // if the code quality is low - it could be set to false to continue
+    // the pipeline if required.
     stage('Quality Gate') {
         container('maven') {
             def scannerHome = tool 'SonarQube Scanner';
@@ -115,11 +156,15 @@ podTemplate(containers: [
             }
         }
     }
+
+    // Build the application into a docker image and push it to the
+    // Docker Hub and the private registry.
+    // TODO: the registry URLs should be global variables.
     stage('Docker Build') {
         container('docker') {
             docker.withServer("$dockerServer") {
                 docker.withRegistry('http://k8s-master:32081', 'nexus-oss') {
-                    def customImage = docker.build("${localImageName}", "-f vendor/docker/Dockerfile .")
+                    def customImage = docker.build("${privateImage}", "-f vendor/docker/Dockerfile .")
                     customImage.push()
                 }
                 docker.withRegistry('https://registry-1.docker.io', 'dockerhub') {
@@ -129,6 +174,8 @@ podTemplate(containers: [
             }
         }
     }
+
+    // Tidy up. Nothing happens here at present.
     stage('Tidy up') {
         container('docker') {
             sh """
