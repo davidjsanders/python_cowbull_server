@@ -35,6 +35,7 @@
 //              |                             | external file and read
 //              |                             | on pipeline execution.
 //              |                             | Add comments.
+//              |                             | Update pip config.
 // -------------------------------------------------------------------
 
 // Define the variables used in the pipeline
@@ -48,10 +49,6 @@ def yamlString = "" // Variable used to contain yaml manifests which are
 // DNS name and protocol for connecting to the Docker service
 // TODO: Make into a global variable
 def dockerServer = "tcp://jenkins-service.jenkins.svc.cluster.local:2375"
-
-// DNS name for connecting to the Nexus OSS python PyPi proxy service
-// TODO: Make into a global variable
-def nexusServer = "nexus-frontend.default.svc.cluster.local"
 
 // Preparation stage. Checks out the source and loads the yaml manifests
 // used during the pipeline. see ./jenkins/build-containers.yaml
@@ -80,19 +77,9 @@ podTemplate(yaml: "${yamlString}") {
         }
         checkout scm
         container('python') {
-            withCredentials([
-                [$class: 'UsernamePasswordMultiBinding', 
-                credentialsId: 'pypi-user',
-                usernameVariable: 'USERNAME', 
-                passwordVariable: 'PASSWORD']
-            ]) {
+            withCredentials([file(credentialsId: 'pip-conf-file', variable: 'pipconfig')]) {
                 sh """
-                    cat <<-EOF >/etc/pip.conf
-[global]
-trusted-host = nexus-frontend.default.svc.cluster.local
-index = http://${USERNAME}:${PASSWORD}@${nexusServer}/repository/pypi-proxy/pypi
-index-url = http://${USERNAME}:${PASSWORD}@${nexusServer}/repository/pypi-proxy/simple
-EOF
+                    cp $pipconfig /etc/pip.conf
                     python --version
                     python -m pip install -r requirements.txt
                 """
