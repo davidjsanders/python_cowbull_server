@@ -1,4 +1,4 @@
-FROM        python:3.7.4-alpine3.10
+FROM        alpine:3.10.2
 MAINTAINER  David Sanders
 RUN         apk update \
             && addgroup -g 10000 cowbull_g \
@@ -8,14 +8,17 @@ RUN         apk update \
             && apk add --update \
                 curl \
                 musl \
+                python3 \
+                py3-pip \
             && curl -Lo /tmp/curl-7.65.3-r0.apk http://dl-3.alpinelinux.org/alpine/edge/main/x86_64/curl-7.65.3-r0.apk \
             && apk add /tmp/curl-7.65.3-r0.apk \
             && curl -Lo /tmp/musl-1.1.23-r3.apk http://dl-3.alpinelinux.org/alpine/edge/main/x86_64/musl-1.1.23-r3.apk \
             && apk add /tmp/musl-1.1.23-r3.apk
 WORKDIR     /cowbull
 COPY        requirements.txt /cowbull
-RUN         pip install -q setuptools \
-            && pip install -q -r /cowbull/requirements.txt
+RUN         pip3 install --upgrade pip \
+            && pip3 install -q setuptools \
+            && pip3 install -q -r /cowbull/requirements.txt
 
 USER        cowbull
 ENV         PYTHONPATH="/cowbull"
