@@ -7,9 +7,8 @@ RUN         apk update \
             && chown cowbull /cowbull \
             && apk add \
                 curl \
-                musl \
-                --update-cache \
-                --repository http://dl-3.alpinelinux.org/alpine/edge/main/
+            && curl -Lo /tmp/musl-1.1.23-r3.apk http://dl-3.alpinelinux.org/alpine/edge/main/x86_64/musl-1.1.23-r3.apk \
+            && apk add /tmp/musl-1.1.23-r3.apk
 WORKDIR     /cowbull
 COPY        requirements.txt /cowbull
 RUN         pip install -q setuptools \
