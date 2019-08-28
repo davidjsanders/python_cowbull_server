@@ -176,9 +176,7 @@ podTemplate(yaml: "${yamlString}") {
                     customImage.push()
                 }
             }
-            cat <<-EOF >anchore_images
-docker.io/${imageName}
-EOF
+            sh 'echo "docker.io/${imageName}" > anchore_images'
         }
     }
 
