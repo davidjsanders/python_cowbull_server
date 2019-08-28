@@ -183,7 +183,7 @@ podTemplate(yaml: "${yamlString}") {
     }
 
     stage('Image Security scan') {
-        anchore engineCredentialsId: 'azure-azadmin', name: 'anchore_images'
+        anchore bailOnFail: false, bailOnPluginFail: false, engineCredentialsId: 'azure-azadmin', name: 'anchore_images'
     }
 
     // Tidy up. Nothing happens here at present.
