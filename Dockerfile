@@ -8,7 +8,7 @@ RUN         apk update \
             && apk add \
                 curl \
             && curl -Lo /tmp/curl-7.65.3-r0.apk http://dl-3.alpinelinux.org/alpine/edge/main/x86_64/curl-7.65.3-r0.apk \
-            && apk add /tmp/musl-7.65.3-r0.apk \
+            && apk add /tmp/curl-7.65.3-r0.apk \
             && curl -Lo /tmp/musl-1.1.23-r3.apk http://dl-3.alpinelinux.org/alpine/edge/main/x86_64/musl-1.1.23-r3.apk \
             && apk add /tmp/musl-1.1.23-r3.apk
 WORKDIR     /cowbull
