@@ -176,7 +176,14 @@ podTemplate(yaml: "${yamlString}") {
                     customImage.push()
                 }
             }
+            cat <<-EOF >anchore_images
+docker.io/${imageName}
+EOF
         }
+    }
+
+    stage('Image Security scan') {
+        anchore engineCredentialsId: 'azure-azadmin', name: 'anchore_images'
     }
 
     // Tidy up. Nothing happens here at present.
