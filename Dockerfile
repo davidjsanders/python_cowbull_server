@@ -16,9 +16,8 @@ RUN         apk update \
             && apk add /tmp/musl-1.1.23-r3.apk
 WORKDIR     /cowbull
 COPY        requirements.txt /cowbull
-RUN         pip3 install --upgrade pip \
-            && pip3 install -q setuptools \
-            && pip3 install -q -r /cowbull/requirements.txt
+RUN         pip3 install --upgrade pip
+RUN         pip3 install -r /cowbull/requirements.txt
 
 USER        cowbull
 ENV         PYTHONPATH="/cowbull"
