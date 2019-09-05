@@ -37,14 +37,26 @@
 //              |                             | Add comments.
 //              |                             | Update pip config.
 // -------------------------------------------------------------------
+// 04 Sep 2019  | David Sanders               | Add anchore engine
+//              |                             | scanning to scan for
+//              |                             | vulnerabilities. Enable
+//              |                             | variable to specify
+//              |                             | yaml manifest file
+//              |                             | location.
+// -------------------------------------------------------------------
 
 // Define the variables used in the pipeline
 def major = '19'    // The major version of the build - Major.Minor.Build
 def minor = '08'    // The minor version of the build - Major.Minor.Build
 def imageName = ''  // Variable to hold image name; depends on branch
 def privateImage = '' // Variable for private hub image name
+def scanImage = ''  // Variable to hold short image name
 def yamlString = "" // Variable used to contain yaml manifests which are
                     // loaded from file.
+
+// The manifestsFile to use - can vary depending on 'proper' cluster
+// vs. minikube
+def manifestsFile = "jenkins/build-containers.yaml"
 
 // DNS name and protocol for connecting to the Docker service
 // TODO: Make into a global variable
@@ -55,7 +67,7 @@ def dockerServer = "tcp://jenkins-service.jenkins.svc.cluster.local:2375"
 node {
     stage('Prepare environment') {
         checkout scm
-        yamlString = readFile "jenkins/build-containers.yaml"
+        yamlString = readFile "${manifestsFile}"
     }
 }
 
@@ -70,10 +82,12 @@ podTemplate(yaml: "${yamlString}") {
     stage('Setup environment') {
         if ( (env.BRANCH_NAME).equals('master') ) {
             imageName = "dsanderscan/cowbull:${major}.${minor}.${env.BUILD_NUMBER}"
-            privateImage = "cowbull:${major}.${minor}.${env.BUILD_NUMBER}"
+            privateImage = "k8s-master:32081/cowbull:${major}.${minor}.${env.BUILD_NUMBER}"
+            scanImage = "nexus-docker.default.svc.cluster.local:18081/cowbull:${major}.${minor}.${env.BUILD_NUMBER}.prescan"
         } else {
             imageName = "dsanderscan/cowbull:${env.BRANCH_NAME}.${env.BUILD_NUMBER}"
-            privateImage = "cowbull:${env.BRANCH_NAME}.${env.BUILD_NUMBER}"
+            privateImage = "k8s-master:32081/cowbull:${env.BRANCH_NAME}.${env.BUILD_NUMBER}"
+            scanImage = "nexus-docker.default.svc.cluster.local:18081/cowbull:${env.BRANCH_NAME}.${env.BUILD_NUMBER}.prescan"
         }
         checkout scm
         container('python') {
@@ -164,7 +178,49 @@ podTemplate(yaml: "${yamlString}") {
     // Build the application into a docker image and push it to the
     // Docker Hub and the private registry.
     // TODO: the registry URLs should be global variables.
-    stage('Docker Build') {
+    stage('Stage Build') {
+        container('docker') {
+            docker.withServer("$dockerServer") {
+                docker.withRegistry('http://k8s-master:32081', 'nexus-oss') {
+                    def customImage = docker.build("${privateImage}.prescan", "-f Dockerfile .")
+                    customImage.push()
+                }
+            }
+            withEnv(["image=${scanImage}"]) {
+                sh """
+                    echo "Add image $image to anchore_images scan file"
+                    echo "$image" > anchore_images
+                """
+            }
+        }
+    }
+
+    // Re-execute the unit and system tests using the image, to ensure
+    // the images function as expected - i.e. there have been no Docker
+    // build errors introduced.
+    stage('Test image') {
+        container('docker') {
+            docker.withServer("$dockerServer") {
+                withEnv(["image=${privateImage}.prescan"]) {
+                    sh """
+                        docker run --rm $image /bin/sh -c "python3 tests/main.py"
+                    """
+                }
+            }
+        }
+    }
+
+    // Scan the image using the OSS anchore engine to check for vulnerability
+    // and image policy issues. NOTE: bailOnFail is false; if it were set to
+    // true, the pipeline would fail if the image fails to meet policy.
+    stage('Anchore scan') {
+        anchore bailOnFail: false, bailOnPluginFail: true, engineCredentialsId: 'azure-azadmin', name: 'anchore_images'
+    }
+
+    // The finalize step of the pipeline (i.e. everything is good), produces
+    // final Docker images and pushes them to the private registry AND
+    // Docker Hub.
+    stage('Finalize') {
         container('docker') {
             docker.withServer("$dockerServer") {
                 docker.withRegistry('http://k8s-master:32081', 'nexus-oss') {
@@ -176,22 +232,6 @@ podTemplate(yaml: "${yamlString}") {
                     customImage.push()
                 }
             }
-            withEnv(["imageName=${imageName}"]) {
-                sh 'echo "docker.io/${imageName}" > anchore_images'
-            }
-        }
-    }
-
-    stage('Image Security scan') {
-        anchore bailOnFail: false, bailOnPluginFail: false, engineCredentialsId: 'azure-azadmin', name: 'anchore_images'
-    }
-
-    // Tidy up. Nothing happens here at present.
-    stage('Tidy up') {
-        container('docker') {
-            sh """
-                echo "Doing some tidying up :) "
-            """
         }
     }
   }
