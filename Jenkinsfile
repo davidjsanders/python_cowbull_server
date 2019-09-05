@@ -198,6 +198,8 @@ podTemplate(yaml: "${yamlString}") {
     // Re-execute the unit and system tests using the image, to ensure
     // the images function as expected - i.e. there have been no Docker
     // build errors introduced.
+
+    // TODO - Containers need to be tidied up to not 'leave behind'
     stage('Test image') {
         container('docker') {
             docker.withServer("$dockerServer") {
@@ -213,7 +215,7 @@ podTemplate(yaml: "${yamlString}") {
                             -d k8s-master:32080/redis:5.0.3-alpine
                         docker run \
                             --rm \
-                            --link redis \
+                            --link redis$build_number \
                             --env PERSISTER='{"engine_name": "redis", "parameters": {"host": "redis", "port": 6379, "db": 0, "password": ""}}' \
                             --entrypoint=/bin/sh \
                             $image \
