@@ -209,7 +209,7 @@ podTemplate(yaml: "${yamlString}") {
                             $image \
                                 -c "coverage run unittests/main.py"
                         docker run \
-                            --name redis \
+                            --name redis${env.BUILD_NUMBER} \
                             -d k8s-master:32080/redis:5.0.3-alpine
                         docker run \
                             --rm \
@@ -218,8 +218,8 @@ podTemplate(yaml: "${yamlString}") {
                             --entrypoint=/bin/sh \
                             $image \
                                 -c "python3 systests/main.py"
-                        docker stop redis
-                        docker rm redis
+                        docker stop redis${env.BUILD_NUMBER}
+                        docker rm redis${env.BUILD_NUMBER}
                     """
                 }
             }
