@@ -201,7 +201,7 @@ podTemplate(yaml: "${yamlString}") {
     stage('Test image') {
         container('docker') {
             docker.withServer("$dockerServer") {
-                withEnv(["image=${privateImage}.prescan"]) {
+                withEnv(["image=${privateImage}.prescan","build_number=${env.BUILD_NUMBER}"]) {
                     sh """
                         docker run \
                             --rm \
@@ -209,7 +209,7 @@ podTemplate(yaml: "${yamlString}") {
                             $image \
                                 -c "coverage run unittests/main.py"
                         docker run \
-                            --name redis${env.BUILD_NUMBER} \
+                            --name redis$build_number \
                             -d k8s-master:32080/redis:5.0.3-alpine
                         docker run \
                             --rm \
@@ -218,8 +218,8 @@ podTemplate(yaml: "${yamlString}") {
                             --entrypoint=/bin/sh \
                             $image \
                                 -c "python3 systests/main.py"
-                        docker stop redis${env.BUILD_NUMBER}
-                        docker rm redis${env.BUILD_NUMBER}
+                        docker stop redis$build_number
+                        docker rm redis$build_number
                     """
                 }
             }
