@@ -203,7 +203,7 @@ podTemplate(yaml: "${yamlString}") {
             docker.withServer("$dockerServer") {
                 withEnv(["image=${privateImage}.prescan"]) {
                     sh """
-                        docker run --rm $image /bin/sh -c "python3 tests/main.py"
+                        docker run --rm $image /bin/sh -c "coverage run unittests/main.py"
                     """
                 }
             }
