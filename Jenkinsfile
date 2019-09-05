@@ -203,7 +203,24 @@ podTemplate(yaml: "${yamlString}") {
             docker.withServer("$dockerServer") {
                 withEnv(["image=${privateImage}.prescan"]) {
                     sh """
-                        docker run --rm $image /bin/sh -c "coverage run unittests/main.py"
+                        docker run \
+                            --rm \
+                            --entrypoint=/bin/sh \
+                            $image \
+                                -c "coverage run unittests/main.py"
+                        docker run \
+                            --name redis \
+                            -d k8s-master:32080/redis:5.0.3-alpine
+                        docker run \
+                            --rm \
+                            -it \
+                            --link redis \
+                            --env PERSISTER='{"engine_name": "redis", "parameters": {"host": "redis", "port": 6379, "db": 0, "password": ""}}' \
+                            --entrypoint=/bin/sh \
+                            $image \
+                                -c "python3 systests/main.py"
+                        docker stop redis
+                        docker rm redis
                     """
                 }
             }
