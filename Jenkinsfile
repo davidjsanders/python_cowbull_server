@@ -216,7 +216,7 @@ podTemplate(yaml: "${yamlString}") {
                         docker run \
                             --rm \
                             --link redis$build_number \
-                            --env PERSISTER='{"engine_name": "redis", "parameters": {"host": "redis", "port": 6379, "db": 0, "password": ""}}' \
+                            --env PERSISTER='{"engine_name": "redis$build_number", "parameters": {"host": "redis", "port": 6379, "db": 0, "password": ""}}' \
                             --entrypoint=/bin/sh \
                             $image \
                                 -c "python3 systests/main.py"
