@@ -1,2 +1,2 @@
 #!/bin/sh
-gunicorn -b 0.0.0.0:$PORT -w 4 app:app
+gunicorn -b 0.0.0.0:8080 -w 4 app:app

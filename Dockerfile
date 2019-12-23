@@ -9,10 +9,11 @@ RUN         apk update \
                 musl \
                 python3 \
                 py3-pip
+
 ENV         APP_HOME    /cowbull
 WORKDIR     $APP_HOME
 COPY        . ./
-#RUN         ls -als && pwd
+
 RUN         pip3 install --upgrade pip
 RUN         pip3 install -r /cowbull/image-requirements
 
@@ -32,15 +33,17 @@ COPY        healthcheck /cowbull/healthcheck/
 COPY        *.py  /cowbull/
 COPY        LICENSE /cowbull/
 COPY        entrypoint.sh /cowbull/
+COPY        entrypoint-cloudrun.sh /cowbull/
 
 #USER        root
 RUN         chmod +x \
                 /cowbull/healthcheck/healthcheck.sh \
                 /cowbull/healthcheck/liveness.sh \
-                /cowbull/entrypoint.sh
+                /cowbull/entrypoint.sh \
+                /cowbull/entrypoint-cloudrun.sh
 #USER        cowbull
 
-ENTRYPOINT [ "/cowbull/entrypoint.sh" ]
+ENTRYPOINT [ "/cowbull/entrypoint-cloudrun.sh" ]
 #CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 app:app
 EXPOSE      8080
 HEALTHCHECK \
