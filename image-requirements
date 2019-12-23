@@ -1,0 +1,12 @@
+coverage==4.5.4
+Flask==1.1.1
+gunicorn==19.9.0
+itsdangerous==1.1.0
+Jinja2==2.10.1
+jsonschema==3.0.2
+MarkupSafe==1.1.1
+pymongo==3.8.0
+python-digits==2.0
+redis==3.3.6
+Werkzeug==0.15.5
+xmlrunner==1.7.7

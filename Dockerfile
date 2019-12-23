@@ -1,5 +1,4 @@
 FROM        alpine:3.10.2
-MAINTAINER  David Sanders
 RUN         apk update \
             && addgroup -g 10000 cowbull_g \
             && mkdir /cowbull \
@@ -9,19 +8,15 @@ RUN         apk update \
                 curl \
                 musl \
                 python3 \
-                py3-pip \
-            && curl -Lo /tmp/curl-7.65.3-r0.apk http://dl-3.alpinelinux.org/alpine/edge/main/x86_64/curl-7.65.3-r0.apk \
-            && apk add /tmp/curl-7.65.3-r0.apk \
-            && curl -Lo /tmp/musl-1.1.23-r3.apk http://dl-3.alpinelinux.org/alpine/edge/main/x86_64/musl-1.1.23-r3.apk \
-            && apk add /tmp/musl-1.1.23-r3.apk \
-            && curl -Lo /tmp/musl-utils-1.1.23-r3.apk http://dl-3.alpinelinux.org/alpine/edge/main/x86_64/musl-utils-1.1.23-r3.apk \
-            && apk add /tmp/musl-utils-1.1.23-r3.apk
-WORKDIR     /cowbull
-COPY        requirements.txt /cowbull
+                py3-pip
+ENV         APP_HOME    /cowbull
+WORKDIR     $APP_HOME
+COPY        . ./
+#RUN         ls -als && pwd
 RUN         pip3 install --upgrade pip
-RUN         pip3 install -r /cowbull/requirements.txt
+RUN         pip3 install -r /cowbull/image-requirements
 
-USER        cowbull
+#USER        cowbull
 ENV         PYTHONPATH="/cowbull"
 COPY        extensions /cowbull/extensions/
 COPY        flask_controllers /cowbull/flask_controllers/
@@ -38,14 +33,15 @@ COPY        *.py  /cowbull/
 COPY        LICENSE /cowbull/
 COPY        entrypoint.sh /cowbull/
 
-USER        root
+#USER        root
 RUN         chmod +x \
                 /cowbull/healthcheck/healthcheck.sh \
                 /cowbull/healthcheck/liveness.sh \
                 /cowbull/entrypoint.sh
-USER        cowbull
+#USER        cowbull
 
 ENTRYPOINT [ "/cowbull/entrypoint.sh" ]
+#CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 app:app
 EXPOSE      8080
 HEALTHCHECK \
     --interval=10s \
