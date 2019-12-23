@@ -3,3 +3,10 @@
 **/*.xml
 **/*.pyc
 **/__pycache__
+#
+# D Sanders, 23 Dec 2019
+#
+Dockerfile
+README.md
+**/*.pyo
+**/*.pyd
