@@ -83,6 +83,25 @@ class Configurator(object):
                 _file.close()
 
         self.load_variables(source=source)
+        self.set_persister()
+
+    def set_persister(self):
+        persister_envvar_check = os.getenv("PERSISTER", None)
+        if not persister_envvar_check:
+            self.app.config["PERSISTER"] = PersistenceEngine(
+                engine_name = self.app.config["PERSISTER_ENGINE"],
+                parameters = {
+                    "host": self.app.config["PERSISTER_HOST"],
+                    "port": self.app.config["PERSISTER_PORT"],
+                    "db": self.app.config["PERSISTER_DB"],
+                    "password": self.app.config["PERSISTER_PASSWORD"]
+                }
+            )
+        else:
+            self.app.config["PERSISTER_ENGINE"] = self.app.config["PERSISTER"].engine_name
+            self.app.config["PERSISTER_HOST"] = self.app.config["PERSISTER"].parameters.get("host", None)
+            self.app.config["PERSISTER_PORT"] = self.app.config["PERSISTER"].parameters.get("port", 0)
+            self.app.config["PERSISTER_PASSWORD"] = self.app.config["PERSISTER"].parameters.get("password", "")
 
     def get_variables(self):
         return [
@@ -119,7 +138,10 @@ class Configurator(object):
         print('| Current configuration set:')
         print('-' * 80)
         for name, val in self.dump_variables():
-            outstr = "| {:20s} | {}".format(name, val)
+            outstr = "| {:20s} | {}".format(
+                name,
+                val if not "password" in name.lower() else "*****"
+            )
             print(outstr)
         print('-' * 80)
         print('')
@@ -178,6 +200,36 @@ class Configurator(object):
             "default": json.dumps(_persister_default),
             "caster": PersistenceEngine
         }
+        _persister_engine = {
+            "name": "PERSISTER_ENGINE",
+            "description": "The persistence engine type",
+            "required": False,
+            "default": "{0}".format(_defaults["persister_engine"])
+        }
+        _persister_host = {
+            "name": "PERSISTER_HOST",
+            "description": "The persistence engine host - fqdn or IP",
+            "required": False,
+            "default": "{0}".format(_defaults["persister_host"])
+        }
+        _persister_port = {
+            "name": "PERSISTER_PORT",
+            "description": "The persistence engine port",
+            "required": False,
+            "default": "{0}".format(_defaults["persister_port"])
+        }
+        _persister_db = {
+            "name": "PERSISTER_DB",
+            "description": "The persistence engine DB name or number",
+            "required": False,
+            "default": "{0}".format(_defaults["persister_db"])
+        }
+        _persister_password = {
+            "name": "PERSISTER_PASSWORD",
+            "description": "The persistence engine password",
+            "required": False,
+            "default": "{0}".format(_defaults["persister_password"])
+        }
         _flask_host = {
             "name": "FLASK_HOST",
             "description": "For debug purposes, defines the Flask host. Default is all traffic *not* localhost",
@@ -220,6 +272,11 @@ class Configurator(object):
 
         return [
             _persister,
+            _persister_engine,
+            _persister_host,
+            _persister_port,
+            _persister_db,
+            _persister_password,
             _flask_host,
             _flask_port,
             _flask_debug,
