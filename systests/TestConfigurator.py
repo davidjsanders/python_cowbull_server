@@ -58,8 +58,11 @@ class TestConfigurator(TestCase):
         self.c.execute_load(self.app.application)
         self.c.load_variables({"FLASK_PORT":22})
         values_set = self.c.dump_variables()
-        self.assertEqual(values_set[5][0], "FLASK_PORT")
-        self.assertEqual(values_set[5][1], 22)
+        test_item = [item for item in values_set if item[0] == "FLASK_PORT"]
+        self.assertEqual(len(test_item), 1)
+        test_item = test_item[0]
+        self.assertEqual(test_item[0], "FLASK_PORT")
+        self.assertEqual(test_item[1], 22)
 
     def test_co_badattr_load_variables(self):
         self.c.execute_load(self.app.application)
