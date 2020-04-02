@@ -15,3 +15,7 @@ substitutions:
   _BUILD_NUMBER: "20.04-1"
 images:
 - 'gcr.io/personal-dev-272223/cowbull:${_BUILD_NUMBER}'
+artifacts:
+  objects:
+    location: 'gs://dasander-artifacts/cowbull-server'
+    paths: ['coverage.xml']
