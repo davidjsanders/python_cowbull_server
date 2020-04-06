@@ -1,21 +1,13 @@
 runtime: python37
-# api_version: 1
-# threadsafe: true
-# service: default
 
 handlers:
 - url: /.*
-  script: app.app
+  script: auto
 
-# libraries:
-# - name: ssl
-#   version: latest
-# - name: grpcio
-#   version: 1.0.0
-  
 env_variables:
   LOGGING_LEVEL: "10"
   LOGGING_FORMAT: "%(asctime)s %(levelname)s: %(message)s"
   # PERSISTER: '{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0, "password": ""}}'
   # PERSISTER: '{"engine_name": "gcpstorage", "parameters": {"bucket": "dasander-cowbull-save-games", "credentials_file": "./personal-dev-272223-63b56e7a9f0d.json"}}'
-  PERSISTER: '{"engine_name": "gaestorage", "parameters": {"bucket": "dasander-cowbull-save-games", "credentials_file": ""}}'
+  # PERSISTER: '{"engine_name": "gaestorage", "parameters": {"bucket": "dasander-cowbull-save-games", "credentials_file": "./personal-dev-272223-63b56e7a9f0d.json", "project": "personal-dev-272223"}}'
+  PERSISTER: '{"engine_name": "gaestorage", "parameters": {"bucket": "dasander-cowbull-save-games"}}'
