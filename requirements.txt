@@ -1,4 +1,3 @@
-click==7.0
 coverage==4.5.4
 Flask==1.1.1
 googleapis_common_protos
@@ -10,12 +9,12 @@ itsdangerous==1.1.0
 Jinja2==2.10.1
 jsonschema==3.0.2
 MarkupSafe==1.1.1
-oauth2client==4.1.3
-protobuf
+# oauth2client==4.1.3
+# protobuf
 pymongo==3.8.0
 python-digits==2.0
 redis==3.3.6
 requests==2.20.0
-urllib3==1.24.2
+# urllib3==1.24.2
 Werkzeug==0.15.5
 xmlrunner==1.7.7

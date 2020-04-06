@@ -17,3 +17,6 @@
 __pycache__/
 # Ignored by the build system
 /setup.cfg
+
+# D Sanders, 06 Apr 2020
+**/*.json
