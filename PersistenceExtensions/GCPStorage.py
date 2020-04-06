@@ -14,15 +14,17 @@ class Persister(AbstractPersister):
 
     #TODO : Refine error checking and logging
 
-    def __init__(self, bucket=None):
+    def __init__(self, bucket=None, credentials_file=None):
         if not bucket:
             raise ValueError('A bucket name must be provided!')
+        # if not credentials_file:
+        #     raise ValueError('Credentials file must be provided!')
 
         super(Persister, self).__init__()
 
         self.handler.module="GCPStoragePersist"
         self.handler.log(message="Validating if credentials are defined or if defaults should be used")
-        secret_name = "/cowbull/secrets/k8storageservice.json"
+        secret_name = credentials_file
         if not os.path.isfile(secret_name):
             self.handler.log(message="Requesting storage client with default credentials.", status=0)
             self.storage_client = googleapiclient.discovery.build('storage', 'v1', cache_discovery=False)
