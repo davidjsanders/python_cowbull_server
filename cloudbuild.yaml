@@ -9,6 +9,8 @@ steps:
     'build', 
     '-t', 
     'gcr.io/personal-dev-272223/cowbull:${_BUILD_NUMBER}', 
+    '-f',
+    'vendor/docker/Dockerfile',
     '.' 
   ]
 substitutions:
