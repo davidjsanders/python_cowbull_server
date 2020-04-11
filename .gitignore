@@ -14,6 +14,8 @@ config/
 **/*.v2
 **/*.xml
 **/*.txt
+.pytest_cache
+.vscode
 .scannerwork
 
 # Byte-compiled / optimized / DLL files

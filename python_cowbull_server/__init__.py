@@ -29,6 +29,7 @@ error_handler.log(
 
 # print the variables defined to stdout.
 c.print_variables()
+print(c.dump_variables())
 
 if app.config["COWBULL_DRY_RUN"]:
     error_handler.log(

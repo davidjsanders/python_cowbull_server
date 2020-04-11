@@ -1,4 +1,20 @@
+"""cowbull_server is a Flask based http server that serves the
+cowbull game using python_cowbull_game objects. It serves up the game
+by responding to http requests to ``http://server/version/game`` and
+decides the action based on the method used for the request: ``GET`` starts
+a new game and ``POST`` makes a guess against the game.
+
+For testing:
+    export PYTHONPATH="$(pwd)"
+    coverage run unittests/main.py
+    coverage xml -i
+
+For execution:
+    python main.py
+
+"""
 import logging
+import os
 
 # Import python_cowbull_server initialization package
 # ---------------------------------------------------
@@ -24,6 +40,7 @@ from Routes.V1 import V1
 # ----------------------------------
 @app.after_request
 def allow_cors(resp):
+    """Enable cross origin resource sharing"""
     resp.headers.add('Access-Control-Allow-Origin', '*')
     resp.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     return resp
@@ -64,6 +81,12 @@ if __name__ == "__main__":
         message="Running application via Flask built-in server.",
         logger=logging.info
     )
+    print("HOST ---> {}".format(app.config["FLASK_HOST"]))
+    print("PORT ---> {}".format(app.config["FLASK_PORT"]))
+    print("DEBUG --> {}".format(app.config["FLASK_DEBUG"]))
+    print("HOST ---> {}".format(os.getenv("FLASK_HOST", "Not set")))
+    print("PORT ---> {}".format(os.getenv("FLASK_PORT", "Not set")))
+    print("DEBUG --> {}".format(os.getenv("FLASK_DEBUG", "Not set")))
     app.run\
         (
             host=app.config["FLASK_HOST"],
