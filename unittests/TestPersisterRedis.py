@@ -2,7 +2,7 @@ import json
 import redis
 
 from unittest import TestCase
-from Persistence.Redis import Persister
+from PersistenceExtensions.Redis import Persister
 
 class TestPersisterRedis(TestCase):
     def setUp(self):

@@ -81,12 +81,6 @@ if __name__ == "__main__":
         message="Running application via Flask built-in server.",
         logger=logging.info
     )
-    print("HOST ---> {}".format(app.config["FLASK_HOST"]))
-    print("PORT ---> {}".format(app.config["FLASK_PORT"]))
-    print("DEBUG --> {}".format(app.config["FLASK_DEBUG"]))
-    print("HOST ---> {}".format(os.getenv("FLASK_HOST", "Not set")))
-    print("PORT ---> {}".format(os.getenv("FLASK_PORT", "Not set")))
-    print("DEBUG --> {}".format(os.getenv("FLASK_DEBUG", "Not set")))
     app.run\
         (
             host=app.config["FLASK_HOST"],

@@ -42,6 +42,10 @@ ifndef IMAGE_REG
   override IMAGE_REG := dsanderscan
 endif
 
+ifndef LOG_LEVEL
+  override LOG_LEVEL := 30
+endif
+
 ifndef REDIS_IMAGE
   override REDIS_IMAGE := redis:alpine3.11
 endif
@@ -83,7 +87,7 @@ define end_log
 	echo
 endef
 
-.PHONY: build debug docker push run shell test
+.PHONY: build debug docker dump push run shell systest unittest
 
 build:
 	@start="`date +"$(DATE_FORMAT)"`"; \
@@ -100,10 +104,11 @@ debug:
 	source $(VENV); \
 	$(call start_docker,10); \
 	PYTHONPATH=$(WORKDIR) \
-		LOGGING_LEVEL=10 \
+		LOGGING_LEVEL=$(LOG_LEVEL) \
 		PERSISTER='{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0, "password": ""}}' \
 		PORT=$(COWBULL_PORT) \
 		FLASK_PORT=$(COWBULL_PORT) \
+		FLASK_DEBUG=true \
 		python main.py; \
 	deactivate; \
 	$(call stop_docker); \
@@ -120,12 +125,27 @@ docker:
 	  --rm \
 	  -p $(COWBULL_PORT):8080 \
 	  --env PORT=8080 \
-	  --env LOGGING_LEVEL=$(1) \
+	  --env LOGGING_LEVEL=$(LOG_LEVEL) \
 	  --env PERSISTER='{"engine_name": "redis", "parameters": {"host": "$(HOST_IP)", "port": 6379, "db": 0}}' \
 	  $(IMAGE_REG)/$(IMAGE_NAME):$(BUILD_NUMBER); \
 	$(call stop_docker); \
 	enddate="`date +$(DATE_FORMAT)`"; \
 	$(call end_log,"build",$$start,$$enddate)
+
+dump:
+	@start="`date +"$(DATE_FORMAT)"`"; \
+	source $(VENV); \
+	PYTHONPATH=$(WORKDIR) \
+		LOGGING_LEVEL=$(LOG_LEVEL) \
+		PERSISTER='{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0, "password": ""}}' \
+		PORT=$(COWBULL_PORT) \
+		FLASK_PORT=$(COWBULL_PORT) \
+		FLASK_DEBUG=true \
+		COWBULL_DRY_RUN=true \
+		python main.py; \
+	deactivate; \
+	enddate="`date +$(DATE_FORMAT)`"; \
+	$(call end_log,"debug",$$start,$$enddate)
 
 push:
 	@start="`date +"$(DATE_FORMAT)"`"; \
@@ -140,7 +160,7 @@ run:
 	PYTHONPATH=$(WORKDIR) \
 	    FLASK_DEBUG=False \
 		FLASK_ENV=run \
-		LOGGING_LEVEL=30 \
+		LOGGING_LEVEL=$(LOG_LEVEL) \
 		PERSISTER='{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0, "password": ""}}' \
 		PORT=$(COWBULL_PORT) \
 		FLASK_PORT=$(COWBULL_PORT) \
@@ -152,18 +172,42 @@ run:
 
 shell:
 	@start="`date +"$(DATE_FORMAT)"`"; \
+	$(call start_docker,30); \
 	docker run \
 		-it --rm  \
-		$(IMAGE_REG)/$(IMAGE_NAME):$(BUILD_NUMBER) /bin/sh; \
+		--name cowbull_server \
+		-p $(COWBULL_PORT):8080 \
+		--env PORT=8080 \
+		--env LOGGING_LEVEL=$(LOG_LEVEL) \
+		--env PERSISTER='{"engine_name": "redis", "parameters": {"host": "$(HOST_IP)", "port": 6379, "db": 0}}' \
+	    --entrypoint=/bin/sh \
+		$(IMAGE_REG)/$(IMAGE_NAME):$(BUILD_NUMBER); \
+	$(call stop_docker);  \
 	enddate="`date +$(DATE_FORMAT)`"; \
 	$(call end_log,"run",$$start,$$enddate)
 
-test:
+systest:
 	@start="`date +"$(DATE_FORMAT)"`"; \
 	source $(VENV); \
+	$(call start_docker,30); \
 	PYTHONPATH=$(WORKDIR) \
-		LOGGING_LEVEL=30 \
-		python tests/main.py; \
+		LOGGING_LEVEL=$(LOG_LEVEL) \
+		PERSISTER='{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0, "password": ""}}' \
+		PORT=$(COWBULL_PORT) \
+		python systests/main.py; \
 	deactivate; \
+	$(call stop_docker);  \
+	enddate="`date +$(DATE_FORMAT)`"; \
+	$(call end_log,"tests",$$start,$$enddate)
+
+unittest:
+	@start="`date +"$(DATE_FORMAT)"`"; \
+	source $(VENV); \
+	$(call start_docker,30); \
+	PYTHONPATH=$(WORKDIR) \
+		LOGGING_LEVEL=$(LOG_LEVEL) \
+		python unittests/main.py; \
+	deactivate; \
+	$(call stop_docker);  \
 	enddate="`date +$(DATE_FORMAT)`"; \
 	$(call end_log,"tests",$$start,$$enddate)
