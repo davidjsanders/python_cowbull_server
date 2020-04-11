@@ -44,7 +44,7 @@ RUN         chmod +x \
                 /cowbull/entrypoint-cloudrun.sh
 #USER        cowbull
 
-ENTRYPOINT [ "/cowbull/entrypoint-cloudrun.sh" ]
+ENTRYPOINT [ "/cowbull/entrypoint.sh" ]
 #CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 app:app
 EXPOSE      8080
 HEALTHCHECK \
