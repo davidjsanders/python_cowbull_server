@@ -18,7 +18,7 @@ RUN         pip3 install --upgrade pip
 RUN         pip3 install -r /cowbull/requirements.txt \
 &&          pip install gunicorn==19.9.0
 
-#USER        cowbull
+USER        cowbull
 ENV         PYTHONPATH="/cowbull"
 COPY        extensions /cowbull/extensions/
 COPY        flask_controllers /cowbull/flask_controllers/
@@ -36,13 +36,16 @@ COPY        LICENSE /cowbull/
 COPY        entrypoint.sh /cowbull/
 COPY        entrypoint-cloudrun.sh /cowbull/
 
+USER        root
 RUN         chmod +x \
                 /cowbull/healthcheck/healthcheck.sh \
                 /cowbull/healthcheck/liveness.sh \
                 /cowbull/entrypoint.sh \
                 /cowbull/entrypoint-cloudrun.sh
+USER        cowbull
 
 ENTRYPOINT [ "/cowbull/entrypoint.sh" ]
+#CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 app:app
 EXPOSE      8080
 HEALTHCHECK \
     --interval=10s \
