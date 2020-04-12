@@ -13,26 +13,27 @@ class ErrorHandler(object):
         self.basic_config = logging.basicConfig
 
         str_level = None
+        caller    = kwargs.get("caller", None)
+
         try:
             str_level = kwargs.get("level", None)
             level = int(str_level)
         except (ValueError, TypeError) as exmsg:
-            level = logging.WARNING
+            level = logging.INFO
             if str_level:
-                self.log(
-                    module="ErrorHandler",
-                    method="__init++",
-                    exception=exmsg,
-                    status=400,
-                    message="*** INVALID LOGGING_LEVEL: --> {}; is LOGGING_LEVEL set to a number?".format(str_level),
-                    logger=logging.warning,
-                    verbose=True
-                )
+                print("*** NO LOGGING; BEGIN PRINT BLOCK...")
+                print("    Issue in ErrorHandler")
+                print("    Logging level passed as {}".format(str_level))
+                print("    Defaulting logging level to {}".format(level))
+                print("*** NO LOGGING; END PRINT BLOCK")
+                print("")
+        finally:
+            self.basic_config(
+                level=level,
+                format=kwargs.get("format", "%(asctime)s %(levelname)s: %(message)s")
+            )
+            logging.getLogger().setLevel(level)
 
-        self.basic_config(
-            level=level,
-            format=kwargs.get("format", "%(asctime)s %(levelname)s: %(message)s")
-        )
 
     #
     # Properties
