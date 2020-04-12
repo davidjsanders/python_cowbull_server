@@ -1,5 +1,5 @@
 ifndef BUILD_NUMBER
-  override BUILD_NUMBER := 20.04-8
+  override BUILD_NUMBER := 20.04-10
 endif
 
 ifndef COWBULL_PORT

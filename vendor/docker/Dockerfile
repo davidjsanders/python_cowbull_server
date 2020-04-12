@@ -20,21 +20,6 @@ RUN         pip3 install -r /cowbull/image-requirements \
 
 USER        cowbull
 ENV         PYTHONPATH="/cowbull"
-# COPY        extensions /cowbull/extensions/
-# COPY        flask_controllers /cowbull/flask_controllers/
-# COPY        flask_helpers /cowbull/flask_helpers
-# COPY        Game    /cowbull/Game/
-# COPY        Persistence /cowbull/Persistence/
-# COPY        PersistenceExtensions /cowbull/PersistenceExtensions/
-# COPY        python_cowbull_server /cowbull/python_cowbull_server/
-# COPY        Routes /cowbull/Routes
-# COPY        unittests /cowbull/unittests
-# COPY        systests /cowbull/systests
-# COPY        healthcheck /cowbull/healthcheck/
-# COPY        *.py  /cowbull/
-# COPY        LICENSE /cowbull/
-# COPY        entrypoint.sh /cowbull/
-# COPY        entrypoint-cloudrun.sh /cowbull/
 
 USER        root
 RUN         chmod +x \
@@ -45,7 +30,9 @@ RUN         chmod +x \
 USER        cowbull
 
 ENTRYPOINT [ "/cowbull/entrypoint.sh" ]
-#CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 app:app
+ARG         build_number=latest
+ENV         BUILD_NUMBER=${build_number}
+
 EXPOSE      8080
 HEALTHCHECK \
     --interval=10s \

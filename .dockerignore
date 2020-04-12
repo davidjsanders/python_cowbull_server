@@ -6,12 +6,24 @@
 #
 # D Sanders, 23 Dec 2019
 #
-Dockerfile
+**/Dockerfile
+**/Makefile
+**/cloudbuild.yaml
 README.md
 **/*.pyo
 **/*.pyd
+#
+# D Sanders, 13 Apr 2020
+#
 **/*.yaml
 **/*.yml
 **/*.old
 **/Jenkinsfile
 **/*.properties
+**/.pytest_cache
+**/.scannerwork
+**/.vscode
+lib/
+unittest-reports/
+systest-reports/
+**/*.coverage
