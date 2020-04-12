@@ -1,5 +1,5 @@
 ifndef BUILD_NUMBER
-  override BUILD_NUMBER := 20.04-7
+  override BUILD_NUMBER := 20.04-8
 endif
 
 ifndef COWBULL_PORT
@@ -87,7 +87,7 @@ define end_log
 	echo
 endef
 
-.PHONY: build debug docker dump push run shell systest unittest
+.PHONY: build curltest debug docker dump push run shell systest unittest
 
 build:
 	@start="`date +"$(DATE_FORMAT)"`"; \
@@ -96,6 +96,22 @@ build:
 		--tag $(IMAGE_REG)/$(IMAGE_NAME):$(BUILD_NUMBER) \
 		-f vendor/docker/Dockerfile \
 		. ; \
+	enddate="`date +$(DATE_FORMAT)`"; \
+	$(call end_log,"build",$$start,$$enddate)
+
+curltest:
+	@start="`date +"$(DATE_FORMAT)"`"; \
+	echo ""; \
+	echo "List game modes"; \
+	echo "---------------"; \
+	curl localhost:8000/v1/modes ; \
+	echo ; \
+	echo ""; \
+	echo "Get a game"; \
+	echo "----------"; \
+	curl localhost:8000/v1/game ; \
+	echo ; \
+	echo ; \
 	enddate="`date +$(DATE_FORMAT)`"; \
 	$(call end_log,"build",$$start,$$enddate)
 

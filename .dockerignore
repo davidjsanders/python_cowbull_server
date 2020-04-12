@@ -10,3 +10,8 @@ Dockerfile
 README.md
 **/*.pyo
 **/*.pyd
+**/*.yaml
+**/*.yml
+**/*.old
+**/Jenkinsfile
+**/*.properties

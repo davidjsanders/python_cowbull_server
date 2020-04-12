@@ -1,9 +1,8 @@
 import json
 import logging
 import os
-from flask import Response
+from flask import Response, current_app as app
 from flask_helpers.check_kwargs import check_kwargs
-
 
 class ErrorHandler(object):
     def __init__(self, **kwargs):
@@ -144,5 +143,12 @@ class ErrorHandler(object):
                 method or self.defaults["method"],
                 message
             )
+
+        # If in the context of a Flask App, get the original logging level
+        # and set it here.
+        try:
+            logging.getLogger().setLevel(int(app.config["LOGGING_LEVEL"]))
+        except Exception as e:
+            pass
 
         logger(_message)
