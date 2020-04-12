@@ -120,7 +120,7 @@ debug:
 	source $(VENV); \
 	$(call start_docker,10); \
 	PYTHONPATH=$(WORKDIR) \
-		LOGGING_LEVEL=$(LOG_LEVEL) \
+		LOGGING_LEVEL=10 \
 		PERSISTER='{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0, "password": ""}}' \
 		PORT=$(COWBULL_PORT) \
 		FLASK_PORT=$(COWBULL_PORT) \

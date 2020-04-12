@@ -1,7 +1,7 @@
 import json
 import logging
 import os
-from flask import Response, current_app as app
+from flask import Response
 from flask_helpers.check_kwargs import check_kwargs
 
 class ErrorHandler(object):
@@ -18,19 +18,25 @@ class ErrorHandler(object):
             str_level = kwargs.get("level", None)
             level = int(str_level)
         except (ValueError, TypeError) as exmsg:
-            level = logging.INFO
-            if str_level:
-                print("*** NO LOGGING; BEGIN PRINT BLOCK...")
-                print("    Issue in ErrorHandler")
-                print("    Logging level passed as {}".format(str_level))
-                print("    Defaulting logging level to {}".format(level))
-                print("*** NO LOGGING; END PRINT BLOCK")
-                print("")
+            try:
+                level = int(os.getenv("LOGGING_LEVEL", 
+                    os.getenv("logging_level",
+                    logging.INFO)))
+            except Exception as e:
+                level = logging.INFO
+
+            print("*** NO LOGGING; BEGIN PRINT BLOCK...")
+            print("    Issue in ErrorHandler")
+            print("    Logging level passed as {}".format(str_level))
+            print("    Defaulting logging level to {}".format(level))
+            print("*** NO LOGGING; END PRINT BLOCK")
+            print("")
         finally:
             self.basic_config(
                 level=level,
                 format=kwargs.get("format", "%(asctime)s %(levelname)s: %(message)s")
             )
+            self.level = level
             logging.getLogger().setLevel(level)
 
 
@@ -143,12 +149,5 @@ class ErrorHandler(object):
                 method or self.defaults["method"],
                 message
             )
-
-        # If in the context of a Flask App, get the original logging level
-        # and set it here.
-        try:
-            logging.getLogger().setLevel(int(app.config["LOGGING_LEVEL"]))
-        except Exception as e:
-            pass
 
         logger(_message)
