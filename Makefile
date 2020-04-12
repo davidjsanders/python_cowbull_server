@@ -221,7 +221,6 @@ unittest:
 	source $(VENV); \
 	$(call start_docker,30); \
 	PYTHONPATH=$(WORKDIR) \
-		LOGGING_LEVEL=$(LOG_LEVEL) \
 		python unittests/main.py; \
 	deactivate; \
 	$(call stop_docker);  \

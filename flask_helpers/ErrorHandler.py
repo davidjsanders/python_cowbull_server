@@ -25,12 +25,12 @@ class ErrorHandler(object):
             except Exception as e:
                 level = logging.INFO
 
-            print("*** NO LOGGING; BEGIN PRINT BLOCK...")
-            print("    Issue in ErrorHandler")
-            print("    Logging level passed as {}".format(str_level))
-            print("    Defaulting logging level to {}".format(level))
-            print("*** NO LOGGING; END PRINT BLOCK")
-            print("")
+            # print("*** NO LOGGING; BEGIN PRINT BLOCK...")
+            # print("    Issue in ErrorHandler")
+            # print("    Logging level passed as {}".format(str_level))
+            # print("    Defaulting logging level to {}".format(level))
+            # print("*** NO LOGGING; END PRINT BLOCK")
+            # print("")
         finally:
             self.basic_config(
                 level=level,

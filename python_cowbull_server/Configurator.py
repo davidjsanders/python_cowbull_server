@@ -37,7 +37,7 @@ class Configurator(object):
         )
         self.app.config["LOGGING_LEVEL"] = os.getenv(
             "logging_level",
-            os.getenv("LOGGING_LEVEL", logging.WARNING)
+            os.getenv("LOGGING_LEVEL", logging.INFO)
         )
 
         self.error_handler = ErrorHandler(
