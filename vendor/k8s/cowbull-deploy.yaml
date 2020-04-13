@@ -28,7 +28,9 @@ spec:
             6379, "db": 0}}'
         - name: PORT
           value: "8080"
-        image: dsanderscan/cowbull:20.04-10
+        - name: WORKERS
+          value: "1"
+        image: dsanderscan/cowbull:20.04-11
         imagePullPolicy: IfNotPresent
         name: cowbull-server
         ports:

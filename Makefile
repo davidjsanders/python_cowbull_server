@@ -1,5 +1,5 @@
 ifndef BUILD_NUMBER
-  override BUILD_NUMBER := 20.04-10
+  override BUILD_NUMBER := 20.04-11
 endif
 
 ifndef COWBULL_PORT
@@ -144,6 +144,7 @@ docker:
 	  -it \
 	  --rm \
 	  -p $(COWBULL_PORT):8080 \
+	  --env WORKERS=1 \
 	  --env PORT=8080 \
 	  --env LOGGING_LEVEL=$(LOG_LEVEL) \
 	  --env PERSISTER='{"engine_name": "redis", "parameters": {"host": "$(HOST_IP)", "port": 6379, "db": 0}}' \
@@ -157,6 +158,7 @@ dump:
 	source $(VENV); \
 	PYTHONPATH=$(WORKDIR) \
 		LOGGING_LEVEL=$(LOG_LEVEL) \
+	    WORKERS=1 \
 		PERSISTER='{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0, "password": ""}}' \
 		PORT=$(COWBULL_PORT) \
 		FLASK_PORT=$(COWBULL_PORT) \
@@ -180,6 +182,7 @@ run:
 	PYTHONPATH=$(WORKDIR) \
 	    FLASK_DEBUG=False \
 		FLASK_ENV=run \
+	    WORKERS=1 \
 		LOGGING_LEVEL=$(LOG_LEVEL) \
 		PERSISTER='{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0, "password": ""}}' \
 		PORT=$(COWBULL_PORT) \
@@ -197,6 +200,7 @@ shell:
 		-it --rm  \
 		--name cowbull_server \
 		-p $(COWBULL_PORT):8080 \
+	    --env WORKERS=1 \
 		--env PORT=8080 \
 		--env LOGGING_LEVEL=$(LOG_LEVEL) \
 		--env PERSISTER='{"engine_name": "redis", "parameters": {"host": "$(HOST_IP)", "port": 6379, "db": 0}}' \

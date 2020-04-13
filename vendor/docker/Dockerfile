@@ -32,6 +32,7 @@ USER        cowbull
 ENTRYPOINT [ "/cowbull/entrypoint.sh" ]
 ARG         build_number=latest
 ENV         BUILD_NUMBER=${build_number}
+ENV         WORKERS=1
 
 EXPOSE      8080
 HEALTHCHECK \
