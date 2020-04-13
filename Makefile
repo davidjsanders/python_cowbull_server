@@ -14,6 +14,10 @@ ifndef COWBULL_SERVER_IMAGE
   override COWBULL_SERVER_IMAGE := dsanderscan/cowbull:20.03-2
 endif
 
+ifndef COWBULL_SERVER_URL
+  override COWBULL_SERVER_URL := http://localhost
+endif
+
 ifndef COWBULL_WEBAPP_PORT
   override COWBULL_WEBAPP_PORT := 8080
 endif
@@ -104,12 +108,12 @@ curltest:
 	echo ""; \
 	echo "List game modes"; \
 	echo "---------------"; \
-	curl localhost:8000/v1/modes ; \
+	curl $(COWBULL_SERVER_URL):$(COWBULL_PORT)/v1/modes ; \
 	echo ; \
 	echo ""; \
 	echo "Get a game"; \
 	echo "----------"; \
-	curl localhost:8000/v1/game ; \
+	curl $(COWBULL_SERVER_URL):$(COWBULL_PORT)/v1/game ; \
 	echo ; \
 	echo ; \
 	enddate="`date +$(DATE_FORMAT)`"; \
