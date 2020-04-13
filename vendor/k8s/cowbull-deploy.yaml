@@ -1,0 +1,44 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: cowbull-server
+  namespace: default
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 3
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      run: cowbull-server
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: cowbull-server
+    spec:
+      containers:
+      - env:
+        - name: PERSISTER
+          value: '{"engine_name": "redis", "parameters": {"host": "redis", "port":
+            6379, "db": 0}}'
+        - name: PORT
+          value: "8080"
+        image: dsanderscan/cowbull:20.04-10
+        imagePullPolicy: IfNotPresent
+        name: cowbull-server
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
