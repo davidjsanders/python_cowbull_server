@@ -70,15 +70,7 @@ class Persister(AbstractPersister):
             return self.handler.error(status=500, message="Exception {}".format(repr(e)))
 
         try:
-            save_games = datastore.Entity(key=_key)
-            if not save_games:
-                raise ValueError("Key not found")
-        except Exception as e:
-            print("Exception - {}".format(str(e)))
-            return self.handler.error(status=500, message="Exception {}".format(repr(e)))
-
-        try:
-            save = datastore_client.get(save_games)
+            save = self.datastore_client.get(_key)
             if not save:
                 raise ValueError("Key not found")
         except Exception as e:

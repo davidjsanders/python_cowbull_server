@@ -1,5 +1,5 @@
 ifndef BUILD_NUMBER
-  override BUILD_NUMBER := 20.04-22
+  override BUILD_NUMBER := 20.04-25
 endif
 
 ifndef COWBULL_PORT
@@ -95,6 +95,9 @@ define end_log
 	echo
 endef
 
+P_PERSISTER := '{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0, "password": ""}}'
+# P_PERSISTER := '{"engine_name": "gcpdatastore", "parameters": {}}'
+
 .PHONY: build curltest debug docker dump push run shell systest unittest
 
 build:
@@ -123,15 +126,13 @@ curltest:
 	enddate="`date +$(DATE_FORMAT)`"; \
 	$(call end_log,"build",$$start,$$enddate)
 
-		# PERSISTER='{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0, "password": ""}}' \
-
 debug:
 	@start="`date +"$(DATE_FORMAT)"`"; \
 	source $(VENV); \
 	$(call start_docker,10); \
 	PYTHONPATH=$(WORKDIR) \
 		LOGGING_LEVEL=10 \
-		PERSISTER='{"engine_name": "gcpdatastore", "parameters": {}}' \
+		PERSISTER=$(P_PERSISTER) \
 		PORT=$(COWBULL_PORT) \
 		FLASK_PORT=$(COWBULL_PORT) \
 		FLASK_DEBUG=true \
@@ -153,7 +154,7 @@ docker:
 	  --env WORKERS=1 \
 	  --env PORT=8080 \
 	  --env LOGGING_LEVEL=$(LOG_LEVEL) \
-	  --env PERSISTER='{"engine_name": "redis", "parameters": {"host": "$(HOST_IP)", "port": 6379, "db": 0}}' \
+	  --env PERSISTER=$(P_PERSISTER) \
 	  $(IMAGE_REG)/$(IMAGE_NAME):$(BUILD_NUMBER); \
 	$(call stop_docker); \
 	enddate="`date +$(DATE_FORMAT)`"; \
@@ -165,7 +166,7 @@ dump:
 	PYTHONPATH=$(WORKDIR) \
 		LOGGING_LEVEL=$(LOG_LEVEL) \
 	    WORKERS=1 \
-		PERSISTER='{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0, "password": ""}}' \
+		PERSISTER=$(P_PERSISTER) \
 		PORT=$(COWBULL_PORT) \
 		FLASK_PORT=$(COWBULL_PORT) \
 		FLASK_DEBUG=true \
@@ -192,7 +193,7 @@ run:
 		FLASK_ENV=run \
 	    WORKERS=1 \
 		LOGGING_LEVEL=$(LOG_LEVEL) \
-		PERSISTER='{"engine_name": "gcpdatastore", "parameters": {}}' \
+		PERSISTER=$(P_PERSISTER) \
 		PORT=$(COWBULL_PORT) \
 		FLASK_PORT=$(COWBULL_PORT) \
 		python main.py; \
@@ -211,7 +212,7 @@ shell:
 	    --env WORKERS=1 \
 		--env PORT=8080 \
 		--env LOGGING_LEVEL=$(LOG_LEVEL) \
-		--env PERSISTER='{"engine_name": "redis", "parameters": {"host": "$(HOST_IP)", "port": 6379, "db": 0}}' \
+		--env PERSISTER=$(P_PERSISTER) \
 	    --entrypoint=/bin/sh \
 		$(IMAGE_REG)/$(IMAGE_NAME):$(BUILD_NUMBER); \
 	$(call stop_docker);  \
@@ -224,7 +225,7 @@ systest:
 	$(call start_docker,30); \
 	PYTHONPATH=$(WORKDIR) \
 		LOGGING_LEVEL=$(LOG_LEVEL) \
-		PERSISTER='{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0, "password": ""}}' \
+		PERSISTER=$(P_PERSISTER) \
 		PORT=$(COWBULL_PORT) \
 		python systests/main.py; \
 	deactivate; \
