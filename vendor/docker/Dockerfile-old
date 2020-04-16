@@ -1,19 +1,23 @@
-FROM        python:3.8.2-slim-buster
-RUN         apt-get update \
-            && apt-get upgrade -y
-RUN         addgroup --gid 10000 cowbull_g \
-            && adduser --uid 10000 --ingroup cowbull_g --disabled-password --home /cowbull --gecos "" cowbull \
-            && chown cowbull /cowbull
+FROM        alpine:3.10.2
+RUN         apk update \
+            && addgroup -g 10000 cowbull_g \
+            && mkdir /cowbull \
+            && adduser -u 10000 -G cowbull_g --disabled-password --home /cowbull cowbull \
+            && chown cowbull /cowbull \
+            && apk add --update \
+                curl \
+                musl \
+                python3 \
+                py3-pip
 
 ENV         APP_HOME    /cowbull
 WORKDIR     $APP_HOME
-COPY        image-requirements /cowbull/image-requirements
+COPY        . ./
 
 RUN         pip3 install --upgrade pip
 RUN         pip3 install -r /cowbull/image-requirements \
 &&          pip install gunicorn==19.9.0
 
-COPY        . ./
 USER        cowbull
 ENV         PYTHONPATH="/cowbull"
 

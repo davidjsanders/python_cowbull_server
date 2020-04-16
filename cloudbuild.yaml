@@ -14,7 +14,7 @@ steps:
     '.' 
   ]
 substitutions:
-  _BUILD_NUMBER: "20.04-1"
+  _BUILD_NUMBER: "20.04-28"
 images:
 - 'gcr.io/personal-dev-272223/cowbull:${_BUILD_NUMBER}'
 artifacts:

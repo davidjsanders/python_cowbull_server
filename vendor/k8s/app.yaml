@@ -1,0 +1,280 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cowbull
+spec: {}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    run: redis
+  name: redis
+  namespace: cowbull
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      run: redis
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: redis
+    spec:
+      containers:
+      - image: redis:alpine3.11
+        imagePullPolicy: IfNotPresent
+        name: redis
+        ports:
+        - containerPort: 6379
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: redis
+  name: redis
+  namespace: cowbull
+spec:
+  clusterIP: None
+  ports:
+  - port: 6379
+    protocol: TCP
+    targetPort: 6379
+  selector:
+    run: redis
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    run: cowbull-server
+  name: cowbull-server
+  namespace: cowbull
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 3
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      run: cowbull-server
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: cowbull-server
+    spec:
+      containers:
+      - env:
+        - name: PERSISTER
+          value: '{"engine_name": "redis", "parameters": {"host": "redis", "port":
+            6379, "db": 0}}'
+        - name: PORT
+          value: "8080"
+        - name: WORKERS
+          value: "1"
+        image: gcr.io/personal-dev-272223/cowbull:20.04-28
+        # image: dsanderscan/cowbull:20.04-28
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          exec:
+            command:
+              - /bin/sh
+              - /cowbull/healthcheck/liveness.sh
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        name: cowbull-server
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+              - /bin/sh
+              - /cowbull/healthcheck/healthcheck.sh
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: cowbull-server
+  name: cowbull-server
+  namespace: cowbull
+spec:
+  clusterIP: None
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    run: cowbull-server
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    run: webapp
+  name: webapp
+  namespace: cowbull
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 3
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      run: webapp
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: webapp
+    spec:
+      containers:
+      - env:
+        - name: LOGGING_LEVEL
+          value: "10"
+        - name: COWBULL_SERVER
+          value: cowbull-server
+        - name: COWBULL_PORT
+          value: "8080"
+        - name: COWBULL_ENVIRONMENT
+          value: "kubernetes"
+        # - name: NAVBAR_COLOUR
+        #   value: "bg-success"
+        - name: NAVBAR_COLOUR
+          value: "bg-primary"
+        image: dsanderscan/cowbull_webapp:20.04-28
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          exec:
+            command:
+              - /bin/sh
+              - /cowbull/healthcheck/liveness.sh
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        name: webapp
+        readinessProbe:
+          exec:
+            command:
+              - /bin/sh
+              - /cowbull/healthcheck/healthcheck.sh
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: webapp
+  name: webapp
+  namespace: cowbull
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    run: webapp
+  sessionAffinity: None
+  type: NodePort
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: cowbull-tls
+  namespace: cowbull
+  annotations:
+    kubernetes.io/ingress.class: "nginx"    
+    nginx.ingress.kubernetes.io/add-base-url: "true"
+    cert-manager.io/issuer: "letsencrypt-staging"
+spec:
+  tls:
+  - hosts:
+    - cowbull.k8s.dgsd-consulting.com
+    secretName: cowbull-tls
+  rules:
+  - host: cowbull.k8s.dgsd-consulting.com
+    http:
+      paths:
+      - backend:
+          serviceName: webapp
+          servicePort: 8080
+        path: /
+      - backend:
+          serviceName: webapp
+          servicePort: 8080
+        path: /static/bootstrap-3.3.7-dist/css/
+      - backend:
+          serviceName: webapp
+          servicePort: 8080
+        path: /static/css/
+      - backend:
+          serviceName: webapp
+          servicePort: 8080
+        path: /static/js/
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Issuer
+metadata:
+  name: letsencrypt-staging
+  namespace: cowbull
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: dsanderscanada@gmail.com
+    privateKeySecretRef:
+      name: letsencrypt-staging
+    solvers:
+    - selector: {}
+      http01:
+        ingress:
+          class: nginx

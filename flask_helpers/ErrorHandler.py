@@ -4,7 +4,6 @@ import os
 from flask import Response
 from flask_helpers.check_kwargs import check_kwargs
 
-
 class ErrorHandler(object):
     def __init__(self, **kwargs):
         self.defaults = {}
@@ -13,26 +12,33 @@ class ErrorHandler(object):
         self.basic_config = logging.basicConfig
 
         str_level = None
+        caller    = kwargs.get("caller", None)
+
         try:
             str_level = kwargs.get("level", None)
             level = int(str_level)
         except (ValueError, TypeError) as exmsg:
-            level = logging.WARNING
-            if str_level:
-                self.log(
-                    module="ErrorHandler",
-                    method="__init++",
-                    exception=exmsg,
-                    status=400,
-                    message="*** INVALID LOGGING_LEVEL: --> {}; is LOGGING_LEVEL set to a number?".format(str_level),
-                    logger=logging.warning,
-                    verbose=True
-                )
+            try:
+                level = int(os.getenv("LOGGING_LEVEL", 
+                    os.getenv("logging_level",
+                    logging.INFO)))
+            except Exception as e:
+                level = logging.INFO
 
-        self.basic_config(
-            level=level,
-            format=kwargs.get("format", "%(asctime)s %(levelname)s: %(message)s")
-        )
+            # print("*** NO LOGGING; BEGIN PRINT BLOCK...")
+            # print("    Issue in ErrorHandler")
+            # print("    Logging level passed as {}".format(str_level))
+            # print("    Defaulting logging level to {}".format(level))
+            # print("*** NO LOGGING; END PRINT BLOCK")
+            # print("")
+        finally:
+            self.basic_config(
+                level=level,
+                format=kwargs.get("format", "%(asctime)s %(levelname)s: %(message)s")
+            )
+            self.level = level
+            logging.getLogger().setLevel(level)
+
 
     #
     # Properties

@@ -118,12 +118,12 @@ class TestHelpers(TestCase):
         self.assertEqual(r_data["exception"], exception)
 
     def test_he_value_error(self):
-        eh = ErrorHandler(
+        eh2 = ErrorHandler(
             module="TEST",
             method="TEST-METHOD",
             level="logging.INFO"
         )
-        self.assertEqual(eh.logger.level, logging.WARNING)
+        self.assertEqual(eh2.logger.level, logging.INFO)
 
     def test_he_type_error(self):
         eh = ErrorHandler(
@@ -131,7 +131,7 @@ class TestHelpers(TestCase):
             method="TEST-METHOD",
             level={"foobar": "logging.INFO"}
         )
-        self.assertEqual(eh.logger.level, logging.WARNING)
+        self.assertEqual(eh.logger.level, logging.INFO)
 
     def test_he_check_warn(self):
         eh = ErrorHandler(

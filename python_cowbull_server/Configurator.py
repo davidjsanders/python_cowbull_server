@@ -37,7 +37,7 @@ class Configurator(object):
         )
         self.app.config["LOGGING_LEVEL"] = os.getenv(
             "logging_level",
-            os.getenv("LOGGING_LEVEL", logging.WARNING)
+            os.getenv("LOGGING_LEVEL", logging.INFO)
         )
 
         self.error_handler = ErrorHandler(
@@ -113,7 +113,8 @@ class Configurator(object):
         print('server. Alternately, these can be defined in a file and passed using the env.')
         print('var. COWBULL_CONFIG. Please note, the file must be a JSON data object.')
         print('')
-        print('Please note. Env. Var. names can be *ALL* lowercase or *ALL* uppercase.')
+        print('Please note 1: Env. Var. names can be *ALL* lowercase or *ALL* uppercase.')
+        print('Please note 2: FLASK_ env. vars. are ignored when using gUnicorn.')
         print('')
         print('-' * 80)
         print('| Current configuration set:')
@@ -131,17 +132,40 @@ class Configurator(object):
             _fetch = os.getenv
 
         for item in self.env_vars:
+            self.error_handler.log(
+                method="load_variables",
+                message="Processing {} of type {}".format(
+                    item.get("name", "no name provided"),
+                    item.get("caster", "string")
+                ),
+                logger=logging.debug
+            )
             if isinstance(item, dict):
+                self.error_handler.log(
+                    method="load_variables",
+                    message="Item is a dict: {}".format(item.get("name", "unknown name")),
+                    logger=logging.debug
+                )
                 self._set_config(
                     source=_fetch,
                     **item
                 )
             elif isinstance(item, str):
+                self.error_handler.log(
+                    method="load_variables",
+                    message="Item is a string: {}".format(item.get("name", "unknown name")),
+                    logger=logging.debug
+                )
                 self._set_config(
                     name=item,
                     source=_fetch
                 )
             elif isinstance(item, list):
+                self.error_handler.log(
+                    method="load_variables",
+                    message="Item is a list: {}".format(item.get("name", "unknown name")),
+                    logger=logging.debug
+                )
                 self.load_variables(source=item)
             else:
                 raise TypeError("Unexpected item in configuration: {}, type: {}".format(item, type(item)))
@@ -248,6 +272,7 @@ class Configurator(object):
         choices=kwargs.get("choices", None)
 
         self.error_handler.log(
+            method="_set_config",
             message="In _set_config -- source: {}, name: {}, description: {}, required: {}, default: {}, errmsg: {}, caster: {}, choices: {}"
                 .format(
                     source,
@@ -273,19 +298,33 @@ class Configurator(object):
                 "{}. It is required and was not found or the value was None.".format(name)
             )
 
+        self.error_handler.log(
+            method="_set_config",
+            message="Before casting: {}".format(value),
+            logger=logging.debug
+        )
+
         if value is None:
             value = default
 
         if caster:
             if caster == PersistenceEngine:
                 if not isinstance(value, dict):
-                    #
-                    # Added .replace to remove single quotes being added by PyCharm
-                    #
                     value = json.loads(str(value).replace("'", ""))
                 value = caster(**value)
+            elif caster == bool and isinstance(value, str):
+                if value.lower() == "false":
+                    value = False
+                else:
+                    value = True
             else:
                 value = caster(value)
+
+        self.error_handler.log(
+            method="_set_config",
+            message="After casting: {}".format(value),
+            logger=logging.debug
+        )
 
         if choices and value not in choices:
                 raise ValueError(

@@ -18,5 +18,23 @@ __pycache__/
 # Ignored by the build system
 /setup.cfg
 
-# D Sanders, 06 Apr 2020
+# D Sanders, 12 Apr 2020
+**/*.env
 **/*.json
+**/*.xml
+**/*.pyc
+**/__pycache__
+**/*.pyo
+**/*.pyd
+**/*.yaml
+**/*.yml
+**/*.old
+**/Jenkinsfile
+**/*.properties
+**/.pytest_cache
+**/.scannerwork
+**/.vscode
+lib/
+unittest-reports/
+systest-reports/
+**/*.coverage
