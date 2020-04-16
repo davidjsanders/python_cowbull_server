@@ -12,19 +12,34 @@ class Persister(AbstractPersister):
         self.handler.log(message="Preparing datastore client")
 
         self.datastore_client = datastore.Client()
-        self.kind = "cowbull-save-game"
+        self.kind = "save"
 
-        line_no = 0
+        key = "validation-save-ignored"
+        current_date = "{}".format(datetime.now())
+
+        # Get a datastore key
         try:
-            key = "00-000000-01"
-            current_date = "{}".format(datetime.now())
             self.handler.log(message="Creating datastore key: {}".format(key))
             _key = self.datastore_client.key(self.kind, key)
+        except Exception as e:
+            print("Exception while getting datastore client - {}".format(str(e)))
+            self.handler.log(message="In GCPDatastorePersist __init__ an exception occurred: {}".format(repr(e)))
+            raise
+
+        # Create an entity
+        try:
             _save = datastore.Entity(key=_key)
             _save['game'] = "validation: {}".format(current_date)
+        except Exception as e:
+            print("Exception while getting datastore Entity - {}".format(str(e)))
+            self.handler.log(message="In GCPDatastorePersist __init__ an exception occurred: {}".format(repr(e)))
+            raise
+
+        # Update the DB
+        try:
             self.datastore_client.put(_save)
         except Exception as e:
-            print("An exception - {}".format(str(e)))
+            print("Exception while putting data - {}".format(str(e)))
             self.handler.log(message="In GCPDatastorePersist __init__ an exception occurred: {}".format(repr(e)))
             raise
 
