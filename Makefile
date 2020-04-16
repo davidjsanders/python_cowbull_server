@@ -1,5 +1,5 @@
 ifndef BUILD_NUMBER
-  override BUILD_NUMBER := 20.04-11
+  override BUILD_NUMBER := 20.04-22
 endif
 
 ifndef COWBULL_PORT
@@ -48,6 +48,10 @@ endif
 
 ifndef LOG_LEVEL
   override LOG_LEVEL := 30
+endif
+
+ifndef PERSISTER_VAR
+  override PERSISTER_VAR := '{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0, "password": ""}}'
 endif
 
 ifndef REDIS_IMAGE
@@ -119,13 +123,15 @@ curltest:
 	enddate="`date +$(DATE_FORMAT)`"; \
 	$(call end_log,"build",$$start,$$enddate)
 
+		# PERSISTER='{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0, "password": ""}}' \
+
 debug:
 	@start="`date +"$(DATE_FORMAT)"`"; \
 	source $(VENV); \
 	$(call start_docker,10); \
 	PYTHONPATH=$(WORKDIR) \
 		LOGGING_LEVEL=10 \
-		PERSISTER='{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0, "password": ""}}' \
+		PERSISTER='{"engine_name": "gcpdatastore", "parameters": {}}' \
 		PORT=$(COWBULL_PORT) \
 		FLASK_PORT=$(COWBULL_PORT) \
 		FLASK_DEBUG=true \
@@ -175,6 +181,8 @@ push:
 	enddate="`date +$(DATE_FORMAT)`"; \
 	$(call end_log,"push",$$start,$$enddate)
 
+#		PERSISTER='{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0, "password": ""}}' \
+
 run:
 	@start="`date +"$(DATE_FORMAT)"`"; \
 	source $(VENV); \
@@ -184,7 +192,7 @@ run:
 		FLASK_ENV=run \
 	    WORKERS=1 \
 		LOGGING_LEVEL=$(LOG_LEVEL) \
-		PERSISTER='{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0, "password": ""}}' \
+		PERSISTER='{"engine_name": "gcpdatastore", "parameters": {}}' \
 		PORT=$(COWBULL_PORT) \
 		FLASK_PORT=$(COWBULL_PORT) \
 		python main.py; \

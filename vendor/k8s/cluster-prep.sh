@@ -3,17 +3,16 @@ echo
 echo "NGINX Ingress Controller installation."
 echo "For reference: https://kubernetes.github.io/ingress-nginx/deploy/"
 echo
-echo "Apply cloud generic"
-kubectl apply \
-    -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.30.0/deploy/static/provider/cloud-generic.yaml
 echo "Create cluster role binding for GKE"
-kubectl create \
-    clusterrolebinding cluster-admin-binding \
-    --clusterrole cluster-admin\
-    --user $(gcloud config get-value account)
+kubectl create clusterrolebinding cluster-admin-binding \
+  --clusterrole cluster-admin \
+  --user $(gcloud config get-value account)
 echo "Apply mandatory"
 kubectl apply \
     -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.30.0/deploy/static/mandatory.yaml
+echo "Apply cloud generic"
+kubectl apply \
+    -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.30.0/deploy/static/provider/cloud-generic.yaml
 echo "Apply generic"
 kubectl apply \
     -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.30.0/deploy/static/provider/cloud-generic.yaml
