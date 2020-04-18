@@ -7,10 +7,10 @@ RUN         addgroup --gid 10000 cowbull_g \
 
 ENV         APP_HOME    /cowbull
 WORKDIR     $APP_HOME
-COPY        image-requirements /cowbull/image-requirements
+COPY        requirements.txt /cowbull/requirements.txt
 
 RUN         pip3 install --upgrade pip
-RUN         pip3 install -r /cowbull/image-requirements \
+RUN         pip3 install -r /cowbull/requirements.txt \
 &&          pip install gunicorn==19.9.0
 
 COPY        . ./
