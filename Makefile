@@ -3,7 +3,7 @@ ifndef BUILD_NUMBER
 endif
 
 ifndef COWBULL_PORT
-  override COWBULL_PORT := 8000
+  override COWBULL_PORT := 5000
 endif
 
 ifndef COWBULL_SERVER
@@ -63,7 +63,7 @@ ifndef REDIS_PORT
 endif
 
 ifndef VENV
-	override VENV := $(HOMEDIR)/virtuals/cowbull_p3/bin/activate
+	override VENV := $(HOMEDIR)/virtuals/cowbull_server/bin/activate
 endif
 
 ifndef WORKDIR

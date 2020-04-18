@@ -1,11 +1,45 @@
 # python_cowbull_server
 
-**Version 1.0**
+## Version: 20.04
+Python cowbull server is a Python 3.x Flask based http server, that serves the
+cowbull game using python_cowbull_game objects. It serves up the game
+by responding to http requests to ``http(s)://server:port/version/game`` and
+decides the action based on the method used for the request: ``GET`` starts
+a new game and ``POST`` makes a guess against the game.
 
-This is part 3 of a multi-part tutorial. The link for the tutorial will be provided soon.
-This is an open source project and you are welcome to reuse and/or fork it.
+The app can be launched on a number of platforms: laptop, Docker, Google App Engine, GKE, Docker, etc. In all platforms, there are dependencies (see below) which need to be included in the Python environment.
 
-**Related Projects**
+### Running Locally
+To run the game server locally, the following (modified) commands need to be performed (validated on MacOS and assuming pip and virtualenv installed):
+
+```
+python3 -m virtualenv -p python3 ~/virtuals/cowbull_server
+source ~/virtuals/cowbull_server/bin/activate
+pip install -r image-requirements
+deactivate
+```
+
+To test the program, run the following commands:
+
+```
+source ~/virtuals/cowbull_server/bin/activate
+PERSISTER='{"engine_name": "file", "parameters": {}}' python main.py
+```
+
+> When run as above, the game will start a Flask non-production server offering the game on the localhost on port 5000. To validate the program is running, execute curl commands:
+
+```
+curl http://localhost:5000/v1/modes ; echo
+curl http://localhost:5000/v1/game ; echo
+```
+
+Both curls should return results and a file should have been created in the /tmp directory with a .cow extension; for example: `/tmp/6970299e-2117-4787-beff-3d8c36612379.cow`
+
+> Without specifying the persister, e.g. running `python main.py`, the game engine will expect a Redis instance available on localhost on port 6379. Use Docker to provide Redis as the default persistence engine; for example: `docker run --detach --name redis -p 6379:6370 redis:alpine3.11`
+
+
+## Related Projects
+
 * [python_digits](https://github.com/dsandersAzure/python_digits) : The python_digits object
 used as the base of this game.
 * [python_cowbull_game](https://github.com/dsandersAzure/python_cowbull_game) : A Flask
@@ -15,89 +49,10 @@ console based game which interacts with the server
 * [python_cowbull_webapp](https://github.com/dsandersAzure/python_cowbull_webapp) : A single
 page webapp which interacts with the web server using XHR (XMLHttpRequest).
 
-Python cowbull server is a Flask based http server that serves the
-cowbull game using python_cowbull_game objects. It serves up the game
-by responding to http requests to ``http://server/version/game`` and
-decides the action based on the method used for the request: ``GET`` starts
-a new game and ``POST`` makes a guess against the game.
+## Depdendencies
+All dependecies are included in the image-requirements file. **Note**, requirements.txt is used for specific scenarios (see below.)
 
-### Swagger Definition
-coming soon.
-
-### Depdendencies
-The game requires a Redis server to act as a cache for game object information
-and must be configured before running the game. The game picks up the Redis
-server via env vars:
-
-* REDIS_HOST : Defines the fqdn name of the redis host (e.g. redis)
-* REDIS_PORT : Defines the port number redis is listening on (e.g. 6379)
-* REDIS_DB : Defines the database number (e.g. 0)
-* REDIS_USEAUTH : *Not Currently Used* For future use to tell the game 
-server to use redis authentication.
-
-Any redis server will do and options include:
-1. [Redis Labs](https://redislabs.com/) free service with 30MB
-2. Docker - use `docker run --name redis -p 6379:6379 -d redis`
-3. Kubernetes - use the K8s instructions below
-
-### Running the game
-To run the game server using source, follow these steps (assuming using Docker for Redis):
-```
-virtualenv /path/to/virtual/env --python=python3
-source /path/to/virtual/env/bin/activate
-export REDIS_HOST="localhost"
-export REDIS_PORT=6379
-export FLASK_HOST="0.0.0.0"
-export FLASK_PORT=5000
-export FLASK_DEBUG="true"
-docker run --name redis -p 6379:6379 -d redis
-cd /to/location/repo/installed
-python app.py
-```
-
-To run the game server using Docker, follow these steps:
-```
-cd /to/location/repo/installed
-docker build -t imagename -f vendor/docker/Dockerfile .
-docker network create yournetwork --driver bridge
-docker run --name redis --network yournetwork -d redis
-docker run --name cowbull --network yournetwork --env REDIS_HOST="redis" -p 5000:5000 -d {imagename}
-#
-# Tear down
-#
-docker stop redis
-docker rm redis
-docker stop cowbull
-docker rm cowbull
-```
-
-To run the game using local Kubernetes (minikube) *NOTE* This uses 
-the standard Docker image for the game server (dsanderscan/cowbull_v5):
-```
-minikube start
-cd /to/location/repo/installed
-kubectl create configmap cowbull-config --from-file vendor/kubeconfig/cowbull.cfg
-kubectl create -f vendor/kubernetes/deploy-redis.yml
-kubectl create -f vendor/kubeconfig/configured-cowbull.yml
-kubectl get po # See the pods and wait till they are running
-kubectl get svc
-# NAME           CLUSTER-IP   EXTERNAL-IP   PORT(S)          AGE
-# cowbull-svc    {ip addr.}   <pending>     5000:{port}/TCP   9s
-#
-# Use the minikube address (usually 192.168.99.100) and the port mapped
-# to 5000 in the get svc output for requests.
-#
-# Tear down
-#
-kubectl delete -f vendor/kubernetes/deploy-redis.yml
-kubectl delete -f vendor/kubeconfig/configured-cowbull.yml
-#
-# To remove configuration
-#
-kubectl delete configmap cowbull-config
-```
-
-### Requests
+## Requests
 Make a request by issuing GET or POST methods to:
 * `curl http://FLASK_HOST:FLASK_PORT/v0_1/game`
 
@@ -105,146 +60,168 @@ For added benefit, install [jq](https://stedolan.github.io/jq/) to be able
 to parse the JSON returned by the request:
 * `curl -s <-X {method}> http://FLASK_HOST:FLASK_PORT/v0_1/game | jq`
 
-**_Notes_**: 
-1. If using Kubernetes:
-  * Use your minikube node address (typically 192.168.99.100 and found
-by executing `kubectl describe nodes minikube | grep Addresses | grep -v grep`) 
-for FLASK_HOST
-  * Use the port number found above (`kubectl get svc cowbull-svc`)
-2. If using Docker:
-  * Use `localhost` for FLASK_HOST
-  * Use the port number `5000` for FLASK_PORT
+### GET
+> Remember to export FLASK_HOST (e.g. localhost) and FLASK_PORT (e.g. 5000)
 
-
-### Methods
-#### GET
 Request (or get) a new game. An optional parameter mode
 can be provided and state one of the game modes (easy, normal,
 or hard).
-* curl -s http://FLASK_HOST:FLASK_PORT/v0_1/game | jq
-  ```
-  {
-    "digits": 4,
-    "guesses": 10,
-    "served-by": "{FLASK_HOST}",
-    "key": "{uuid}"
-  }
-  ```
-* curl -s http://FLASK_HOST:FLASK_PORT/v0_1/game?mode=easy | jq
-  ```
-  {
-    "digits": 3,
-    "guesses": 15,
-    "served-by": "{FLASK_HOST}",
-    "key": "{uuid}"
-  }
-  ```
-* curl -s http://FLASK_HOST:FLASK_PORT/v0_1/game?mode=hard | jq
-  ```
-  {
-    "digits": 6,
-    "guesses": 6,
-    "served-by": "{FLASK_HOST}",
-    "key": "{uuid}"
-  }
-  ```
 
-#### POST
+* curl -s http://$FLASK_HOST:$FLASK_PORT/v1/game | jq
+
+```
+{
+  "key": "d04c7555-465c-4f57-b749-4539a14e482b",
+  "mode": "Normal",
+  "digits": 4,
+  "digit-type": 0,
+  "guesses": 10,
+  "served-by": "(machine-name)",
+  "help-text": "This is the normal (default) game. You need to guess 4 digits in the right place and each digit must be a whole number between 0 and 9. There are 10 tries to guess the correct answer.",
+  "instruction-text": "Enter 4 digits, each digit between 0 and 9 (0, 1, 2, 3, 4, 5, 6, 7, 8, and 9)."
+}
+```
+
+* curl -s http://$FLASK_HOST:$FLASK_PORT/v1/game?mode=Easy | jq
+
+```
+{
+  "key": "d01496ef-1339-40fe-8455-5c7f07f622c1",
+  "mode": "Easy",
+  "digits": 3,
+  "digit-type": 0,
+  "guesses": 6,
+  "served-by": "(machine name)",
+  "help-text": "Easy. You need to guess 3 digits in the right place and each digit must be a whole number between 0 and 9. There are 6 tries to guess the correct answer.",
+  "instruction-text": "Enter 3 digits, each digit between 0 and 9 (0, 1, 2, 3, 4, 5, 6, 7, 8, and 9)."
+}
+```
+
+* curl -s http://$FLASK_HOST:$FLASK_PORT/v1/game?mode=Hex | jq
+```
+{
+  "key": "be8f461a-31de-4134-8edd-11dc99a49368",
+  "mode": "Hex",
+  "digits": 4,
+  "digit-type": 1,
+  "guesses": 10,
+  "served-by": "(machine name)",
+  "help-text": "Hex. You need to guess 4 digits in the right place and each digit must be a hexidecimal number between 0 and F. There are 10 tries to guess the correct answer.",
+  "instruction-text": "Enter 4 digits, each digit between 0 and F (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A, B, C, D, E, and F)."
+}
+```
+
+### POST
 Make a guess against an existing game, passing the key and
 an array of Digits (integers between 0 and 9) as raw JSON data.
 
-* curl -s -X POST -H "Content-type: application/json" -d '{"key":"{uuid}", "digits":[0, 1, 2, 3, 4, 5]}' http://localhost:5000/v0_1/game | jq
-  ```
-  {
-    "served-by": "{FLASK_HOST}",
-    "outcome": {
-      "cows": 2,
-      "status": "playing",
-      "bulls": 1,
-      "analysis": [
-        {
-          "multiple": false,
-          "in_word": true,
-          "index": 0,
-          "digit": 0,
-          "match": false
-        },
-        {
-          "multiple": false,
-          "in_word": true,
-          "index": 1,
-          "digit": 1,
-          "match": false
-        },
-        {
-          "multiple": false,
-          "in_word": false,
-          "index": 2,
-          "digit": 2,
-          "match": false
-        },
-        {
-          "multiple": false,
-          "in_word": true,
-          "index": 3,
-          "digit": 3,
-          "match": true
-        },
-        {
-          "multiple": false,
-          "in_word": false,
-          "index": 4,
-          "digit": 4,
-          "match": false
-        },
-        {
-          "multiple": false,
-          "in_word": false,
-          "index": 5,
-          "digit": 5,
-          "match": false
-        }
-      ]
+* curl -s -X POST -H "Content-type: application/json" -d '{"key":"0afbe262-c324-4bd4-bb87-a7c72739b852", "digits":[0, 1, 2, 3, 4, 5]}' http://$FLASK_HOST:$FLASK_PORT/v1/game | jq
+
+```
+{
+  "game": {
+    "key": "0afbe262-c324-4bd4-bb87-a7c72739b852",
+    "status": "playing",
+    "ttl": 3600,
+    "mode": {
+      "mode": "Hard",
+      "priority": 30,
+      "digits": 6,
+      "digit_type": 0,
+      "guesses_allowed": 6,
+      "instruction_text": "Enter 6 digits, each digit between 0 and 9 (0, 1, 2, 3, 4, 5, 6, 7, 8, and 9).",
+      "help_text": "Hard. You need to guess 6 digits in the right place and each digit must be a whole number between 0 and 9. There are only 6 tries to guess the correct answer."
     },
-    "game": {
-      "mode": "hard",
-      "ttl": 1494962909,
-      "status": "playing",
-      "key": "{uuid}",
-      "guesses_made": 1,
-      "guesses_remaining": 5
-    }
-  }
-  ```
-* Errors will be reported back to the caller via JSON.
+    "guesses_made": 1
+  },
+  "outcome": {
+    "bulls": 0,
+    "cows": 3,
+    "analysis": [
+      {
+        "index": 0,
+        "digit": 0,
+        "match": false,
+        "multiple": false,
+        "in_word": false
+      },
+      {
+        "index": 1,
+        "digit": 1,
+        "match": false,
+        "multiple": false,
+        "in_word": true
+      },
+      {
+        "index": 2,
+        "digit": 2,
+        "match": false,
+        "multiple": false,
+        "in_word": true
+      },
+      {
+        "index": 3,
+        "digit": 3,
+        "match": false,
+        "multiple": false,
+        "in_word": true
+      },
+      {
+        "index": 4,
+        "digit": 4,
+        "match": false,
+        "multiple": false,
+        "in_word": false
+      },
+      {
+        "index": 5,
+        "digit": 5,
+        "match": false,
+        "multiple": false,
+        "in_word": false
+      }
+    ],
+    "status": "You have 0 bulls and 3 cows"
+  },
+  "served-by": "(machine name)"
+}
+```
+
+Errors will be reported back to the caller via JSON; For example:
+
   * Incorrect number of digits:
-  ```
-  {
-  "module": "GameServerController",
-  "exception": "The digits provided did not match the required number (6)",
-  "method": "post",
-  "message": "There was a problem with the value of the digits provided!",
-  "status": 400
-  }
-  ```
+ ```
+curl -s -X POST -H "Content-type: application/json" -d '{"key":"0afbe262-c324-4bd4-bb87-a7c72739b852", "digits":[0, 1, 2, 3, 5]}' http://$FLASK_HOST:$FLASK_PORT/v1/game | jq
+
+{
+  "status": 400,
+  "module": "GameMode",
+  "method": "guess",
+  "exception": "The DigitWord objects are of different lengths and so comparison fails.",
+  "message": "There is a problem with the digits provided!"
+}
+ ```
   * Bad key:
-  ```bash
-  {
-    "module": "GameServerControllerroller",
-    "exception": "'The key provided is invalid.'",
-    "method": "post",
-    "message": "The request must contain a valid game key.",
-    "status": 400
-  }
-  ```
+```
+curl -s -X POST -H "Content-type: application/json" -d '{"key":"0afbe262-c324-4bd4-bb87-a7c72739b8521", "digits":[0, 1, 2, 3, 4, 5]}' http://$FLASK_HOST:$FLASK_PORT/v1/game | jq
+
+{
+  "status": 400,
+  "module": "GameServerController",
+  "method": "post",
+  "exception": "'Unable to open the key file: /tmp/0afbe262-c324-4bd4-bb87-a7c72739b8521.cow'",
+  "message": "The request must contain a valid game key."
+}
+```
   * Bad JSON data:
-  ```
-  {
-    "moduGameServerControllerroller",
-    "exception": "Failed to decode JSON object: Expecting value: line 1 column 1 (char 0)",
-    "method": "post",
-    "message": "Bad request. There was no JSON present. ### LIKELY CALLER ERROR ###",
-    "status": 400
-  }
-  ```
-  
+```
+curl -s -X POST -H "Content-type: application/json" -d '{"key":"0afbe262-c324-4bd4-bb87-a7c72739b852", "digit":[0, 1, 2, 3, 4, 5]}' http://$FLASK_HOST:$FLASK_PORT/v1/game | jq
+
+{
+  "status": 400,
+  "module": "GameMode",
+  "method": "__init__",
+  "exception": "'digits'",
+  "message": "The request must contain an array of digits called 'digits'"
+}
+```

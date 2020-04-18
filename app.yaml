@@ -11,3 +11,4 @@ env_variables:
   # PERSISTER: '{"engine_name": "gcpstorage", "parameters": {"bucket": "dasander-cowbull-save-games", "credentials_file": "./personal-dev-272223-63b56e7a9f0d.json"}}'
   # PERSISTER: '{"engine_name": "gaestorage", "parameters": {"bucket": "dasander-cowbull-save-games", "credentials_file": "./personal-dev-272223-63b56e7a9f0d.json", "project": "personal-dev-272223"}}'
   PERSISTER: '{"engine_name": "gaestorage", "parameters": {"bucket": "dasander-cowbull-save-games"}}'
+  # PERSISTER: '{"engine_name": "gcpdatastore", "parameters": {}}'
