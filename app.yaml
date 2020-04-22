@@ -9,4 +9,5 @@ env_variables:
   LOGGING_FORMAT: "%(asctime)s %(levelname)s: %(message)s"
   # PERSISTER: '{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0, "password": ""}}'
   PERSISTER: '{"engine_name": "gaestorage", "parameters": {"bucket": "dasander-cowbull-save-games"}}'
+  # PERSISTER: '{"engine_name": "gaestorage", "parameters": {"bucket": "djsanders-cowbull-save-games"}}'
   # PERSISTER: '{"engine_name": "gcpdatastore", "parameters": {}}'
