@@ -1,0 +1,19 @@
+steps:
+- name: 'python:3.6.10-alpine3.11'
+  args: [
+    '/bin/sh',
+    './cloudbuild_test.sh'
+  ]
+- name: 'gcr.io/cloud-builders/docker'
+  args: [ 
+    'build', 
+    '-t', 
+    'gcr.io/$PROJECT_ID/cowbull:${_BUILD_NUMBER}', 
+    '-f',
+    'vendor/docker/Dockerfile',
+    '.' 
+  ]
+substitutions:
+  _BUILD_NUMBER: "20.04-33"
+images:
+- 'gcr.io/$PROJECT_ID/cowbull:${_BUILD_NUMBER}'
