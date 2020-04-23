@@ -1,5 +1,5 @@
-#!/bin/sh
-set -o pipefail
+#!/bin/bash
+#set -o pipefail
 output=$(curl -s http://localhost:8080/v1/health)
 grepout=$(echo $output | grep "notok")
 if [ "$grepout" == "" ]; 

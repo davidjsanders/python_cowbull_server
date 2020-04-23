@@ -1,6 +1,7 @@
-FROM        python:3.8.2-slim-buster
+FROM        python:3.8.2-buster
 RUN         apt-get update \
-            && apt-get upgrade -y
+            && apt-get upgrade -y \
+	    && apt-get install -y curl
 RUN         addgroup --gid 10000 cowbull_g \
             && adduser --uid 10000 --ingroup cowbull_g --disabled-password --home /cowbull --gecos "" cowbull \
             && chown cowbull /cowbull

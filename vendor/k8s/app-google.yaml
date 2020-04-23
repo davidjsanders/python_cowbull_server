@@ -97,13 +97,13 @@ spec:
           value: "8080"
         - name: WORKERS
           value: "1"
-        image: gcr.io/djsanders-dev-spaces/cowbull:20.04-33
+        image: gcr.io/djsanders-dev-spaces/cowbull:20.04-34
         # image: dsanderscan/cowbull:20.04-28
         imagePullPolicy: IfNotPresent
         livenessProbe:
           exec:
             command:
-              - /bin/sh
+              - /bin/bash
               - /cowbull/healthcheck/liveness.sh
           initialDelaySeconds: 5
           periodSeconds: 5
@@ -114,7 +114,7 @@ spec:
         readinessProbe:
           exec:
             command:
-              - /bin/sh
+              - /bin/bash
               - /cowbull/healthcheck/healthcheck.sh
           initialDelaySeconds: 5
           periodSeconds: 5
@@ -135,7 +135,7 @@ metadata:
   name: cowbull-server
   # namespace: cowbull
 spec:
-  clusterIP: None
+        # clusterIP: None
   ports:
   - port: 8080
     protocol: TCP
@@ -143,7 +143,7 @@ spec:
   selector:
     run: cowbull-server
   sessionAffinity: None
-  type: ClusterIP
+  # type: ClusterIP
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -217,7 +217,6 @@ metadata:
   labels:
     run: webapp
   name: webapp
-  namespace: cowbull
 spec:
   ports:
   - port: 8080
