@@ -2,7 +2,6 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: webapp-ingress
-  namespace: default
 spec:
   rules:
   - host: k8s-cowbull.dgsd-consulting.com

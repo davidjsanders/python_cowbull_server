@@ -35,17 +35,26 @@ class Persister(AbstractPersister):
             self.storage_client = storage.Client()
 
         self.storage_client = storage.Client()
-        self.bucket = self.storage_client.bucket("dasander-cowbull-save-games")
+        self.bucket = self.storage_client.bucket(bucket)
 
     def load(self, key=None):
+        self.handler.log(message="Calling load.super()")
         super(Persister, self).load(key=key)
+        self.handler.log(message="Getting data for key {}".format(key))
         blob = self.bucket.blob(key)
-        return blob.download_as_string()
+        self.handler.log(message="Key data for key {} retrieved".format(key))
+        downloaded_string = blob.download_as_string()
+        self.handler.log(message="Key data for key {} retrieved -> {}".format(key, downloaded_string))
+        return downloaded_string
 
     def save(self, key=None, jsonstr=None):
+        self.handler.log(message="Calling save.super()")
         super(Persister, self).save(key=key, jsonstr=jsonstr)
+        self.handler.log(message="Calling self.bucket.blob from key {}".format(key))
         blob = self.bucket.blob(key)
+        self.handler.log(message="Uploading key {} with value {}".format(key, jsonstr))
         blob.upload_from_string(
             data=jsonstr,
             content_type="application/json"
         )
+        self.handler.log(message="Completed upload")
