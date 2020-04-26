@@ -1,14 +1,7 @@
-from flask_helpers.ErrorHandler import ErrorHandler
-from google.auth.credentials import Credentials
 from google.cloud import storage
-from google.cloud.storage import Blob
 from google.oauth2 import service_account
 from Persistence.AbstractPersister import AbstractPersister
-
-
 import google.auth
-
-# import cloudstorage
 
 
 class Persister(AbstractPersister):
