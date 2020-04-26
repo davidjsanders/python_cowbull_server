@@ -40,11 +40,28 @@ class Persister(AbstractPersister):
     def load(self, key=None):
         self.handler.log(message="Calling load.super()")
         super(Persister, self).load(key=key)
+
         self.handler.log(message="Getting data for key {}".format(key))
-        blob = self.bucket.blob(key)
+        try:
+            blob = self.bucket.blob(key)
+        except Exception as e:
+            self.handler.log(
+                message="Exception raised while fetching Blob: {}"
+                .format(str(e))
+            )
+            raise
         self.handler.log(message="Key data for key {} retrieved".format(key))
-        downloaded_string = blob.download_as_string()
+
+        self.handler.log(message="Fetching game data from {}".format(key))
+        try:
+            downloaded_string = blob.download_as_string()
+        except Exception as e:
+            self.handler.log(
+                message="Exception raisef while downloading blob as string: {}"
+                .format(str(e))
+            )
         self.handler.log(message="Key data for key {} retrieved -> {}".format(key, downloaded_string))
+
         return downloaded_string
 
     def save(self, key=None, jsonstr=None):
