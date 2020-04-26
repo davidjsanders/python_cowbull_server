@@ -13,14 +13,20 @@ import google.auth
 
 class Persister(AbstractPersister):
     def __init__(self, bucket=None, credentials_file=None, project=None):
-        if bucket is None:
-            raise ValueError("Bucket name must be provided to the persister.")
-        if credentials_file is not None and project is None:
-            raise ValueError("Project must be provided if credentials file is provided!")
-
         super(Persister, self).__init__()
 
         self.handler.module="GAEStorage"
+        if bucket is None:
+            self.handler.log(
+                message="*** NO BUCKET PASSED! ***"
+            )
+            raise ValueError("Bucket name must be provided to the persister.")
+        if credentials_file is not None and project is None:
+            self.handler.log(
+                message="*** NO CREDENTIALS AND PROJECT IS NONE! ***"
+            )
+            raise ValueError("Project must be provided if credentials file is provided!")
+
         self.handler.log(message="Validating if credentials are defined or if defaults should be used")
         if credentials_file is not None:
             self.handler.log(message="Setting credentials")
