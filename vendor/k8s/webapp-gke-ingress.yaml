@@ -1,0 +1,13 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    ingress.kubernetes.io/backends: '{"k8s-be-30613--7c475f5b96fbdbe7":"Unknown"}'
+    ingress.kubernetes.io/forwarding-rule: k8s-fw-cowbull-webapp-ingress--7c475f5b96fbdbe7
+    ingress.kubernetes.io/target-proxy: k8s-tp-cowbull-webapp-ingress--7c475f5b96fbdbe7
+    ingress.kubernetes.io/url-map: k8s-um-cowbull-webapp-ingress--7c475f5b96fbdbe7
+  name: webapp-ingress
+spec:
+  backend:
+    serviceName: webapp
+    servicePort: 8080
