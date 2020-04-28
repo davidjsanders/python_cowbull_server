@@ -10,16 +10,8 @@ ifndef COWBULL_SERVER
   override COWBULL_SERVER := localhost
 endif
 
-ifndef COWBULL_SERVER_IMAGE
-  override COWBULL_SERVER_IMAGE := dsanderscan/cowbull:20.03-2
-endif
-
 ifndef COWBULL_SERVER_URL
   override COWBULL_SERVER_URL := http://localhost
-endif
-
-ifndef COWBULL_WEBAPP_PORT
-  override COWBULL_WEBAPP_PORT := 8080
 endif
 
 ifndef GAE_BUCKET
@@ -42,14 +34,6 @@ ifndef HOMEDIR
   override HOMEDIR := $(shell echo ~)
 endif
 
-ifndef HOST_IF
-  override HOST_IF := en3
-endif
-
-ifndef HOST_IP
-  override HOST_IP := $(shell ipconfig getifaddr $(HOST_IF))
-endif
-
 ifndef IMAGE_NAME
   override IMAGE_NAME := cowbull
 endif
@@ -62,10 +46,6 @@ ifndef LOG_LEVEL
   override LOG_LEVEL := 30
 endif
 
-ifndef PERSISTER_VAR
-  override PERSISTER_VAR := '{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0, "password": ""}}'
-endif
-
 ifndef REDIS_IMAGE
   override REDIS_IMAGE := redis:alpine3.11
 endif
@@ -75,7 +55,7 @@ ifndef REDIS_PORT
 endif
 
 ifndef VENV
-	override VENV := $(HOMEDIR)/virtuals/cowbull_server/bin/activate
+	override VENV := $(HOMEDIR)/virtuals/cowbull_p3/bin/activate
 endif
 
 ifndef WORKDIR
@@ -83,19 +63,20 @@ ifndef WORKDIR
 endif
 
 define start_docker
-	docker run \
+	rm -f /tmp/start_docker.pid; \
+	pid=$(shell docker run \
 	  --detach \
-	  --name redis \
 	  -p $(REDIS_PORT):6379 \
-	  $(REDIS_IMAGE)
+	  $(REDIS_IMAGE)); \
+	echo "Started Redis in container $$pid"
 endef
 
 define stop_docker
 	echo; \
-	echo "Stopping Redis container "; \
-	docker stop redis; \
-	echo "Removing Redis container"; \
-	docker rm redis; \
+	echo -n "Stopping Redis container "; \
+	docker stop $$pid; \
+	echo -n "Removing Redis container "; \
+	docker rm $$pid; \
 	echo; \
 	echo
 endef
@@ -111,7 +92,7 @@ SHELL := /bin/bash
 P_PERSISTER := '{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0, "password": ""}}'
 # P_PERSISTER := '{"engine_name": "gcpdatastore", "parameters": {}}'
 
-.PHONY: build cloudbuild cloudrun curltest debug docker dump push run shell systest unittest
+.PHONY: build cloudbuild cloudlocal cloudrun cloudstop curltest debug docker dump push run shell systest unittest
 
 build:
 	@start="`date +"$(DATE_FORMAT)"`"; \
