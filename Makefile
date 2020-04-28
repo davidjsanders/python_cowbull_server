@@ -89,8 +89,9 @@ define end_log
 endef
 
 SHELL := /bin/bash
-P_PERSISTER := '{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0, "password": ""}}'
-# P_PERSISTER := '{"engine_name": "gcpdatastore", "parameters": {}}'
+REDIS_PERSISTER := '{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0, "password": ""}}'
+FILE_PERSISTER := '{"engine_name": "file", "parameters": {}}'
+DATASTORE_PERSISTER := '{"engine_name": "gcpdatastore", "parameters": {}}'
 
 .PHONY: build cloudbuild cloudlocal cloudrun cloudstop curltest debug docker dump push run shell systest unittest
 
@@ -124,7 +125,6 @@ cloudlocal:
 	    $(IMAGE_REG)/$(IMAGE_NAME):$(BUILD_NUMBER); \
 	enddate="`date +$(DATE_FORMAT)`"; \
 	$(call end_log,"build",$$start,$$enddate)
-# 
 
 cloudrun:
 	@start="`date +"$(DATE_FORMAT)"`"; \
@@ -163,16 +163,14 @@ curltest:
 debug:
 	@start="`date +"$(DATE_FORMAT)"`"; \
 	source $(VENV); \
-	$(call start_docker,10); \
 	PYTHONPATH=$(WORKDIR) \
 		LOGGING_LEVEL=10 \
-		PERSISTER=$(P_PERSISTER) \
+		PERSISTER=$(FILE_PERSISTER) \
 		PORT=$(COWBULL_PORT) \
 		FLASK_PORT=$(COWBULL_PORT) \
 		FLASK_DEBUG=true \
 		python main.py; \
 	deactivate; \
-	$(call stop_docker); \
 	enddate="`date +$(DATE_FORMAT)`"; \
 	$(call end_log,"debug",$$start,$$enddate)
 
@@ -188,7 +186,7 @@ docker:
 	  --env WORKERS=1 \
 	  --env PORT=8080 \
 	  --env LOGGING_LEVEL=$(LOG_LEVEL) \
-	  --env PERSISTER=$(P_PERSISTER) \
+	  --env PERSISTER=$(REDIS_PERSISTER) \
 	  $(IMAGE_REG)/$(IMAGE_NAME):$(BUILD_NUMBER); \
 	$(call stop_docker); \
 	enddate="`date +$(DATE_FORMAT)`"; \
@@ -200,7 +198,7 @@ dump:
 	PYTHONPATH=$(WORKDIR) \
 		LOGGING_LEVEL=$(LOG_LEVEL) \
 	    WORKERS=1 \
-		PERSISTER=$(P_PERSISTER) \
+		PERSISTER=$(FILE_PERSISTER) \
 		PORT=$(COWBULL_PORT) \
 		FLASK_PORT=$(COWBULL_PORT) \
 		FLASK_DEBUG=true \
@@ -216,23 +214,19 @@ push:
 	enddate="`date +$(DATE_FORMAT)`"; \
 	$(call end_log,"push",$$start,$$enddate)
 
-#		PERSISTER='{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0, "password": ""}}' \
-
 run:
 	@start="`date +"$(DATE_FORMAT)"`"; \
 	source $(VENV); \
-	$(call start_docker,30); \
 	PYTHONPATH=$(WORKDIR) \
 	    FLASK_DEBUG=False \
 		FLASK_ENV=run \
 	    WORKERS=1 \
 		LOGGING_LEVEL=$(LOG_LEVEL) \
-		PERSISTER=$(P_PERSISTER) \
+		PERSISTER=$(FILE_PERSISTER) \
 		PORT=$(COWBULL_PORT) \
 		FLASK_PORT=$(COWBULL_PORT) \
 		python main.py; \
 	deactivate; \
-	$(call stop_docker);  \
 	enddate="`date +$(DATE_FORMAT)`"; \
 	$(call end_log,"run",$$start,$$enddate)
 
@@ -246,7 +240,7 @@ shell:
 	    --env WORKERS=1 \
 		--env PORT=8080 \
 		--env LOGGING_LEVEL=$(LOG_LEVEL) \
-		--env PERSISTER=$(P_PERSISTER) \
+		--env PERSISTER=$(REDIS_PERSISTER) \
 	    --entrypoint=/bin/sh \
 		$(IMAGE_REG)/$(IMAGE_NAME):$(BUILD_NUMBER); \
 	$(call stop_docker);  \
@@ -259,7 +253,7 @@ systest:
 	$(call start_docker,30); \
 	PYTHONPATH=$(WORKDIR) \
 		LOGGING_LEVEL=$(LOG_LEVEL) \
-		PERSISTER=$(P_PERSISTER) \
+		PERSISTER=$(REDIS_PERSISTER) \
 		PORT=$(COWBULL_PORT) \
 		python systests/main.py; \
 	deactivate; \
