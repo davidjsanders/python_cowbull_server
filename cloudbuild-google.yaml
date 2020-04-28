@@ -9,17 +9,6 @@ steps:
   - --cache=true
   - --cache-ttl=24h
   - --destination=gcr.io/$PROJECT_ID/cowbull:${_BUILD_NUMBER}
-  - --dockerfile vendor/docker/Dockerfile
-# - name: 'gcr.io/cloud-builders/docker'
-#   args: [ 
-#     'build', 
-#     '-t', 
-#     'gcr.io/$PROJECT_ID/cowbull:${_BUILD_NUMBER}', 
-#     '-f',
-#     'vendor/docker/Dockerfile',
-#     '.' 
-#   ]
+  - --dockerfile=vendor/docker/Dockerfile
 substitutions:
-  _BUILD_NUMBER: "20.04-39"
-images:
-- 'gcr.io/$PROJECT_ID/cowbull:${_BUILD_NUMBER}'
+  _BUILD_NUMBER: "20.04-41"
