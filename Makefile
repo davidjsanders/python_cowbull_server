@@ -99,7 +99,7 @@ SHELL := /bin/bash
 P_PERSISTER := '{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0, "password": ""}}'
 # P_PERSISTER := '{"engine_name": "gcpdatastore", "parameters": {}}'
 
-.PHONY: build cloudbuild curltest debug docker dump push run shell systest unittest
+.PHONY: build cloudbuild cloudrun curltest debug docker dump push run shell systest unittest
 
 build:
 	@start="`date +"$(DATE_FORMAT)"`"; \
@@ -114,6 +114,24 @@ build:
 cloudbuild:
 	@start="`date +"$(DATE_FORMAT)"`"; \
 	gcloud builds submit --config=cloudbuild-google.yaml; \
+	enddate="`date +$(DATE_FORMAT)`"; \
+	$(call end_log,"build",$$start,$$enddate)
+
+cloudrun:
+	@start="`date +"$(DATE_FORMAT)"`"; \
+	gcloud run deploy cloudrun-make \
+	  --image=$(IMAGE_REG)/$(IMAGE_NAME):$(BUILD_NUMBER) \
+	  --allow-unauthenticated \
+	  --set-env-vars "^;^PERSISTER='{\"engine_name\": \"file\", \"parameters\": {}}'" \
+	  --set-env-vars LOGGING_LEVEL="10" \
+	  --platform managed \
+	  --region us-east1; \
+	enddate="`date +$(DATE_FORMAT)`"; \
+	$(call end_log,"build",$$start,$$enddate)
+
+cloudstop:
+	@start="`date +"$(DATE_FORMAT)"`"; \
+	gcloud run services delete -q cloudrun-make --platform managed --region us-east1 ; \
 	enddate="`date +$(DATE_FORMAT)`"; \
 	$(call end_log,"build",$$start,$$enddate)
 
