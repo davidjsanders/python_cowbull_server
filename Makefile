@@ -1,5 +1,5 @@
 ifndef BUILD_NUMBER
-  override BUILD_NUMBER := 20.04-35
+  override BUILD_NUMBER := 20.04-37
 endif
 
 ifndef COWBULL_PORT
@@ -99,7 +99,7 @@ SHELL := /bin/bash
 P_PERSISTER := '{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0, "password": ""}}'
 # P_PERSISTER := '{"engine_name": "gcpdatastore", "parameters": {}}'
 
-.PHONY: build curltest debug docker dump push run shell systest unittest
+.PHONY: build cloudbuild curltest debug docker dump push run shell systest unittest
 
 build:
 	@start="`date +"$(DATE_FORMAT)"`"; \
@@ -108,6 +108,12 @@ build:
 		--tag $(IMAGE_REG)/$(IMAGE_NAME):$(BUILD_NUMBER) \
 		-f vendor/docker/Dockerfile \
 		. ; \
+	enddate="`date +$(DATE_FORMAT)`"; \
+	$(call end_log,"build",$$start,$$enddate)
+
+cloudbuild:
+	@start="`date +"$(DATE_FORMAT)"`"; \
+	gcloud builds submit --config=cloudbuild-google.yaml; \
 	enddate="`date +$(DATE_FORMAT)`"; \
 	$(call end_log,"build",$$start,$$enddate)
 

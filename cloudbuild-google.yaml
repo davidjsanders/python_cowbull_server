@@ -1,5 +1,5 @@
 steps:
-- name: 'python:3.6.10-alpine3.11'
+- name: 'python:3.8.2-buster'
   args: [
     '/bin/sh',
     './cloudbuild_test.sh'
@@ -14,6 +14,6 @@ steps:
     '.' 
   ]
 substitutions:
-  _BUILD_NUMBER: "20.04-35"
+  _BUILD_NUMBER: "20.04-37"
 images:
 - 'gcr.io/$PROJECT_ID/cowbull:${_BUILD_NUMBER}'

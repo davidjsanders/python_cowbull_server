@@ -97,8 +97,8 @@ spec:
           value: "8080"
         - name: WORKERS
           value: "1"
-        image: gcr.io/djsanders-dev-spaces/cowbull:20.04-35
-        # image: dsanderscan/cowbull:20.04-35
+        image: gcr.io/djsanders-dev-spaces/cowbull:20.04-37
+        # image: dsanderscan/cowbull:20.04-37
         imagePullPolicy: IfNotPresent
         livenessProbe:
           exec:
@@ -184,7 +184,7 @@ spec:
         #   value: "bg-success"
         - name: NAVBAR_COLOUR
           value: "bg-primary"
-        image: dsanderscan/cowbull_webapp:20.04-35
+        image: dsanderscan/cowbull_webapp:20.04-37
         imagePullPolicy: IfNotPresent
         livenessProbe:
           exec:
