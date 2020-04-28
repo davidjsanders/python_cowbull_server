@@ -22,6 +22,18 @@ ifndef COWBULL_WEBAPP_PORT
   override COWBULL_WEBAPP_PORT := 8080
 endif
 
+ifndef GAE_BUCKET
+  override GAE_BUCKET := the-bucket
+endif
+
+ifndef GAE_CREDENTIALS
+  override GAE_CREDENTIALS := /tmp/keys/key.json
+endif
+
+ifndef GAE_PROJECT
+  override GAE_PROJECT := the-project
+endif
+
 ifndef DATE_FORMAT
   override DATE_FORMAT := %Y-%m-%dT%H:%M:%S%Z
 endif
@@ -116,6 +128,22 @@ cloudbuild:
 	gcloud builds submit --config=cloudbuild-google.yaml; \
 	enddate="`date +$(DATE_FORMAT)`"; \
 	$(call end_log,"build",$$start,$$enddate)
+
+cloudlocal:
+	@start="`date +"$(DATE_FORMAT)"`"; \
+	docker run \
+	    --name cowbull-server \
+		--rm \
+		-it \
+	    -p 9090:8080 \
+	    -e PERSISTER='{"engine_name": "gaestorage", "parameters":{"bucket": "$(GAE_BUCKET)", "credentials_file": "/tmp/keys/key.json", "project": "$(GAE_PROJECT)"}}' \
+	    -e PORT=8080 \
+	    -e GOOGLE_APPLICATION_CREDENTIALS=/tmp/keys/key.json \
+		-v $(GAE_CREDENTIALS):/tmp/keys/key.json \
+	    $(IMAGE_REG)/$(IMAGE_NAME):$(BUILD_NUMBER); \
+	enddate="`date +$(DATE_FORMAT)`"; \
+	$(call end_log,"build",$$start,$$enddate)
+# 
 
 cloudrun:
 	@start="`date +"$(DATE_FORMAT)"`"; \
