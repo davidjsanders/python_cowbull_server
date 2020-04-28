@@ -95,6 +95,7 @@ define end_log
 	echo
 endef
 
+SHELL := /bin/bash
 P_PERSISTER := '{"engine_name": "redis", "parameters": {"host": "localhost", "port": 6379, "db": 0, "password": ""}}'
 # P_PERSISTER := '{"engine_name": "gcpdatastore", "parameters": {}}'
 
